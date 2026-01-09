@@ -5,6 +5,9 @@ import Login from "../auth/Login";
 import { NotFound } from "../not-found/NotFound";
 import HomePage from "../home/HomePage";
 import DocumentPage from "../docs/DocumentPage";
+import UserPage from "../user/UserPage";
+import SettingsPage from "../settings/SettingsPage";
+import { ProtectedRole } from "../utils/ProtectedRole";
 
 export const router = createBrowserRouter([
   {
@@ -22,7 +25,11 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <HomePage />,
+        element: (
+          <ProtectedRole allowedRoles={[]}>
+            <HomePage />
+          </ProtectedRole>
+        ),
       },
       {
         path: "docs",
@@ -30,11 +37,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "users",
-        element: <div>Users</div>,
+        element: <UserPage />,
       },
       {
         path: "settings",
-        element: <div>Settings</div>,
+        element: <SettingsPage />,
       }
     ],
   },

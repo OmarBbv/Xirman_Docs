@@ -1,0 +1,14 @@
+{
+  "Layout": {
+    "dashboard": "Ana Səhifə",
+    "docs": "Sənədlər",
+    "users": "İstifadəçilər",
+    "settings": "Ayarlar",
+    "collapse_menu": "Menünü yığ",
+    "expand_menu": "Menünü aç",
+    "admin_panel": "İdarə Paneli",
+    "logout": "Çıxış",
+    "notifications": "Bildiriş",
+    "greeting": "Salam"
+  }
+}

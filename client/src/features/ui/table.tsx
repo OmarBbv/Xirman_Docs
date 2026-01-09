@@ -55,8 +55,8 @@ export const Table = ({ data }: TableProps) => {
               <td className="p-2 align-top">
                 <span
                   className={`px-2 py-0.5 rounded-sm text-[11px] font-medium ${item.status === "Dərc edilib"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-gray-100 text-gray-600"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-gray-100 text-gray-600"
                     }`}
                 >
                   {item.status}
@@ -65,7 +65,7 @@ export const Table = ({ data }: TableProps) => {
             </tr>
           ))}
         </tbody>
-        <tfoot>
+        {/* <tfoot>
           <tr className="bg-white">
             <th className="p-2 text-center">
               <input type="checkbox" className="border-[#8c8f94] cursor-pointer" />
@@ -75,7 +75,7 @@ export const Table = ({ data }: TableProps) => {
             <th className="p-2 font-bold">Tarix</th>
             <th className="p-2 font-bold">Status</th>
           </tr>
-        </tfoot>
+        </tfoot> */}
       </table>
     </div>
   );

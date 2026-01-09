@@ -1,0 +1,14 @@
+{
+  "Layout": {
+    "dashboard": "Dashboard",
+    "docs": "Documents",
+    "users": "Users",
+    "settings": "Settings",
+    "collapse_menu": "Collapse Menu",
+    "expand_menu": "Expand Menu",
+    "admin_panel": "Admin Panel",
+    "logout": "Logout",
+    "notifications": "Notifications",
+    "greeting": "Hello"
+  }
+}
