@@ -6,9 +6,10 @@ interface TableProps {
     date: string;
     status: string;
   }[];
+  actions?: string[]
 }
 
-export const Table = ({ data }: TableProps) => {
+export const Table = ({ data, actions }: TableProps) => {
   return (
     <div className="border border-[#c3c4c7] bg-white overflow-x-auto">
       <table className="w-full text-left text-[13px] border-collapse">
@@ -38,11 +39,9 @@ export const Table = ({ data }: TableProps) => {
                 </div>
                 {/* Action Links - Visible on Hover */}
                 <div className="flex items-center space-x-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity text-[11px]">
-                  <span className="text-[#2271b1] cursor-pointer hover:text-[#135e96]">Düzəliş et</span>
-                  <span className="text-[#c3c4c7]">|</span>
-                  <span className="text-[#2271b1] cursor-pointer hover:text-[#135e96]">Sürətli düzəliş</span>
-                  <span className="text-[#c3c4c7]">|</span>
-                  <span className="text-[#b32d2e] cursor-pointer hover:text-[#d63638]">Zibil qutusuna at</span>
+                  {actions?.map((action) => (
+                    <span key={action} className="text-[#2271b1] cursor-pointer hover:text-[#135e96]">{action}</span>
+                  ))}
                   <span className="text-[#c3c4c7]">|</span>
                   <span className="text-[#2271b1] cursor-pointer hover:text-[#135e96]">Bax</span>
                 </div>

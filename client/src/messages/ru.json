@@ -1,0 +1,14 @@
+{
+  "Layout": {
+    "dashboard": "Главная",
+    "docs": "Документы",
+    "users": "Пользователи",
+    "settings": "Настройки",
+    "collapse_menu": "Свернуть меню",
+    "expand_menu": "Развернуть меню",
+    "admin_panel": "Панель управления",
+    "logout": "Выход",
+    "notifications": "Уведомление",
+    "greeting": "Привет"
+  }
+}

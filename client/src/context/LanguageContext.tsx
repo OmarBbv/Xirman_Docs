@@ -1,10 +1,10 @@
-import { createContext, useState, useContext, } from "react";
+import { createContext, useState, useContext } from "react";
 import type { ReactNode } from "react";
 import { IntlProvider } from "use-intl";
 import azMessages from "../messages/az.json";
-import enMessages from "../messages/en.json";
+import ruMessages from "../messages/ru.json";
 
-type Locale = "az" | "en";
+type Locale = "az" | "ru";
 
 interface LanguageContextType {
   locale: Locale;
@@ -15,7 +15,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 const messages = {
   az: azMessages,
-  en: enMessages,
+  ru: ruMessages,
 };
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
