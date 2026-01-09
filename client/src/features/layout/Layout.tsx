@@ -109,7 +109,7 @@ export default function Layout() {
         </header>
 
         {/* Content Body */}
-        <main className="flex-1 overflow-y-auto p-5 max-w-[1500px]">
+        <main className="flex-1 overflow-y-auto p-5 max-w-[1800px]">
           <header className="mb-6">
             <h1 className="text-[23px] font-normal text-[#1d2327]">{t('admin_panel')}</h1>
           </header>
