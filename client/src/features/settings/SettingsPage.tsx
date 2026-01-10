@@ -8,130 +8,238 @@ export default function SettingsPage() {
   const [activeTab, setActiveTab] = useState<TabType>("profile");
 
   const sessionLogs = [
-    { id: 1, ip: "192.168.1.45", date: "2024/01/09 10:24", status: "Aktiv" },
-    { id: 2, ip: "172.20.10.2", date: "2024/01/08 14:15", status: "Bağlanıb" },
-    { id: 3, ip: "192.168.1.45", date: "2024/01/07 09:40", status: "Bağlanıb" },
+    { id: 1, ip: "192.168.1.45", date: "2024/01/09 10:24", status: "Aktiv", device: "Chrome - Windows" },
+    { id: 2, ip: "172.20.10.2", date: "2024/01/08 14:15", status: "Bağlanıb", device: "Safari - MacOS" },
+    { id: 3, ip: "192.168.1.45", date: "2024/01/07 09:40", status: "Bağlanıb", device: "Firefox - Linux" },
   ];
 
   return (
-    <div className="max-w-4xl animate-in fade-in duration-500">
-      <header className="mb-6">
-        <h1 className="text-[23px] font-normal text-[#1d2327]">Ayarlar</h1>
-      </header>
-
-      <div className="flex border-b border-[#c3c4c7] mb-8 bg-white/50">
-        {[
-          { id: "profile", label: "Şəxsi Məlumatlar" },
-          { id: "security", label: "Təhlükəsizlik" },
-          { id: "app", label: "Tətbiq Tənzimləmələri" },
-        ].map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id as TabType)}
-            className={`px-6 py-3 text-sm font-medium transition-all relative cursor-pointer ${activeTab === tab.id
-              ? "text-[#2271b1] border-b-2 border-[#2271b1] bg-white"
-              : "text-[#50575e] hover:text-[#2271b1] hover:bg-white/40"
-              }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+    <div className="space-y-6 animate-in fade-in duration-500">
+      {/* Modern Header Section */}
+      <div className="bg-linear-to-br from-[#2271b1] to-[#135e96] rounded-lg shadow-lg p-8 text-white">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold mb-2">Parametrlər</h1>
+            <p className="text-blue-100 text-sm">Hesab və tətbiq ayarlarınızı idarə edin</p>
+          </div>
+          <div className="flex items-center gap-3">
+            <button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 hover:bg-white/20">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Sıfırla
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="bg-white border border-[#c3c4c7] shadow-sm p-8 rounded-sm">
-        {activeTab === "profile" && (
-          <div className="space-y-8 max-w-2xl">
-            <div className="flex items-center space-x-6">
-              <div className="w-24 h-24 rounded-full bg-[#1a73e8] flex items-center justify-center text-white text-3xl font-bold shadow-lg">
-                AD
+      {/* Enhanced Tab Navigation */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+        <div className="flex border-b border-gray-200">
+          {[
+            {
+              id: "profile", label: "Şəxsi Məlumatlar", icon: (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              )
+            },
+            {
+              id: "security", label: "Təhlükəsizlik", icon: (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              )
+            },
+            {
+              id: "app", label: "Tətbiq Tənzimləmələri", icon: (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              )
+            },
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as TabType)}
+              className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-all relative ${activeTab === tab.id
+                ? "text-[#2271b1] border-b-2 border-[#2271b1] bg-blue-50"
+                : "text-gray-600 hover:text-[#2271b1] hover:bg-gray-50"
+                }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Tab Content */}
+        <div className="p-8">
+          {activeTab === "profile" && (
+            <div className="space-y-8 max-w-3xl">
+              <div className="flex items-center gap-6 p-6 bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+                <div className="w-24 h-24 rounded-full bg-gradient-to-br from-[#2271b1] to-[#135e96] flex items-center justify-center text-white text-3xl font-bold shadow-lg ring-4 ring-white">
+                  AD
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-lg font-bold text-gray-900 mb-1">Admin User</h3>
+                  <p className="text-sm text-gray-600 mb-3">admin@xirman.az</p>
+                  <div className="flex items-center gap-3">
+                    <button className="px-4 py-2 text-sm font-medium bg-white text-[#2271b1] border border-[#2271b1] rounded-lg hover:bg-blue-50 transition-all">
+                      Şəkli dəyiş
+                    </button>
+                    <span className="text-xs text-gray-500">Maks. 2MB (JPG, PNG)</span>
+                  </div>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Button className="py-2 px-4 text-xs bg-white text-[#2271b1] border border-[#2271b1] hover:bg-[#f0f6fa]">
-                  Şəkli dəyiş
-                </Button>
-                <p className="text-[11px] text-[#50575e]">Maksimal ölçü 2MB. Format: JPG, PNG</p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <Input type="text" label="Ad" placeholder="Adınız" defaultValue="Admin" />
+                <Input type="text" label="Soyad" placeholder="Soyadınız" defaultValue="User" />
+                <div className="md:col-span-2">
+                  <Input type="email" label="E-mail" placeholder="E-mail ünvanınız" defaultValue="admin@xirman.az" disabled />
+                </div>
+                <Input type="text" label="Telefon" placeholder="+994 XX XXX XX XX" defaultValue="+994 50 123 45 67" />
+                <Input type="text" label="Vəzifə" placeholder="Vəzifəniz" defaultValue="Sistem Administratoru" />
+              </div>
+
+              <div className="pt-6 border-t border-gray-200 flex items-center justify-between">
+                <p className="text-sm text-gray-500">Son dəyişiklik: 09/01/2024, 10:24</p>
+                <Button className="px-8 py-3 font-semibold shadow-sm">Yadda saxla</Button>
               </div>
             </div>
+          )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <Input type="text" label="Ad" placeholder="Ad" defaultValue="Admin" />
-              <Input type="text" label="Soyad" placeholder="Soyad" defaultValue="User" />
-              <Input type="email" label="E-mail" placeholder="E-mail" defaultValue="admin@xirman.az" disabled className="md:col-span-2" />
-            </div>
+          {activeTab === "security" && (
+            <div className="space-y-8 max-w-3xl">
+              <div className="bg-amber-50 border border-amber-200 rounded-lg p-4 flex items-start gap-3">
+                <svg className="w-5 h-5 text-amber-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+                <div>
+                  <h4 className="text-sm font-semibold text-amber-900 mb-1">Şifrə Təhlükəsizliyi</h4>
+                  <p className="text-xs text-amber-700">Güclü şifrə istifadə edin: ən azı 8 xarakter, böyük/kiçik hərf və rəqəm daxil edin.</p>
+                </div>
+              </div>
 
-            <div className="pt-4 border-t border-gray-100">
-              <Button className="px-8 py-3 font-semibold">Yadda saxla</Button>
-            </div>
-          </div>
-        )}
+              <div className="space-y-6">
+                <h3 className="text-lg font-bold text-gray-900 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-[#2271b1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                  </svg>
+                  Şifrəni Dəyiş
+                </h3>
+                <div className="grid grid-cols-1 gap-5 max-w-md">
+                  <Input type="password" label="Cari şifrə" placeholder="Cari şifrənizi daxil edin" />
+                  <Input type="password" label="Yeni şifrə" placeholder="Yeni şifrənizi daxil edin" />
+                  <Input type="password" label="Yeni şifrə (Təkrar)" placeholder="Yeni şifrəni təkrar edin" />
+                </div>
+                <Button className="px-8 py-3 font-semibold shadow-sm">Şifrəni Yenilə</Button>
+              </div>
 
-        {activeTab === "security" && (
-          <div className="space-y-8">
-            <div className="max-w-md space-y-6">
-              <h3 className="text-lg font-bold text-[#1d2327]">Şifrəni Dəyiş</h3>
-              <Input type="password" label="Cari şifrə" placeholder="Cari şifrə" />
-              <Input type="password" label="Yeni şifrə" placeholder="Yeni şifrə" />
-              <Input type="password" label="Yeni şifrə (Təkrar)" placeholder="Yeni şifrə (Təkrar)" />
-              <Button className="px-8 py-3 font-semibold">Şifrəni Yenilə</Button>
-            </div>
-
-            <div className="pt-8 border-t border-gray-100">
-              <h3 className="text-lg font-bold text-[#1d2327] mb-4">Son Giriş Hərəkətləri</h3>
-              <div className="border border-[#c3c4c7] rounded-sm overflow-hidden">
-                <table className="w-full text-left text-[13px] border-collapse">
-                  <thead>
-                    <tr className="bg-[#f6f7f7] border-b border-[#c3c4c7]">
-                      <th className="p-3 font-bold">IP Ünvanı</th>
-                      <th className="p-3 font-bold">Tarix</th>
-                      <th className="p-3 font-bold">Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sessionLogs.map((log) => (
-                      <tr key={log.id} className="border-b border-[#f0f0f1] last:border-0 hover:bg-[#f6f7f7] transition-colors">
-                        <td className="p-3 font-medium text-[#2271b1]">{log.ip}</td>
-                        <td className="p-3 text-[#50575e]">{log.date}</td>
-                        <td className="p-3">
-                          <span className={`${log.status === "Aktiv" ? "text-green-600 font-bold" : "text-gray-400"}`}>
-                            {log.status}
-                          </span>
-                        </td>
+              <div className="pt-8 border-t border-gray-200">
+                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-[#2271b1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  Son Giriş Hərəkətləri
+                </h3>
+                <div className="border border-gray-200 rounded-lg overflow-hidden">
+                  <table className="w-full text-left text-sm">
+                    <thead>
+                      <tr className="bg-gray-50 border-b border-gray-200">
+                        <th className="p-4 font-semibold text-gray-700">IP Ünvanı</th>
+                        <th className="p-4 font-semibold text-gray-700">Cihaz</th>
+                        <th className="p-4 font-semibold text-gray-700">Tarix</th>
+                        <th className="p-4 font-semibold text-gray-700">Status</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody>
+                      {sessionLogs.map((log) => (
+                        <tr key={log.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
+                          <td className="p-4 font-medium text-[#2271b1]">{log.ip}</td>
+                          <td className="p-4 text-gray-600">{log.device}</td>
+                          <td className="p-4 text-gray-600">{log.date}</td>
+                          <td className="p-4">
+                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${log.status === "Aktiv"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-gray-100 text-gray-600"
+                              }`}>
+                              {log.status === "Aktiv" && (
+                                <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+                              )}
+                              {log.status}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {activeTab === "app" && (
-          <div className="space-y-8 max-w-md">
-            <div>
-              <h3 className="text-lg font-bold text-[#1d2327] mb-2">Dil Seçimi</h3>
-              <p className="text-sm text-[#50575e] mb-6">Sistemin interfeys dilini seçin.</p>
+          {activeTab === "app" && (
+            <div className="space-y-8 max-w-2xl">
+              <div>
+                <h3 className="text-lg font-bold text-gray-900 mb-2 flex items-center gap-2">
+                  <svg className="w-5 h-5 text-[#2271b1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+                  </svg>
+                  Dil Seçimi
+                </h3>
+                <p className="text-sm text-gray-600 mb-6">Sistemin interfeys dilini seçin</p>
 
-              <div className="space-y-3">
-                {[
-                  { id: "az", label: "Azərbaycan dili", flag: "🇦🇿" },
-                  { id: "ru", label: "Русский язык", flag: "🇷🇺" },
-                ].map((lang) => (
-                  <label key={lang.id} className="flex items-center justify-between p-4 border border-[#dadce0] rounded-lg cursor-pointer hover:bg-[#f0f6fa] transition-all group has-[:checked]:border-[#2271b1] has-[:checked]:bg-[#f0f6fa]">
-                    <div className="flex items-center space-x-3">
-                      <span className="text-2xl">{lang.flag}</span>
-                      <span className="font-medium text-[#202124]">{lang.label}</span>
+                <div className="space-y-3">
+                  {[
+                    { id: "az", label: "Azərbaycan dili", flag: "🇦🇿" },
+                    { id: "ru", label: "Русский язык", flag: "🇷🇺" },
+                    { id: "en", label: "English", flag: "🇬🇧" },
+                  ].map((lang) => (
+                    <label key={lang.id} className="flex items-center justify-between p-5 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-[#2271b1] hover:bg-blue-50 transition-all group has-[:checked]:border-[#2271b1] has-[:checked]:bg-blue-50">
+                      <div className="flex items-center gap-4">
+                        <span className="text-3xl">{lang.flag}</span>
+                        <span className="font-medium text-gray-900">{lang.label}</span>
+                      </div>
+                      <input
+                        type="radio"
+                        name="lang"
+                        defaultChecked={lang.id === "az"}
+                        className="w-5 h-5 text-[#2271b1] focus:ring-2 focus:ring-[#2271b1] cursor-pointer"
+                      />
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-8 border-t border-gray-200">
+                <h3 className="text-lg font-bold text-gray-900 mb-6">Digər Tənzimləmələr</h3>
+                <div className="space-y-4">
+                  <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="font-medium text-gray-900">E-mail bildirişləri</p>
+                      <p className="text-sm text-gray-600">Yeni sənəd və tapşırıqlar haqqında bildiriş al</p>
                     </div>
-                    <input type="radio" name="lang" defaultChecked={lang.id === "az"} className="w-4 h-4 text-[#2271b1] focus:ring-[#2271b1] cursor-pointer" />
+                    <input type="checkbox" defaultChecked className="w-5 h-5 text-[#2271b1] rounded focus:ring-2 focus:ring-[#2271b1]" />
                   </label>
-                ))}
+                  <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                    <div>
+                      <p className="font-medium text-gray-900">İki faktorlu autentifikasiya</p>
+                      <p className="text-sm text-gray-600">Hesabınızı daha təhlükəsiz edin</p>
+                    </div>
+                    <input type="checkbox" className="w-5 h-5 text-[#2271b1] rounded focus:ring-2 focus:ring-[#2271b1]" />
+                  </label>
+                </div>
+              </div>
+
+              <div className="pt-6 border-t border-gray-200">
+                <Button className="px-8 py-3 font-semibold shadow-sm">Dəyişiklikləri Yadda Saxla</Button>
               </div>
             </div>
-
-            <div className="pt-6 border-t border-gray-100">
-              <Button className="px-8 py-3 font-semibold">Deşiklikləri Yadda Saxla</Button>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
