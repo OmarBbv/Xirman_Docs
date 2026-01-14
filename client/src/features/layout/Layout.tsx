@@ -1,34 +1,38 @@
 import { useState } from "react";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useTranslations } from "use-intl";
 import { HomeIcon, PostsIcon, UsersIcon, SettingsIcon } from "../ui/Icons";
 import { useLanguage } from "../../context/LanguageContext";
 import { Sidebar } from "./Sidebar";
+import { useAuth } from "../../context/AuthContext";
 
 export default function Layout() {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const t = useTranslations('Layout');
   const { locale, setLocale } = useLanguage();
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const menuItems = [
     {
       name: t('dashboard'),
       path: "/dashboard",
       icon: <HomeIcon />,
-      allowedRoles: [
-        // 'admin'
-      ]
+      allowedRoles: ['admin']
     },
     { name: t('docs'), path: "/dashboard/docs", icon: <PostsIcon />, allowedRoles: [] },
-    { name: t('users'), path: "/dashboard/users", icon: <UsersIcon />, allowedRoles: [] },
+    { name: t('users'), path: "/dashboard/users", icon: <UsersIcon />, allowedRoles: ['admin'] },
     { name: t('settings'), path: "/dashboard/settings", icon: <SettingsIcon />, allowedRoles: [] },
   ];
 
-
+  const filteredMenuItems = menuItems.filter(item => {
+    if (item.allowedRoles.length === 0) return true;
+    return user && item.allowedRoles.includes(user.role);
+  });
 
   return (
     <div className="flex h-screen bg-[#f0f0f1] font-sans text-[#1d2327]">
-      <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} menuItems={menuItems} />
+      <Sidebar isCollapsed={isCollapsed} setIsCollapsed={setIsCollapsed} menuItems={filteredMenuItems} />
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
@@ -52,9 +56,28 @@ export default function Layout() {
               <option value="az">AZ</option>
               <option value="ru">RU</option>
             </select>
-            <div className="flex items-center cursor-pointer transition-colors space-x-2 hover:bg-white/10 px-2 py-1 rounded">
-              <span className="text-[13px]">{t('greeting')}, <span className="font-bold">admin</span></span>
-              <div className="w-5 h-5 rounded bg-gray-600"></div>
+            <div className="group relative flex items-center cursor-pointer transition-colors space-x-2 hover:bg-white/10 px-2 py-1 h-full">
+              <span className="text-[13px]">{t('greeting')}, <span className="font-bold">{user?.firstName || 'İstifadəçi'}</span></span>
+              <div className="w-5 h-5 rounded bg-gray-600 flex items-center justify-center text-[10px] font-bold">
+                {user?.firstName?.[0]}{user?.lastName?.[0]}
+              </div>
+
+              {/* Profile Dropdown */}
+              <div className="absolute right-0 top-[32px] w-48 bg-white border border-[#c3c4c7] shadow-lg hidden group-hover:block z-50 py-1">
+                <div className="px-4 py-2 border-b border-[#f0f0f1]">
+                  <p className="text-sm font-bold text-[#1d2327] truncate">{user?.firstName} {user?.lastName}</p>
+                  <p className="text-xs text-[#50575e] truncate">{user?.email}</p>
+                </div>
+                <button
+                  onClick={() => {
+                    logout();
+                    navigate('/login');
+                  }}
+                  className="w-full text-left px-4 py-2 text-sm text-[#d63638] hover:bg-[#f0f0f1] transition-colors"
+                >
+                  Çıxış et
+                </button>
+              </div>
             </div>
           </div>
         </header>

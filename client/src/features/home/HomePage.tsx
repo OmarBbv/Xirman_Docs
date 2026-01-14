@@ -1,40 +1,58 @@
+import { useNavigate } from "react-router-dom";
 import { Table } from "../ui/table";
+import { useDocuments, useDocumentStats, useRecentActivities } from "../hooks/documentHooks";
+import { Spin } from "antd";
 
 export default function HomePage() {
-  const recentDocs = [
-    { id: 1, title: "Müqavilə_32.pdf", author: "Elvin Hüseynli", date: "10 dk əvvəl", status: "Dərc edilib" },
-    { id: 2, title: "Təchizat_Siyahısı.xlsx", author: "Admin", date: "1 saat əvvəl", status: "Qaralama" },
-    { id: 3, title: "İllik_Hesabat_2023.docx", author: "Omar", date: "3 saat əvvəl", status: "Dərc edilib" },
-  ];
+  const navigate = useNavigate();
 
-  const activities = [
-    { id: 1, user: "Elvin Hüseynli", action: "'Müqavilə_32.pdf' belgesine baxdı", time: "10 dk əvvəl", color: "bg-blue-500" },
-    { id: 2, user: "Admin", action: "Yeni istifadəçi əlavə etdi (Leyla M.)", time: "25 dk əvvəl", color: "bg-green-500" },
-    { id: 3, user: "Omar", action: "'İllik_Hesabat' silindi", time: "1 saat əvvəl", color: "bg-red-500" },
-    { id: 4, user: "Admin", action: "Sistem parametrlərini güncəllədi", time: "2 saat əvvəl", color: "bg-orange-500" },
-  ];
+  // Real data hooks
+  const { data: statsData, isLoading: isStatsLoading } = useDocumentStats();
+  const { data: recentDocsData, isLoading: isDocsLoading } = useDocuments({ page: 1, limit: 5 });
+  const { data: activities, isLoading: isActivitiesLoading } = useRecentActivities();
+
+  if (isStatsLoading || isDocsLoading || isActivitiesLoading) {
+    return (
+      <div className="flex justify-center items-center h-full min-h-[400px]">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  // Format charts data
+  const documentTypeData = [
+    { label: "PDF Sənədlər", value: statsData?.pdfCount || 0, color: "bg-[#2271b1]", lightColor: "bg-blue-100" },
+    { label: "Word (DOCX)", value: statsData?.wordCount || 0, color: "bg-[#34A853]", lightColor: "bg-green-100" },
+    { label: "Excel (XLSX)", value: statsData?.excelCount || 0, color: "bg-[#FBBC05]", lightColor: "bg-yellow-100" },
+    { label: "Digər", value: statsData?.otherCount || 0, color: "bg-[#EA4335]", lightColor: "bg-red-100" },
+  ].map(item => ({
+    ...item,
+    percentage: statsData?.total ? Math.round((item.value / statsData.total) * 100) : 0
+  })).sort((a, b) => b.value - a.value);
+
+  // Recent Docs formatted for generic Table
+  const formattedRecentDocs = recentDocsData?.data?.map(doc => ({
+    id: doc.id,
+    title: doc.fileName,
+    author: `${doc.uploadedBy?.firstName} ${doc.uploadedBy?.lastName}`,
+    date: new Date(doc.uploadedAt).toLocaleString('az-AZ'),
+    status: doc.amount ? `${doc.amount} AZN` : 'Məbləğ yoxdur'
+  })) || [];
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       {/* Welcome Section - Modern Header */}
-      <div className="bg-gradient-to-br from-[#2271b1] to-[#135e96] rounded-lg shadow-lg p-8 text-white">
+      <div className="bg-linear-to-br from-[#2271b1] to-[#135e96] rounded-lg shadow-lg p-8 text-white">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex-1">
             <h1 className="text-3xl font-bold mb-2">Xoş gəldiniz, Admin</h1>
             <p className="text-blue-100 text-sm">Sistemin ümumi vəziyyəti və son hərəkətlər burada görüntülənir</p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Sənəd axtar..."
-                className="pl-10 pr-4 py-2.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-sm text-white placeholder-blue-200 focus:bg-white/20 focus:border-white/40 outline-none transition-all w-64"
-              />
-              <svg className="w-4 h-4 absolute left-3 top-3 text-blue-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
-            <button className="bg-white text-[#2271b1] px-5 py-2.5 rounded-lg text-sm font-semibold shadow-md transition-all flex items-center gap-2 whitespace-nowrap">
+            <button
+              onClick={() => navigate('/dashboard/docs/new')}
+              className="bg-white text-[#2271b1] px-5 py-2.5 rounded-lg text-sm font-semibold shadow-md transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer hover:bg-blue-50"
+            >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
               </svg>
@@ -49,59 +67,51 @@ export default function HomePage() {
         {[
           {
             label: "Toplam Sənəd",
-            value: "1,284",
-            trend: "+12%",
-            trendLabel: "bu ay",
+            value: statsData?.total || 0,
+            trend: "Ümumi",
+            bgLight: "bg-blue-50",
+            textColor: "text-blue-600",
             icon: (
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             ),
-            gradient: "from-blue-500 to-blue-600",
-            bgLight: "bg-blue-50",
-            textColor: "text-blue-600"
           },
           {
             label: "Toplam Məbləğ",
-            value: "42,500 ₼",
-            trend: "+5%",
-            trendLabel: "keçən ay",
+            value: `${statsData?.totalAmount || 0} ₼`,
+            trend: "Cəmi",
+            bgLight: "bg-emerald-50",
+            textColor: "text-emerald-600",
             icon: (
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             ),
-            gradient: "from-emerald-500 to-emerald-600",
-            bgLight: "bg-emerald-50",
-            textColor: "text-emerald-600"
           },
           {
             label: "Aktiv İstifadəçilər",
-            value: "18",
-            trend: "+3",
-            trendLabel: "son 24 saat",
+            value: statsData?.activeUsers || 0,
+            trend: "Son 24 saat",
+            bgLight: "bg-purple-50",
+            textColor: "text-purple-600",
             icon: (
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
             ),
-            gradient: "from-purple-500 to-purple-600",
-            bgLight: "bg-purple-50",
-            textColor: "text-purple-600"
           },
           {
-            label: "Gözləyən Tapşırıqlar",
-            value: "5",
-            trend: "3",
-            trendLabel: "təcili",
+            label: "Digər Sənədlər",
+            value: statsData?.otherCount || 0,
+            trend: "Formatlar",
+            bgLight: "bg-amber-50",
+            textColor: "text-amber-600",
             icon: (
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             ),
-            gradient: "from-amber-500 to-amber-600",
-            bgLight: "bg-amber-50",
-            textColor: "text-amber-600"
           },
         ].map((stat, i) => (
           <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-all duration-200 hover:shadow-md hover:border-gray-300">
@@ -111,14 +121,11 @@ export default function HomePage() {
                   {stat.icon}
                 </div>
               </div>
-              <div className={`text-xs font-semibold px-2 py-1 rounded ${stat.bgLight} ${stat.textColor}`}>
-                {stat.trend}
-              </div>
             </div>
             <div>
               <p className="text-sm text-gray-500 font-medium mb-1">{stat.label}</p>
               <h3 className="text-2xl font-bold text-gray-900">{stat.value}</h3>
-              <p className="text-xs text-gray-400 mt-1">{stat.trendLabel}</p>
+              <p className="text-xs text-gray-400 mt-1">{stat.trend}</p>
             </div>
           </div>
         ))}
@@ -130,29 +137,21 @@ export default function HomePage() {
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-bold text-gray-900">Sənəd Növü Dağılımı</h3>
-            <button className="text-sm text-gray-500 hover:text-gray-700 font-medium">
-              Detallar
-            </button>
           </div>
           <div className="space-y-5">
-            {[
-              { label: "PDF Sənədlər", value: 65, count: "834", color: "bg-[#2271b1]", lightColor: "bg-blue-100" },
-              { label: "Excel (XLSX)", value: 45, count: "578", color: "bg-[#34A853]", lightColor: "bg-green-100" },
-              { label: "Word (DOCX)", value: 30, count: "385", color: "bg-[#FBBC05]", lightColor: "bg-yellow-100" },
-              { label: "Digər", value: 15, count: "193", color: "bg-[#EA4335]", lightColor: "bg-red-100" },
-            ].map((bar, i) => (
+            {documentTypeData.map((bar, i) => (
               <div key={i} className="space-y-2">
                 <div className="flex justify-between items-center text-sm">
                   <span className="font-medium text-gray-700">{bar.label}</span>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-500">{bar.count} sənəd</span>
-                    <span className="font-bold text-gray-900">{bar.value}%</span>
+                    <span className="text-xs text-gray-500">{bar.value} sənəd</span>
+                    <span className="font-bold text-gray-900">{bar.percentage}%</span>
                   </div>
                 </div>
                 <div className={`h-3 w-full ${bar.lightColor} rounded-full overflow-hidden`}>
                   <div
                     className={`h-full ${bar.color} rounded-full transition-all duration-1000 ease-out`}
-                    style={{ width: `${bar.value}%` }}
+                    style={{ width: `${bar.percentage}%` }}
                   ></div>
                 </div>
               </div>
@@ -160,90 +159,54 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Company Distribution - Enhanced */}
+        {/* Recent Activity */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold text-gray-900">Şirkətlərə Görə Dağılım</h3>
-            <button className="text-sm text-gray-500 hover:text-gray-700 font-medium">
-              Detallar
-            </button>
-          </div>
-          <div className="flex items-center justify-center gap-8">
-            {/* Enhanced Pie Chart */}
+          <h3 className="text-lg font-bold text-gray-900 mb-4">Son Hərəkətlər</h3>
+          {activities && activities.length > 0 ? (
             <div className="relative">
-              <svg className="w-40 h-40 transform -rotate-90">
-                <circle cx="80" cy="80" r="60" fill="transparent" stroke="#e5e7eb" strokeWidth="32" />
-                <circle cx="80" cy="80" r="60" fill="transparent" stroke="#2271b1" strokeWidth="32" strokeDasharray="377" strokeDashoffset="75" className="transition-all duration-1000" />
-                <circle cx="80" cy="80" r="60" fill="transparent" stroke="#34A853" strokeWidth="32" strokeDasharray="377" strokeDashoffset="264" className="transition-all duration-1000" />
-                <circle cx="80" cy="80" r="60" fill="transparent" stroke="#FBBC05" strokeWidth="32" strokeDasharray="377" strokeDashoffset="339" className="transition-all duration-1000" />
-              </svg>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <div className="text-center">
-                  <p className="text-2xl font-bold text-gray-900">100%</p>
-                  <p className="text-xs text-gray-500">Toplam</p>
-                </div>
+              <div className="absolute left-[11px] top-2 bottom-2 w-px bg-gray-200"></div>
+              <div className="space-y-5 relative">
+                {activities.map((act) => (
+                  <div key={act.id} className="flex gap-4 items-start relative">
+                    <div className={`w-6 h-6 rounded-full bg-blue-500 ring-4 ring-white z-10 shrink-0 flex items-center justify-center shadow-sm`}>
+                      <div className="w-2 h-2 bg-white rounded-full"></div>
+                    </div>
+                    <div className="flex-1 pt-0.5">
+                      <p className="text-sm text-gray-900">
+                        <span className="font-semibold">{act.viewedBy?.firstName} {act.viewedBy?.lastName}</span>
+                      </p>
+                      <p className="text-xs text-gray-600 mt-0.5">
+                        '{act.document?.fileName}' sənədinə baxdı
+                      </p>
+                      <span className="text-xs text-gray-400 mt-1 block">
+                        {new Date(act.viewedAt).toLocaleString('az-AZ')}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
-            {/* Legend */}
-            <div className="space-y-3">
-              {[
-                { label: "Şirkət A", value: "70%", count: "899", color: "bg-[#2271b1]" },
-                { label: "Şirkət B", value: "20%", count: "257", color: "bg-[#34A853]" },
-                { label: "Şirkət C", value: "10%", count: "128", color: "bg-[#FBBC05]" },
-              ].map((item, i) => (
-                <div key={i} className="flex items-center gap-3">
-                  <div className={`w-4 h-4 ${item.color} rounded`}></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-700">{item.label}</p>
-                    <p className="text-xs text-gray-500">{item.count} sənəd</p>
-                  </div>
-                  <span className="text-sm font-bold text-gray-900">{item.value}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          ) : (
+            <p className="text-gray-500 text-sm text-center py-4">Hələ heç bir hərəkət yoxdur</p>
+          )}
         </div>
       </div>
 
-      {/* Bottom Section - Table & Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
-        {/* Recent Documents Table */}
-        <div className="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-gray-900">Son Yüklənən Sənədlər</h3>
-            <button className="text-sm text-[#2271b1] font-semibold hover:text-[#135e96]">
-              Hamısına bax →
-            </button>
-          </div>
-          <Table data={recentDocs} />
-        </div>
-
-        {/* Activity Timeline - Enhanced */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Son Hərəkətlər</h3>
-          <div className="relative">
-            <div className="absolute left-[11px] top-2 bottom-2 w-px bg-gray-200"></div>
-            <div className="space-y-5 relative">
-              {activities.map((act) => (
-                <div key={act.id} className="flex gap-4 items-start relative">
-                  <div className={`w-6 h-6 rounded-full ${act.color} ring-4 ring-white z-10 shrink-0 flex items-center justify-center shadow-sm`}>
-                    <div className="w-2 h-2 bg-white rounded-full"></div>
-                  </div>
-                  <div className="flex-1 pt-0.5">
-                    <p className="text-sm text-gray-900">
-                      <span className="font-semibold">{act.user}</span>
-                    </p>
-                    <p className="text-xs text-gray-600 mt-0.5">{act.action}</p>
-                    <span className="text-xs text-gray-400 mt-1 block">{act.time}</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-          <button className="w-full mt-4 pt-4 border-t border-gray-200 text-sm text-[#2271b1] font-semibold text-center hover:text-[#135e96]">
-            Bütün hərəkətlərə bax
+      {/* Recent Documents Table */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold text-gray-900">Son Yüklənən Sənədlər</h3>
+          <button
+            onClick={() => navigate('/dashboard/docs')}
+            className="text-sm text-[#2271b1] font-semibold hover:text-[#135e96] cursor-pointer"
+          >
+            Hamısına bax →
           </button>
         </div>
+        <Table
+          data={formattedRecentDocs}
+          onView={(id) => navigate(`/dashboard/docs/${id}`)}
+        />
       </div>
     </div>
   );

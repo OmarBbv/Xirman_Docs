@@ -7,9 +7,10 @@ interface TableProps {
     status: string;
   }[];
   actions?: string[]
+  onView?: (id: number) => void;
 }
 
-export const Table = ({ data, actions }: TableProps) => {
+export const Table = ({ data, actions, onView }: TableProps) => {
   return (
     <div className="border border-[#c3c4c7] bg-white overflow-x-auto">
       <table className="w-full text-left text-[13px] border-collapse">
@@ -43,7 +44,11 @@ export const Table = ({ data, actions }: TableProps) => {
                     <span key={action} className="text-[#2271b1] cursor-pointer hover:text-[#135e96]">{action}</span>
                   ))}
                   <span className="text-[#c3c4c7]">|</span>
-                  <span className="text-[#2271b1] cursor-pointer hover:text-[#135e96]">Bax</span>
+                  <span
+                    onClick={() => onView?.(item.id)}
+                    className="text-[#2271b1] cursor-pointer hover:text-[#135e96]">
+                    Bax
+                  </span>
                 </div>
               </td>
               <td className="p-2 align-top text-[#2271b1]">{item.author}</td>
@@ -64,17 +69,6 @@ export const Table = ({ data, actions }: TableProps) => {
             </tr>
           ))}
         </tbody>
-        {/* <tfoot>
-          <tr className="bg-white">
-            <th className="p-2 text-center">
-              <input type="checkbox" className="border-[#8c8f94] cursor-pointer" />
-            </th>
-            <th className="p-2 font-bold">Başlıq</th>
-            <th className="p-2 font-bold">Müəllif</th>
-            <th className="p-2 font-bold">Tarix</th>
-            <th className="p-2 font-bold">Status</th>
-          </tr>
-        </tfoot> */}
       </table>
     </div>
   );

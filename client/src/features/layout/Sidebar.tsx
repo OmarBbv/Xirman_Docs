@@ -1,5 +1,4 @@
 import { Link, useLocation } from "react-router-dom";
-import { mockUser as user } from "../auth/mockUser";
 import { useTranslations } from "use-intl";
 
 interface Props {
@@ -17,11 +16,6 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed, menuItems }: Props) => {
   const location = useLocation();
   const t = useTranslations('Layout');
 
-  const filteredMenuItems = menuItems.filter(item => {
-    if (item.allowedRoles.length === 0) return true;
-    return user.isAuthenticated && item.allowedRoles.includes(user.role);
-  });
-
   const isActive = (path: string) => location.pathname === path;
 
   return (
@@ -38,7 +32,7 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed, menuItems }: Props) => {
       </div>
 
       <nav className="flex-1 mt-3">
-        {filteredMenuItems.map((item) => (
+        {menuItems.map((item) => (
           <Link
             key={item.path}
             to={item.path}
