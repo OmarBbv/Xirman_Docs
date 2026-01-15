@@ -75,7 +75,6 @@ export default function NewDocsPage() {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header */}
       <div className="bg-linear-to-r from-[#1a73e8] to-[#4285f4] p-8 shadow-lg flex items-center gap-6">
         <button
           onClick={() => navigate('/dashboard/docs')}
@@ -94,10 +93,8 @@ export default function NewDocsPage() {
         </div>
       </div>
 
-      {/* Form */}
       <div className="bg-white p-6 md:px-8 md:py-6">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          {/* Company Name & Amount */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Input
               type="text"
