@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { Card, List, Tag, Spin, Button, Empty } from "antd";
+import { Spin, Empty } from "antd";
 import { useDocuments } from "../hooks/documentHooks";
 import {
   FileTextOutlined,
