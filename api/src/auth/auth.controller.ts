@@ -15,7 +15,6 @@ export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Request() req, @Body() loginDto: LoginDto) {
-    // LocalStrategy validates the user and puts it in req.user
     return this.authService.login(req.user);
   }
 
@@ -25,13 +24,31 @@ export class AuthController {
     return {
       message: 'OTP kodu email ünvanınıza göndərildi',
       email: user.email,
-      otpCode: user.otpCode, // Müvəqqəti olaraq test üçün kodu bura əlavə edirik
+      // otpCode: user.otpCode,
     };
   }
 
   @Post('verify-otp')
   async verifyOtp(@Body() verifyDto: { email: string; code: string }) {
     const user = await this.usersService.verifyOtp(verifyDto.email, verifyDto.code);
-    return this.authService.login(user); // Təsdiqləndikdən sonra avtomatik login edirik
+    return this.authService.login(user);
+  }
+
+  @Post('forgot-password')
+  async forgotPassword(@Body() body: { email: string }) {
+    await this.usersService.generateForgotPasswordOtp(body.email);
+    return { message: 'OTP kodu email ünvanınıza göndərildi' };
+  }
+
+  @Post('verify-reset-otp')
+  async verifyResetOtp(@Body() body: { email: string; code: string }) {
+    await this.usersService.verifyOtpForReset(body.email, body.code);
+    return { success: true };
+  }
+
+  @Post('reset-password')
+  async resetPassword(@Body() body: { email: string; code: string; newPass: string }) {
+    await this.usersService.resetPassword(body.email, body.code, body.newPass);
+    return { message: 'Şifrəniz uğurla yeniləndi' };
   }
 }

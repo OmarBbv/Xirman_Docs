@@ -3,6 +3,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { motion, AnimatePresence } from "framer-motion";
 import Register from "./Register";
+import ForgotPassword from "./ForgotPassword";
 import { useLogin } from "../hooks/authHooks";
 
 type AuthView = "login" | "register" | "forgot-password";
@@ -23,12 +24,6 @@ export default function Login() {
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     loginMutation.mutate(formData);
-  };
-
-  const handleForgotPassword = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Forgot password submitted");
-    // Show success message or back to login
   };
 
   const variants = {
@@ -172,31 +167,7 @@ export default function Login() {
                   }}
                   className="w-full"
                 >
-                  <div className="text-center mb-8">
-                    <h2 className="text-2xl font-semibold text-[#202124] mb-2">Şifrəni unutmusunuz?</h2>
-                    <p className="text-[16px] text-[#202124]">Email ünvanınızı daxil edin</p>
-                  </div>
-
-                  <form className="space-y-6" onSubmit={handleForgotPassword}>
-                    <Input type="email" placeholder="Email" label="Email" className="w-full" />
-
-                    <div className="text-sm text-gray-500">
-                      Biz sizə şifrəni yeniləmək üçün link göndərəcəyik.
-                    </div>
-
-                    <div className="flex items-center justify-between pt-4">
-                      <button
-                        type="button"
-                        onClick={() => changeView("login")}
-                        className="text-[#1a73e8] font-medium text-sm py-2 rounded transition-colors hover:bg-blue-50 px-2"
-                      >
-                        Geri qayıt
-                      </button>
-                      <Button type="submit" className="py-1.5 px-6 w-fit">
-                        Linki göndər
-                      </Button>
-                    </div>
-                  </form>
+                  <ForgotPassword onNavigateToLogin={() => changeView("login")} />
                 </motion.div>
               )}
             </AnimatePresence>

@@ -66,3 +66,40 @@ export const useVerifyOtp = () => {
     }
   });
 };
+
+export const useForgotPassword = () => {
+  return useMutation({
+    mutationFn: (email: string) => authService.forgotPassword(email),
+    onSuccess: (data: any) => {
+      message.success(data.message || "OTP kodu göndərildi");
+    },
+    onError: (error: any) => {
+      message.error(error.message || "Xəta baş verdi");
+    }
+  });
+};
+
+export const useVerifyResetOtp = () => {
+  return useMutation({
+    mutationFn: ({ email, code }: { email: string; code: string }) => authService.verifyResetOtp(email, code),
+    onSuccess: () => {
+      message.success("OTP kodu təsdiqləndi");
+    },
+    onError: (error: any) => {
+      message.error(error.message || "Yanlış OTP kodu");
+    }
+  });
+};
+
+export const useResetPassword = () => {
+  return useMutation({
+    mutationFn: ({ email, code, newPass }: { email: string; code: string; newPass: string }) =>
+      authService.resetPassword(email, code, newPass),
+    onSuccess: (data: any) => {
+      message.success(data.message || "Şifrə uğurla yeniləndi");
+    },
+    onError: (error: any) => {
+      message.error(error.message || "Şifrə yenilənməsi zamanı xəta");
+    }
+  });
+};

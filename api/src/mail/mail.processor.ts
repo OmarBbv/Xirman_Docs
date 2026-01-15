@@ -10,7 +10,7 @@ export interface EmailJobData {
 }
 
 @Processor('email-queue', {
-  concurrency: 5, // Eyni anda 5 email göndərə bilər
+  concurrency: 5,
 })
 export class EmailProcessor extends WorkerHost {
   private readonly logger = new Logger(EmailProcessor.name);

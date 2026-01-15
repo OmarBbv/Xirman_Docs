@@ -63,6 +63,47 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
+  async generateForgotPasswordOtp(email: string): Promise<void> {
+    const user = await this.findByEmail(email);
+    if (!user) {
+      throw new BadRequestException('Bu email adresi ilə istifadəçi tapılmadı');
+    }
+
+    const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
+    user.otpCode = otpCode;
+    await this.usersRepository.save(user);
+
+    await this.mailService.sendOtpEmail(user.email, otpCode);
+  }
+
+  async verifyOtpForReset(email: string, code: string): Promise<boolean> {
+    const user = await this.findByEmail(email);
+    if (!user) {
+      throw new BadRequestException('İstifadəçi tapılmadı');
+    }
+    if (user.otpCode !== code) {
+      throw new BadRequestException('Yanlış OTP kodu');
+    }
+    return true;
+  }
+
+  async resetPassword(email: string, code: string, newPass: string): Promise<void> {
+    const user = await this.findByEmail(email);
+    if (!user) {
+      throw new BadRequestException('İstifadəçi tapılmadı');
+    }
+    if (user.otpCode !== code) {
+      throw new BadRequestException('Yanlış OTP kodu');
+    }
+
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(newPass, salt);
+
+    user.password = hashedPassword;
+    user.otpCode = null; // Kodu təmizləyirik
+    await this.usersRepository.save(user);
+  }
+
   async findByEmail(email: string): Promise<User | null> {
     return this.usersRepository.findOne({ where: { email } });
   }
