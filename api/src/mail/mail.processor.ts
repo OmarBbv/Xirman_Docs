@@ -108,7 +108,7 @@ export class EmailProcessor extends WorkerHost {
             <div class="content">
               <p class="message">Salam!</p>
               <p class="message">Hesabınızı təsdiqləmək üçün aşağıdakı kodu daxil edin:</p>
-              <div class="otp-code">\${otp}</div>
+              <div class="otp-code">${otp}</div>
               <p class="message">Bu kod 10 dəqiqə ərzində etibarlıdır.</p>
               <p class="message" style="color: #ff6b6b; font-weight: bold;">
                 ⚠️ Bu kodu heç kimlə paylaşmayın!
