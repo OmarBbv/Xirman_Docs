@@ -145,7 +145,7 @@ export default function Layout() {
               type="text"
               icon={<MenuOutlined className="text-white text-lg" />}
               onClick={() => setMobileMenuOpen(true)}
-              className="lg:hidden flex items-center justify-center -ml-2 text-white hover:text-white"
+              className="lg:hidden! flex items-center justify-center -ml-2 text-white hover:text-white"
             />
             <div className="hover:bg-white/10 h-full px-2 md:px-3 flex items-center cursor-pointer transition-colors">
               <span className="text-[14px] font-bold text-white md:text-[13px] md:font-normal md:text-[#c3c4c7] whitespace-nowrap">Xirman DMS</span>
@@ -183,9 +183,9 @@ export default function Layout() {
 
         {/* Content Body */}
         <main className="flex-1 overflow-y-auto p-3 md:p-5 max-w-[1800px] no-scrollbar">
-          <header className="mb-4 md:mb-6">
+          {/* <header className="mb-4 md:mb-6">
             <h1 className="text-xl md:text-[23px] font-normal text-[#1d2327] hidden md:block">{t('admin_panel')}</h1>
-          </header>
+          </header> */}
           <div className="bg-transparent md:bg-white border-none md:border md:border-[#c3c4c7] shadow-none md:shadow-sm p-0 md:p-6">
             <Outlet />
           </div>

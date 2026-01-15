@@ -1,10 +1,11 @@
 import { Injectable, ConflictException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Like } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserPosition } from './entities/user.entity';
+
 import { MailService } from '../mail/mail.service';
 
 @Injectable()
@@ -36,6 +37,28 @@ export class UsersService {
       return savedUser;
     } catch (error) {
       console.error('Registration Error Details:', error);
+      if (error.code === '23505') {
+        throw new ConflictException('Bu email adresi ilə artıq qeydiyyatdan keçilib');
+      }
+      throw new BadRequestException('İstifadəçi yaradılanda xəta baş verdi');
+    }
+  }
+
+  async createByAdmin(createUserDto: CreateUserDto): Promise<User> {
+    try {
+      const { password, ...rest } = createUserDto;
+      const salt = await bcrypt.genSalt();
+      const hashedPassword = await bcrypt.hash(password, salt);
+
+      const user = this.usersRepository.create({
+        ...rest,
+        password: hashedPassword,
+        isVerified: true,
+        otpCode: null,
+      });
+
+      return await this.usersRepository.save(user);
+    } catch (error) {
       if (error.code === '23505') {
         throw new ConflictException('Bu email adresi ilə artıq qeydiyyatdan keçilib');
       }
@@ -102,7 +125,6 @@ export class UsersService {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(newPass, salt);
 
-    // Update password and clear OTP using update method
     await this.usersRepository.update(user.id, {
       password: hashedPassword,
       otpCode: null
@@ -117,8 +139,28 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { id } });
   }
 
-  findAll() {
-    return this.usersRepository.find();
+  findAll(search?: string, role?: string) {
+    if (search) {
+      if (role) {
+        return this.usersRepository.find({
+          where: [
+            { role, firstName: Like(`%${search}%`) },
+            { role, lastName: Like(`%${search}%`) },
+            { role, email: Like(`%${search}%`) },
+          ]
+        });
+      } else {
+        return this.usersRepository.find({
+          where: [
+            { firstName: Like(`%${search}%`) },
+            { lastName: Like(`%${search}%`) },
+            { email: Like(`%${search}%`) },
+          ]
+        });
+      }
+    }
+
+    return this.usersRepository.find({ where: role ? { role } : {} });
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {

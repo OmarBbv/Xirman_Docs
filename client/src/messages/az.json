@@ -10,5 +10,105 @@
     "logout": "Çıxış",
     "notifications": "Bildiriş",
     "greeting": "Salam"
+  },
+  "UserPage": {
+    "title": "İstifadəçi İdarəetməsi",
+    "subtitle": "Sistemdəki bütün istifadəçiləri və onların rollarını idarə edin",
+    "newUser": "Yeni İstifadəçi",
+    "totalUsers": "Toplam İstifadəçi",
+    "admins": "Adminlər",
+    "activeAccounts": "Aktiv Hesablar",
+    "deactiveAccounts": "Deaktiv Hesablar",
+    "searchPlaceholder": "İstifadəçi axtar (Ad, Email)...",
+    "roleFilter": "Rol filtr",
+    "clear": "Təmizlə",
+    "columns": {
+      "user": "İstifadəçi",
+      "position": "Vəzifə",
+      "role": "Rol",
+      "status": "Status",
+      "actions": "Əməliyyatlar"
+    },
+    "actions": {
+      "edit": "Düzəliş et",
+      "delete": "Sil",
+      "deleteTitle": "İstifadəçini sil",
+      "deleteConfirm": "Bu istifadəçini silmək istədiyinizə əminsiniz?",
+      "yes": "Bəli",
+      "no": "Xeyr"
+    },
+    "form": {
+      "firstName": "Ad",
+      "lastName": "Soyad",
+      "email": "Email",
+      "password": "Şifrə",
+      "passwordEdit": "Şifrə (dəyişmək üçün daxil edin)",
+      "role": "Rol",
+      "position": "Vəzifə",
+      "cancel": "Ləğv et",
+      "create": "Yarat",
+      "save": "Yadda saxla",
+      "required": "daxil edin",
+      "selectRequired": "seçin",
+      "validEmail": "Düzgün email daxil edin"
+    },
+    "roles": {
+      "admin": "Admin",
+      "editor": "Editor",
+      "user": "User"
+    },
+    "positions": {
+      "director": "Direktor",
+      "finance_manager": "Maliyyə müdiri",
+      "accountant": "Mühasib",
+      "sales_specialist": "Satış mütəxəssisi",
+      "warehouseman": "Anbardar",
+      "hr": "HR",
+      "manager": "Menecer",
+      "employee": "İşçi"
+    },
+    "status": {
+      "verified": "Təsdiqlənib",
+      "unverified": "Təsdiqlənməyib"
+    },
+    "notFound": "İstifadəçi tapılmadı"
+  },
+  "SettingsPage": {
+    "title": "Parametrlər",
+    "subtitle": "Hesab və tətbiq ayarlarınızı idarə edin",
+    "tabs": {
+      "profile": "Şəxsi Məlumatlar",
+      "security": "Təhlükəsizlik",
+      "app": "Tətbiq Tənzimləmələri"
+    },
+    "profile": {
+      "firstName": "Ad",
+      "lastName": "Soyad",
+      "email": "E-mail",
+      "position": "Vəzifə",
+      "notSaved": "Məlumatlar avtomatik saxlanılmır",
+      "save": "Yadda saxla",
+      "saving": "Saxlanılır..."
+    },
+    "security": {
+      "passwordSecurity": "Şifrə Təhlükəsizliyi",
+      "passwordHint": "Güclü şifrə istifadə edin: ən azı 6 xarakter.",
+      "changePassword": "Şifrəni Dəyiş",
+      "currentPassword": "Cari şifrə",
+      "newPassword": "Yeni şifrə",
+      "confirmPassword": "Yeni şifrə (Təkrar)",
+      "updatePassword": "Şifrəni Yenilə",
+      "pdating": "Yenilənir..."
+    },
+    "app": {
+      "languageSelection": "Dil Seçimi",
+      "languageHint": "Sistemin interfeys dilini seçin",
+      "otherSettings": "Digər Tənzimləmələr",
+      "emailNotifications": "E-mail bildirişləri",
+      "emailHint": "Yeni sənəd və tapşırıqlar haqqında bildiriş al",
+      "twoFactor": "İki faktorlu autentifikasiya",
+      "twoFactorHint": "Hesabınızı daha təhlükəsiz edin",
+      "soon": "Tezliklə"
+    }
   }
 }

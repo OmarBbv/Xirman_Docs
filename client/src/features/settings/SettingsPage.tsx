@@ -4,12 +4,14 @@ import { Button } from "../ui/button";
 import { useAuth } from "../../context/AuthContext";
 import { useUpdateUser } from "../hooks/userHooks";
 import { useLanguage } from "../../context/LanguageContext";
-import { message } from "antd";
+import { message, Tabs } from "antd";
 import { EyeIcon, EyeOffIcon } from "../ui/Icons";
+import { useTranslations } from "use-intl";
 
 type TabType = "profile" | "security" | "app";
 
 export default function SettingsPage() {
+  const t = useTranslations("SettingsPage");
   const { user } = useAuth();
   const { locale, setLocale } = useLanguage();
   const updateUser = useUpdateUser();
@@ -80,76 +82,66 @@ export default function SettingsPage() {
     });
   };
 
-  const tabs = [
-    {
-      id: "profile",
-      label: "Şəxsi Məlumatlar",
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-        </svg>
-      )
-    },
-    {
-      id: "security",
-      label: "Təhlükəsizlik",
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-        </svg>
-      )
-    },
-    {
-      id: "app",
-      label: "Tətbiq Tənzimləmələri",
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-      )
-    },
-  ];
+
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      {/* Modern Header Section */}
       <div className="bg-linear-to-br from-[#2271b1] to-[#135e96] rounded-lg md:shadow-lg p-5 md:p-8 text-white">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex-1">
-            <h1 className="text-xl md:text-3xl font-bold mb-2">Parametrlər</h1>
-            <p className="text-blue-100 text-xs md:text-sm">Hesab və tətbiq ayarlarınızı idarə edin</p>
-          </div>
-          <div className="flex items-center gap-3">
-            {/* <button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 hover:bg-white/20 cursor-pointer">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-              </svg>
-              Sıfırla
-            </button> */}
+            <h1 className="text-xl md:text-3xl font-bold mb-2">{t("title")}</h1>
+            <p className="text-blue-100 text-xs md:text-sm">{t("subtitle")}</p>
           </div>
         </div>
       </div>
 
-      {/* Tab Navigation */}
-      <div className="bg-white rounded-lg border border-gray-200 md:shadow-sm">
-        <div className="flex border-b border-gray-200 overflow-x-auto">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as TabType)}
-              className={`flex items-center gap-2 px-6 py-4 text-sm font-medium transition-all relative whitespace-nowrap ${activeTab === tab.id
-                ? "text-[#2271b1] border-b-2 border-[#2271b1] bg-blue-50"
-                : "text-gray-600 border-b-2 border-transparent hover:text-[#2271b1] hover:bg-gray-50"
-                }`}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
-        </div>
+      <div className="bg-white rounded-lg border border-gray-200 md:shadow-sm md:px-2">
+        <Tabs
+          activeKey={activeTab}
+          onChange={(key) => setActiveTab(key as TabType)}
+          size="middle"
+          tabBarGutter={16}
+          items={[
+            {
+              id: "profile",
+              label: t("tabs.profile"),
+              icon: (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+              )
+            },
+            {
+              id: "security",
+              label: t("tabs.security"),
+              icon: (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              )
+            },
+            {
+              id: "app",
+              label: t("tabs.app"),
+              icon: (
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              )
+            },
+          ].map((tab) => ({
+            key: tab.id,
+            label: (
+              <span className="flex items-center gap-2">
+                {tab.icon}
+                <span>{tab.label}</span>
+              </span>
+            ),
+          }))}
+          className="px-0 md:px-4"
+        />
 
-        {/* Tab Content */}
         <div className="p-4 md:p-8">
           {activeTab === "profile" && (
             <div className="space-y-8 max-w-3xl">
@@ -172,22 +164,22 @@ export default function SettingsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <Input
                   type="text"
-                  label="Ad"
-                  placeholder="Adınız"
+                  label={t("profile.firstName")}
+                  placeholder={t("profile.firstName")}
                   value={profileData.firstName}
                   onChange={(e) => setProfileData({ ...profileData, firstName: e.target.value })}
                 />
                 <Input
                   type="text"
-                  label="Soyad"
-                  placeholder="Soyadınız"
+                  label={t("profile.lastName")}
+                  placeholder={t("profile.lastName")}
                   value={profileData.lastName}
                   onChange={(e) => setProfileData({ ...profileData, lastName: e.target.value })}
                 />
                 <div className="md:col-span-2">
                   <Input
                     type="email"
-                    label="E-mail"
+                    label={t("profile.email")}
                     value={user?.email || ''}
                     disabled
                   />
@@ -195,11 +187,10 @@ export default function SettingsPage() {
 
                 <Input
                   type="text"
-                  label="Vəzifə"
-                  placeholder="Vəzifəniz"
+                  label={t("profile.position")}
                   value={
                     {
-                      manager: "Menecer",
+                      manager: "Menecer", // Ideally these come from translations too if needed dynamic, but assuming key map is fine or use t()
                       accountant: "Mühasib",
                       hr: "İnsan Resursları",
                       finance_manager: "Maliyyə Meneceri",
@@ -214,13 +205,13 @@ export default function SettingsPage() {
               </div>
 
               <div className="pt-6 border-t border-gray-200 flex items-center justify-between">
-                <p className="text-sm text-gray-500">Məlumatlar avtomatik saxlanılmır</p>
+                <p className="text-sm text-gray-500">{t("profile.notSaved")}</p>
                 <Button
                   onClick={handleProfileSave}
                   className="px-8 py-3 font-semibold shadow-sm"
                   disabled={updateUser.isPending}
                 >
-                  {updateUser.isPending ? 'Saxlanılır...' : 'Yadda saxla'}
+                  {updateUser.isPending ? t("profile.saving") : t("profile.save")}
                 </Button>
               </div>
             </div>
@@ -233,8 +224,8 @@ export default function SettingsPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
                 <div>
-                  <h4 className="text-sm font-semibold text-amber-900 mb-1">Şifrə Təhlükəsizliyi</h4>
-                  <p className="text-xs text-amber-700">Güclü şifrə istifadə edin: ən azı 6 xarakter.</p>
+                  <h4 className="text-sm font-semibold text-amber-900 mb-1">{t("security.passwordSecurity")}</h4>
+                  <p className="text-xs text-amber-700">{t("security.passwordHint")}</p>
                 </div>
               </div>
 
@@ -243,13 +234,13 @@ export default function SettingsPage() {
                   <svg className="w-5 h-5 text-[#2271b1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
                   </svg>
-                  Şifrəni Dəyiş
+                  {t("security.changePassword")}
                 </h3>
                 <div className="grid grid-cols-1 gap-5 max-w-md">
                   <Input
                     type={showPasswords.current ? "text" : "password"}
-                    label="Cari şifrə"
-                    placeholder="Cari şifrənizi daxil edin"
+                    label={t("security.currentPassword")}
+                    placeholder={t("security.currentPassword")}
                     value={passwords.current}
                     onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
                     suffix={
@@ -260,8 +251,8 @@ export default function SettingsPage() {
                   />
                   <Input
                     type={showPasswords.newPass ? "text" : "password"}
-                    label="Yeni şifrə"
-                    placeholder="Yeni şifrənizi daxil edin"
+                    label={t("security.newPassword")}
+                    placeholder={t("security.newPassword")}
                     value={passwords.newPass}
                     onChange={(e) => setPasswords({ ...passwords, newPass: e.target.value })}
                     suffix={
@@ -272,8 +263,8 @@ export default function SettingsPage() {
                   />
                   <Input
                     type={showPasswords.confirm ? "text" : "password"}
-                    label="Yeni şifrə (Təkrar)"
-                    placeholder="Yeni şifrəni təkrar edin"
+                    label={t("security.confirmPassword")}
+                    placeholder={t("security.confirmPassword")}
                     value={passwords.confirm}
                     onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
                     suffix={
@@ -288,7 +279,7 @@ export default function SettingsPage() {
                   className="px-8 py-3 font-semibold shadow-sm"
                   disabled={updateUser.isPending}
                 >
-                  {updateUser.isPending ? 'Yenilənir...' : 'Şifrəni Yenilə'}
+                  {updateUser.isPending ? t("security.pdating") : t("security.updatePassword")}
                 </Button>
               </div>
 
@@ -343,9 +334,9 @@ export default function SettingsPage() {
                   <svg className="w-5 h-5 text-[#2271b1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
                   </svg>
-                  Dil Seçimi
+                  {t("app.languageSelection")}
                 </h3>
-                <p className="text-sm text-gray-600 mb-6">Sistemin interfeys dilini seçin</p>
+                <p className="text-sm text-gray-600 mb-6">{t("app.languageHint")}</p>
 
                 <div className="space-y-3">
                   {[
@@ -362,7 +353,7 @@ export default function SettingsPage() {
                         <span className="text-3xl">{lang.flag}</span>
                         <div className="flex flex-col">
                           <span className="font-medium text-gray-900">{lang.label}</span>
-                          {lang.disabled && <span className="text-xs text-gray-400">Tezliklə</span>}
+                          {lang.disabled && <span className="text-xs text-gray-400">{t("app.soon")}</span>}
                         </div>
                       </div>
                       <input
@@ -383,19 +374,19 @@ export default function SettingsPage() {
               </div>
 
               <div className="pt-8 border-t border-gray-200">
-                <h3 className="text-lg font-bold text-gray-900 mb-6">Digər Tənzimləmələr</h3>
+                <h3 className="text-lg font-bold text-gray-900 mb-6">{t("app.otherSettings")}</h3>
                 <div className="space-y-4">
                   <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer">
                     <div>
-                      <p className="font-medium text-gray-900">E-mail bildirişləri</p>
-                      <p className="text-sm text-gray-600">Yeni sənəd və tapşırıqlar haqqında bildiriş al</p>
+                      <p className="font-medium text-gray-900">{t("app.emailNotifications")}</p>
+                      <p className="text-sm text-gray-600">{t("app.emailHint")}</p>
                     </div>
                     <input type="checkbox" defaultChecked className="w-5 h-5 text-[#2271b1] rounded focus:ring-2 focus:ring-[#2271b1] cursor-pointer" />
                   </label>
                   <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer">
                     <div>
-                      <p className="font-medium text-gray-900">İki faktorlu autentifikasiya</p>
-                      <p className="text-sm text-gray-600">Hesabınızı daha təhlükəsiz edin</p>
+                      <p className="font-medium text-gray-900">{t("app.twoFactor")}</p>
+                      <p className="text-sm text-gray-600">{t("app.twoFactorHint")}</p>
                     </div>
                     <input type="checkbox" className="w-5 h-5 text-[#2271b1] rounded focus:ring-2 focus:ring-[#2271b1] cursor-pointer" />
                   </label>

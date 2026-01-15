@@ -171,9 +171,7 @@ export default function DocumentPage() {
         ))}
       </div>
 
-      {/* Main Content Card */}
-      <div className="bg-white rounded-lg border border-gray-200 md:shadow-sm p-4 md:p-6">
-        {/* Filter Tabs */}
+      <div className="bg-white rounded-lg p-4 md:p-0">
         <div className="flex items-center gap-1 mb-6 pb-4 border-b border-gray-200 overflow-x-auto">
           <button
             onClick={() => handleFilterByFormat(undefined)}

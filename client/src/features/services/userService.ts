@@ -11,10 +11,11 @@ export interface User {
 }
 
 class UserService {
-  async getAll(): Promise<User[]> {
-    const response = await PRIVATE_API.get("/users");
-    // API birbaşa array qaytarırsa response.data, əgər { data: [...] } qaytarırsa ona uyğun
-    // NestJS default olaraq array qaytarır findAll-da (service-dən asılıdır)
+  async getAll(search?: string, role?: string | null): Promise<User[]> {
+    const params = new URLSearchParams();
+    if (search) params.append('search', search);
+    if (role) params.append('role', role);
+    const response = await PRIVATE_API.get(`/users?${params.toString()}`);
     return response.data;
   }
 
@@ -24,6 +25,10 @@ class UserService {
 
   async update(id: number, data: any): Promise<void> {
     await PRIVATE_API.patch(`/users/${id}`, data);
+  }
+
+  async create(data: any): Promise<void> {
+    await PRIVATE_API.post("/users/admin", data);
   }
 }
 

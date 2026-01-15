@@ -4,12 +4,14 @@ import { message } from "antd";
 
 export const userKeys = {
   all: ['users'] as const,
+  lists: () => [...userKeys.all, 'list'] as const,
+  list: (filters: any) => [...userKeys.lists(), { ...filters }] as const,
 };
 
-export const useUsers = () => {
+export const useUsers = (search?: string, role?: string | null) => {
   return useQuery({
-    queryKey: userKeys.all,
-    queryFn: () => userService.getAll(),
+    queryKey: userKeys.list({ search, role }),
+    queryFn: () => userService.getAll(search, role),
   });
 };
 
@@ -37,6 +39,20 @@ export const useUpdateUser = () => {
     },
     onError: () => {
       message.error("Xəta baş verdi");
+    }
+  });
+};
+
+export const useCreateUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (data: any) => userService.create(data),
+    onSuccess: () => {
+      message.success("İstifadəçi uğurla yaradıldı");
+      queryClient.invalidateQueries({ queryKey: userKeys.all });
+    },
+    onError: (error: any) => {
+      message.error(error.response?.data?.message || "Xəta baş verdi");
     }
   });
 };

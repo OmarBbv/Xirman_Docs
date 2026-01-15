@@ -15,7 +15,7 @@ export class MailService {
     try {
       const job = await this.emailQueue.add(
         'send-otp',
-        { email, otp },
+        { type: 'otp', email, otp },
         {
           attempts: 3,
           backoff: {

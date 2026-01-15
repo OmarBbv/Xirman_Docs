@@ -118,7 +118,6 @@ export default function DocumentDetailsPage() {
       </div>
 
       <div className="flex flex-col lg:flex-row gap-6 items-stretch">
-        {/* Main Details */}
         <div className="flex-1 flex flex-col h-full">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-full">
             <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">

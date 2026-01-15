@@ -10,5 +10,105 @@
     "logout": "Выход",
     "notifications": "Уведомление",
     "greeting": "Привет"
+  },
+  "UserPage": {
+    "title": "Управление пользователями",
+    "subtitle": "Управляйте всеми пользователями и их ролями в системе",
+    "newUser": "Новый пользователь",
+    "totalUsers": "Всего пользователей",
+    "admins": "Администраторы",
+    "activeAccounts": "Активные аккаунты",
+    "deactiveAccounts": "Неактивные аккаунты",
+    "searchPlaceholder": "Поиск пользователя (Имя, Email)...",
+    "roleFilter": "Фильтр роли",
+    "clear": "Очистить",
+    "columns": {
+      "user": "Пользователь",
+      "position": "Должность",
+      "role": "Роль",
+      "status": "Статус",
+      "actions": "Действия"
+    },
+    "actions": {
+      "edit": "Редактировать",
+      "delete": "Удалить",
+      "deleteTitle": "Удалить пользователя",
+      "deleteConfirm": "Вы уверены, что хотите удалить этого пользователя?",
+      "yes": "Да",
+      "no": "Нет"
+    },
+    "form": {
+      "firstName": "Имя",
+      "lastName": "Фамилия",
+      "email": "Email",
+      "password": "Пароль",
+      "passwordEdit": "Пароль (введите для изменения)",
+      "role": "Роль",
+      "position": "Должность",
+      "cancel": "Отмена",
+      "create": "Создать",
+      "save": "Сохранить",
+      "required": "введите",
+      "selectRequired": "выберите",
+      "validEmail": "Введите корректный email"
+    },
+    "roles": {
+      "admin": "Admin",
+      "editor": "Editor",
+      "user": "User"
+    },
+    "positions": {
+      "director": "Директор",
+      "finance_manager": "Финансовый менеджер",
+      "accountant": "Бухгалтер",
+      "sales_specialist": "Специалист по продажам",
+      "warehouseman": "Кладовщик",
+      "hr": "HR",
+      "manager": "Менеджер",
+      "employee": "Сотрудник"
+    },
+    "status": {
+      "verified": "Подтвержден",
+      "unverified": "Не подтвержден"
+    },
+    "notFound": "Пользователь не найден"
+  },
+  "SettingsPage": {
+    "title": "Настройки",
+    "subtitle": "Управление настройками аккаунта и приложения",
+    "tabs": {
+      "profile": "Личная информация",
+      "security": "Безопасность",
+      "app": "Настройки приложения"
+    },
+    "profile": {
+      "firstName": "Имя",
+      "lastName": "Фамилия",
+      "email": "E-mail",
+      "position": "Должность",
+      "notSaved": "Данные не сохраняются автоматически",
+      "save": "Сохранить",
+      "saving": "Сохранение..."
+    },
+    "security": {
+      "passwordSecurity": "Безопасность пароля",
+      "passwordHint": "Используйте надежный пароль: не менее 6 символов.",
+      "changePassword": "Изменить пароль",
+      "currentPassword": "Текущий пароль",
+      "newPassword": "Новый пароль",
+      "confirmPassword": "Новый пароль (повтор)",
+      "updatePassword": "Обновить пароль",
+      "pdating": "Обновление..."
+    },
+    "app": {
+      "languageSelection": "Выбор языка",
+      "languageHint": "Выберите язык интерфейса системы",
+      "otherSettings": "Другие настройки",
+      "emailNotifications": "E-mail уведомления",
+      "emailHint": "Получать уведомления о новых документах и задачах",
+      "twoFactor": "Двухфакторная аутентификация",
+      "twoFactorHint": "Сделайте ваш аккаунт более безопасным",
+      "soon": "Скоро"
+    }
   }
 }
