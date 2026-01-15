@@ -15,7 +15,18 @@ import { ConfigService } from '@nestjs/config';
         database: configService.get<string>('DB_DATABASE'),
         entities: [__dirname + '/../**/*.entity{.ts,.js}'],
         synchronize: true,
-        // dropSchema: true,
+        // dropSchema: true, // ⚠️ Production-da heç vaxt true etməyin!
+
+        // SSL Configuration for Supabase/Production
+        ssl: configService.get<string>('DB_HOST') !== 'localhost'
+          ? { rejectUnauthorized: false }
+          : false,
+
+        // Connection pool settings
+        extra: {
+          max: 10, // maximum number of connections
+          connectionTimeoutMillis: 10000, // 10 seconds
+        },
       }),
     }),
   ],
