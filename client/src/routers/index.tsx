@@ -8,7 +8,7 @@ import DocumentPage from "../features/docs/DocumentPage";
 import DocumentDetailsPage from "../features/docs/DocumentDetailsPage";
 import UserPage from "../features/user/UserPage";
 import SettingsPage from "../features/settings/SettingsPage";
-// import { ProtectedRole } from "../features/utils/ProtectedRole";
+import { ProtectedRole } from "../features/utils/ProtectedRole";
 import NewDocsPage from "../features/new-docs/NewDocsPage";
 import NotificationsPage from "../features/notifications/NotificationsPage";
 
@@ -33,9 +33,9 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: (
-          // <ProtectedRole allowedRoles={['admin']}>
-          <HomePage />
-          // </ProtectedRole>
+          <ProtectedRole allowedRoles={['admin']}>
+            <HomePage />
+          </ProtectedRole>
         ),
       },
       {
@@ -48,7 +48,11 @@ export const router = createBrowserRouter([
       },
       {
         path: "users",
-        element: <UserPage />,
+        element: (
+          <ProtectedRole allowedRoles={['admin']}>
+            <UserPage />
+          </ProtectedRole>
+        ),
       },
       {
         path: "settings",

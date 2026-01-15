@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Select } from "antd";
+import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -29,6 +30,7 @@ export default function Register({ onNavigateToLogin }: RegisterProps) {
   const [step, setStep] = useState<"register" | "verify">("register");
   const [userEmail, setUserEmail] = useState("");
   const [otpCode, setOtpCode] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const { mutate: registerUser, isPending: isRegisterPending } = useRegister();
   const { mutate: verifyOtp, isPending: isVerifyPending } = useVerifyOtp();
@@ -169,16 +171,26 @@ export default function Register({ onNavigateToLogin }: RegisterProps) {
         </div>
 
         <Input
-          type="password"
+          type={showPassword ? "text" : "password"}
           label="Şifrə"
           {...register("password")}
           error={errors.password?.message}
+          suffix={
+            <div onClick={() => setShowPassword(!showPassword)}>
+              {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+            </div>
+          }
         />
         <Input
-          type="password"
+          type={showPassword ? "text" : "password"}
           label="Şifrəni təsdiqlə"
           {...register("confirmPassword")}
           error={errors.confirmPassword?.message}
+          suffix={
+            <div onClick={() => setShowPassword(!showPassword)}>
+              {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+            </div>
+          }
         />
 
         <div className="flex items-center justify-between pt-4">

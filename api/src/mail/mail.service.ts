@@ -13,18 +13,17 @@ export class MailService {
 
   async sendOtpEmail(email: string, otp: string): Promise<boolean> {
     try {
-      // Email-i queue-ya əlavə edirik
       const job = await this.emailQueue.add(
         'send-otp',
         { email, otp },
         {
-          attempts: 3, // 3 dəfə retry edəcək
+          attempts: 3,
           backoff: {
             type: 'exponential',
-            delay: 2000, // 2 saniyə gözləyəcək, sonra exponential artacaq
+            delay: 2000,
           },
-          removeOnComplete: true, // Uğurlu olsa queue-dan silinəcək
-          removeOnFail: false, // Uğursuz olsa saxlanacaq (monitoring üçün)
+          removeOnComplete: true,
+          removeOnFail: false,
         },
       );
 

@@ -13,7 +13,11 @@ export const useLogin = () => {
     onSuccess: (data: any) => {
       if (data.access_token) {
         login(data.user, data.access_token);
-        navigate("/dashboard");
+        if (data.user.role === 'admin') {
+          navigate("/dashboard");
+        } else {
+          navigate("/dashboard/docs");
+        }
       }
     },
     onError: (error: any) => {
@@ -50,7 +54,11 @@ export const useVerifyOtp = () => {
       if (data.access_token) {
         login(data.user, data.access_token);
         message.success("Qeydiyyat tamamlandı!");
-        navigate("/dashboard");
+        if (data.user.role === 'admin') {
+          navigate("/dashboard");
+        } else {
+          navigate("/dashboard/docs");
+        }
       }
     },
     onError: (error: any) => {

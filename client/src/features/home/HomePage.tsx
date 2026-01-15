@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useDocuments, useDocumentStats, useRecentActivities } from "../hooks/documentHooks";
-import { Spin, Table, Tag, Button } from "antd";
+import { Spin, Table, Tag, Button, Card } from "antd";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -86,16 +86,16 @@ export default function HomePage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       {/* Welcome Section - Modern Header */}
-      <div className="bg-linear-to-br from-[#2271b1] to-[#135e96] rounded-lg shadow-lg p-8 text-white">
+      <div className="bg-linear-to-br from-[#2271b1] to-[#135e96] rounded-lg md:shadow-lg p-5 md:p-8 text-white">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex-1">
-            <h1 className="text-3xl font-bold mb-2">Xoş gəldiniz, Admin</h1>
-            <p className="text-blue-100 text-sm">Sistemin ümumi vəziyyəti və son hərəkətlər burada görüntülənir</p>
+            <h1 className="text-xl md:text-3xl font-bold mb-2">Xoş gəldiniz, Admin</h1>
+            <p className="text-blue-100 text-xs md:text-sm">Sistemin ümumi vəziyyəti və son hərəkətlər burada görüntülənir</p>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate('/dashboard/docs/new')}
-              className="bg-white text-[#2271b1] px-5 py-2.5 rounded-lg text-sm font-semibold shadow-md transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer hover:bg-blue-50"
+              className="bg-white text-[#2271b1] px-4 py-2 md:px-5 md:py-2.5 rounded-lg text-sm font-semibold md:shadow-md transition-all flex items-center gap-2 whitespace-nowrap cursor-pointer hover:bg-blue-50"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
@@ -158,7 +158,7 @@ export default function HomePage() {
             ),
           },
         ].map((stat, i) => (
-          <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 transition-all duration-200 hover:shadow-md hover:border-gray-300">
+          <div key={i} className="bg-white rounded-lg border border-gray-200 md:shadow-sm p-4 md:p-6 transition-all duration-200 hover:shadow-md hover:border-gray-300">
             <div className="flex items-start justify-between mb-4">
               <div className={`${stat.bgLight} p-3 rounded-lg`}>
                 <div className={stat.textColor}>
@@ -167,9 +167,9 @@ export default function HomePage() {
               </div>
             </div>
             <div>
-              <p className="text-sm text-gray-500 font-medium mb-1">{stat.label}</p>
-              <h3 className="text-2xl font-bold text-gray-900">{stat.value}</h3>
-              <p className="text-xs text-gray-400 mt-1">{stat.trend}</p>
+              <p className="text-xs md:text-sm text-gray-500 font-medium mb-1">{stat.label}</p>
+              <h3 className="text-xl md:text-2xl font-bold text-gray-900">{stat.value}</h3>
+              <p className="text-[10px] md:text-xs text-gray-400 mt-1">{stat.trend}</p>
             </div>
           </div>
         ))}
@@ -178,18 +178,18 @@ export default function HomePage() {
       {/* Charts Section - Enhanced Design */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Document Type Distribution */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-white rounded-lg border border-gray-200 md:shadow-sm p-4 md:p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-lg font-bold text-gray-900">Sənəd Növü Dağılımı</h3>
+            <h3 className="text-base md:text-lg font-bold text-gray-900">Sənəd Növü Dağılımı</h3>
           </div>
           <div className="space-y-5">
             {documentTypeData.map((bar, i) => (
               <div key={i} className="space-y-2">
                 <div className="flex justify-between items-center text-sm">
-                  <span className="font-medium text-gray-700">{bar.label}</span>
+                  <span className="font-medium text-gray-700 text-xs md:text-sm">{bar.label}</span>
                   <div className="flex items-center gap-3">
-                    <span className="text-xs text-gray-500">{bar.value} sənəd</span>
-                    <span className="font-bold text-gray-900">{bar.percentage}%</span>
+                    <span className="text-[10px] md:text-xs text-gray-500">{bar.value} sənəd</span>
+                    <span className="font-bold text-gray-900 text-xs md:text-sm">{bar.percentage}%</span>
                   </div>
                 </div>
                 <div className={`h-3 w-full ${bar.lightColor} rounded-full overflow-hidden`}>
@@ -204,8 +204,8 @@ export default function HomePage() {
         </div>
 
         {/* Recent Activity */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-bold text-gray-900 mb-4">Son Hərəkətlər</h3>
+        <div className="bg-white rounded-lg border border-gray-200 md:shadow-sm p-4 md:p-6">
+          <h3 className="text-base md:text-lg font-bold text-gray-900 mb-4">Son Hərəkətlər</h3>
           {activities && activities.length > 0 ? (
             <div className="relative">
               <div className="absolute left-[11px] top-2 bottom-2 w-px bg-gray-200"></div>
@@ -216,13 +216,13 @@ export default function HomePage() {
                       <div className="w-2 h-2 bg-white rounded-full"></div>
                     </div>
                     <div className="flex-1 pt-0.5">
-                      <p className="text-sm text-gray-900">
+                      <p className="text-xs md:text-sm text-gray-900">
                         <span className="font-semibold">{act.viewedBy?.firstName} {act.viewedBy?.lastName}</span>
                       </p>
-                      <p className="text-xs text-gray-600 mt-0.5">
+                      <p className="text-[10px] md:text-xs text-gray-600 mt-0.5">
                         '{act.document?.fileName}' sənədinə baxdı
                       </p>
-                      <span className="text-xs text-gray-400 mt-1 block">
+                      <span className="text-[10px] md:text-xs text-gray-400 mt-1 block">
                         {new Date(act.viewedAt).toLocaleString('az-AZ')}
                       </span>
                     </div>
@@ -237,24 +237,66 @@ export default function HomePage() {
       </div>
 
       {/* Recent Documents Table */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-200 md:shadow-sm p-4 md:p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-gray-900">Son Yüklənən Sənədlər</h3>
+          <h3 className="text-base md:text-lg font-bold text-gray-900">Son Yüklənən Sənədlər</h3>
           <button
             onClick={() => navigate('/dashboard/docs')}
-            className="text-sm text-[#2271b1] font-semibold hover:text-[#135e96] cursor-pointer"
+            className="text-xs md:text-sm text-[#2271b1] font-semibold hover:text-[#135e96] cursor-pointer"
           >
             Hamısına bax →
           </button>
         </div>
-        <Table
-          columns={columns}
-          dataSource={formattedRecentDocs}
-          pagination={false}
-          rowKey="id"
-          size="middle"
-          className="overflow-x-auto"
-        />
+        <div className="hidden md:block">
+          <Table
+            columns={columns}
+            dataSource={formattedRecentDocs}
+            pagination={false}
+            rowKey="id"
+            size="middle"
+            className="overflow-x-auto"
+          />
+        </div>
+
+        {/* Mobile Card View */}
+        <div className="md:hidden space-y-3">
+          {formattedRecentDocs.length > 0 ? (
+            formattedRecentDocs.map((doc) => (
+              <Card key={doc.id} className="shadow-none border border-gray-200" bodyStyle={{ padding: '16px' }}>
+                <div className="flex justify-between items-start mb-2">
+                  <div className="font-medium text-base text-gray-900 break-all">{doc.title}</div>
+                  <Tag color={doc.amount ? 'green' : 'default'} className="mr-0">
+                    {doc.amount ? `${doc.amount} AZN` : '0 AZN'}
+                  </Tag>
+                </div>
+
+                <div className="space-y-2 text-sm text-gray-600">
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Yükləyən:</span>
+                    <span className="font-medium">{doc.author}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-500">Tarix:</span>
+                    <span>{doc.date}</span>
+                  </div>
+                </div>
+
+                <div className="mt-3 pt-3 border-t border-gray-100 flex justify-end">
+                  <Button
+                    type="link"
+                    size="small"
+                    onClick={() => navigate(`/dashboard/docs/${doc.id}`)}
+                    className="text-[#2271b1] p-0 h-auto text-sm font-medium"
+                  >
+                    Sənədə Bax →
+                  </Button>
+                </div>
+              </Card>
+            ))
+          ) : (
+            <div className="text-center py-8 text-gray-500 text-sm">Heç bir sənəd yoxdur</div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -3,10 +3,11 @@ import { forwardRef } from "react";
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   label: string;
   error?: string;
+  suffix?: React.ReactNode;
 }
 
 export const Input = forwardRef<HTMLInputElement, Props>(
-  ({ label, error, className = "", ...props }, ref) => {
+  ({ label, error, suffix, className = "", ...props }, ref) => {
     return (
       <div className={`relative group ${className}`}>
         <input
@@ -14,7 +15,8 @@ export const Input = forwardRef<HTMLInputElement, Props>(
           {...props}
           className={`w-full px-4 py-3.5 text-[16px] text-[#202124] bg-white border ${error ? "border-red-500" : "border-[#dadce0]"
             } rounded focus:outline-none focus:ring-2 ${error ? "focus:ring-red-200" : "focus:ring-[#4285F4]"
-            } focus:border-transparent transition-all placeholder:text-transparent peer disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0`}
+            } focus:border-transparent transition-all placeholder:text-transparent peer disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-inner-spin-button]:m-0 ${suffix ? "pr-10" : ""
+            }`}
           placeholder={props.placeholder || label}
         />
         <label
@@ -24,6 +26,11 @@ export const Input = forwardRef<HTMLInputElement, Props>(
         >
           {label}
         </label>
+        {suffix && (
+          <div className="absolute right-3 top-3.5 text-gray-500 cursor-pointer z-10">
+            {suffix}
+          </div>
+        )}
         {error && <p className="text-red-500 text-[12px] mt-1 ml-1">{error}</p>}
       </div>
     );

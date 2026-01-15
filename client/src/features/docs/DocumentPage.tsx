@@ -133,16 +133,16 @@ export default function DocumentPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       {/* Modern Header Section */}
-      <div className="bg-linear-to-br from-[#2271b1] to-[#135e96] rounded-lg shadow-lg p-8 text-white">
+      <div className="bg-linear-to-br from-[#2271b1] to-[#135e96] rounded-lg md:shadow-lg p-5 md:p-8 text-white">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex-1">
-            <h1 className="text-3xl font-bold mb-2">Sənəd İdarəetməsi</h1>
-            <p className="text-blue-100 text-sm">Bütün sənədlərinizi buradan idarə edə bilərsiniz</p>
+            <h1 className="text-xl md:text-3xl font-bold mb-2">Sənəd İdarəetməsi</h1>
+            <p className="text-blue-100 text-xs md:text-sm">Bütün sənədlərinizi buradan idarə edə bilərsiniz</p>
           </div>
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate('/dashboard/docs/new')}
-              className="cursor-pointer bg-white text-[#2271b1] px-5 py-2.5 rounded-lg text-sm font-semibold shadow-md transition-all flex items-center gap-2 hover:bg-blue-50">
+              className="cursor-pointer bg-white text-[#2271b1] px-4 py-2 md:px-5 md:py-2.5 rounded-lg text-sm font-semibold md:shadow-md transition-all flex items-center gap-2 hover:bg-blue-50">
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
               </svg>
@@ -155,7 +155,7 @@ export default function DocumentPage() {
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         {stats.map((stat, i) => (
-          <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-200 p-5 transition-all duration-200 hover:shadow-md hover:border-gray-300">
+          <div key={i} className="bg-white rounded-lg border border-gray-200 md:shadow-sm p-4 md:p-5 transition-all duration-200 hover:shadow-md hover:border-gray-300">
             <div className="flex items-center justify-between">
               <div className={`${stat.bgLight} p-3 rounded-lg`}>
                 <div className={stat.textColor}>
@@ -163,8 +163,8 @@ export default function DocumentPage() {
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-sm text-gray-500 font-medium mb-1">{stat.label}</p>
-                <h3 className="text-2xl font-bold text-gray-900">{stat.value}</h3>
+                <p className="text-xs md:text-sm text-gray-500 font-medium mb-1">{stat.label}</p>
+                <h3 className="text-xl md:text-2xl font-bold text-gray-900">{stat.value}</h3>
               </div>
             </div>
           </div>
@@ -172,7 +172,7 @@ export default function DocumentPage() {
       </div>
 
       {/* Main Content Card */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+      <div className="bg-white rounded-lg border border-gray-200 md:shadow-sm p-4 md:p-6">
         {/* Filter Tabs */}
         <div className="flex items-center gap-1 mb-6 pb-4 border-b border-gray-200 overflow-x-auto">
           <button

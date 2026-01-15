@@ -1,4 +1,4 @@
-import { Table, Tag, Space, Button, Tooltip, Popconfirm } from 'antd';
+import { Table, Tag, Space, Button, Tooltip, Popconfirm, Card } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
   EyeOutlined,
@@ -197,29 +197,128 @@ export const DocumentTable = ({
   ];
 
   return (
-    <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-      <Table
-        columns={columns}
-        dataSource={data}
-        rowKey="id"
-        loading={loading}
-        onRow={(record) => ({
-          onClick: () => onView?.(record.id),
-          style: { cursor: 'pointer' },
-        })}
-        pagination={pagination ? {
-          current: pagination.current,
-          pageSize: pagination.pageSize,
-          total: pagination.total,
-          onChange: pagination.onChange,
-          showSizeChanger: false,
-          position: ['bottomRight'],
-        } : false}
-        locale={{
-          emptyText: 'Heç bir sənəd tapılmadı'
-        }}
-        scroll={{ x: true }}
-      />
-    </div>
+    <>
+      <div className="hidden md:block bg-white rounded-lg border border-gray-200 overflow-hidden">
+        <Table
+          columns={columns}
+          dataSource={data}
+          rowKey="id"
+          loading={loading}
+          onRow={(record) => ({
+            onClick: () => onView?.(record.id),
+            style: { cursor: 'pointer' },
+          })}
+          pagination={pagination ? {
+            current: pagination.current,
+            pageSize: pagination.pageSize,
+            total: pagination.total,
+            onChange: pagination.onChange,
+            showSizeChanger: false,
+            position: ['bottomRight'],
+          } : false}
+          locale={{
+            emptyText: 'Heç bir sənəd tapılmadı'
+          }}
+          scroll={{ x: true }}
+        />
+      </div>
+
+      {/* Mobile Card View */}
+      <div className="md:hidden space-y-3">
+        {loading ? (
+          <div className="text-center py-8 bg-white rounded-lg">Yüklənir...</div>
+        ) : data.length > 0 ? (
+          data.map((record) => (
+            <Card key={record.id} className="shadow-none border border-gray-200" bodyStyle={{ padding: '16px' }} onClick={() => onView?.(record.id)}>
+              <div className="flex justify-between items-start mb-3">
+                <div className="flex items-center gap-2 overflow-hidden">
+                  {getFileIcon(record.fileFormat)}
+                  <span className="font-medium text-base text-gray-900 truncate">{record.fileName}</span>
+                </div>
+                <Tag color={getDocumentTypeColor(record.documentType)} className="mr-0 rounded-full px-2 text-xs">
+                  {getDocumentTypeLabel(record.documentType)}
+                </Tag>
+              </div>
+
+              <div className="space-y-2 text-sm text-gray-600 mb-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Şirkət:</span>
+                  <span className="font-medium text-gray-800">{record.companyName}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Məbləğ:</span>
+                  <span className="font-medium text-gray-800">{record.amount ? `${record.amount} AZN` : '-'}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-gray-500">Tarix:</span>
+                  <span>{new Date(record.documentDate).toLocaleDateString('az-AZ')}</span>
+                </div>
+              </div>
+
+              <div className="flex justify-between items-center pt-3 border-t border-gray-100 mt-2">
+                <div className="text-xs text-gray-400">
+                  {formatFileSize(record.fileSize)}
+                </div>
+                <Space size="small" onClick={(e) => e.stopPropagation()}>
+                  <Button
+                    icon={<DownloadOutlined />}
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onDownload?.(record.id, record.fileName);
+                    }}
+                    className="text-green-600 bg-green-50 border-green-200"
+                  />
+                  <Popconfirm
+                    title="Sənədi sil"
+                    description="Sənədi silmək istədiyinizə əminsiniz?"
+                    onConfirm={(e) => {
+                      e?.stopPropagation();
+                      onDelete?.(record.id);
+                    }}
+                    onCancel={(e) => e?.stopPropagation()}
+                    okText="Bəli"
+                    cancelText="Xeyr"
+                    okButtonProps={{ danger: true }}
+                  >
+                    <Button
+                      icon={<DeleteOutlined />}
+                      size="small"
+                      onClick={(e) => e.stopPropagation()}
+                      className="text-red-500 bg-red-50 border-red-200"
+                    />
+                  </Popconfirm>
+                </Space>
+              </div>
+            </Card>
+          ))
+        ) : (
+          <div className="text-center py-10 bg-white rounded-lg border border-gray-200 text-gray-500">Heç bir sənəd tapılmadı</div>
+        )}
+
+        {/* Mobile Pagination */}
+        {pagination && pagination.total > pagination.pageSize && (
+          <div className="flex justify-center pt-4">
+            <Button
+              disabled={pagination.current === 1}
+              onClick={() => pagination.onChange(pagination.current - 1, pagination.pageSize)}
+              className="mr-2"
+            >
+              Geri
+            </Button>
+            <span className="flex items-center px-2 text-sm text-gray-600">
+              Səhifə {pagination.current}
+            </span>
+            <Button
+              disabled={pagination.current * pagination.pageSize >= pagination.total}
+              onClick={() => pagination.onChange(pagination.current + 1, pagination.pageSize)}
+              className="ml-2"
+            >
+              İrəli
+            </Button>
+          </div>
+        )}
+      </div>
+    </>
   );
 };

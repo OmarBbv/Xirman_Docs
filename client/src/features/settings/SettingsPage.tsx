@@ -103,11 +103,11 @@ export default function SettingsPage() {
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       {/* Modern Header Section */}
-      <div className="bg-linear-to-br from-[#2271b1] to-[#135e96] rounded-lg shadow-lg p-8 text-white">
+      <div className="bg-linear-to-br from-[#2271b1] to-[#135e96] rounded-lg md:shadow-lg p-5 md:p-8 text-white">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex-1">
-            <h1 className="text-3xl font-bold mb-2">Parametrlər</h1>
-            <p className="text-blue-100 text-sm">Hesab və tətbiq ayarlarınızı idarə edin</p>
+            <h1 className="text-xl md:text-3xl font-bold mb-2">Parametrlər</h1>
+            <p className="text-blue-100 text-xs md:text-sm">Hesab və tətbiq ayarlarınızı idarə edin</p>
           </div>
           <div className="flex items-center gap-3">
             {/* <button className="bg-white/10 backdrop-blur-sm border border-white/20 text-white px-5 py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center gap-2 hover:bg-white/20 cursor-pointer">
@@ -121,7 +121,7 @@ export default function SettingsPage() {
       </div>
 
       {/* Tab Navigation */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+      <div className="bg-white rounded-lg border border-gray-200 md:shadow-sm">
         <div className="flex border-b border-gray-200 overflow-x-auto">
           {tabs.map((tab) => (
             <button
@@ -139,10 +139,10 @@ export default function SettingsPage() {
         </div>
 
         {/* Tab Content */}
-        <div className="p-8">
+        <div className="p-4 md:p-8">
           {activeTab === "profile" && (
             <div className="space-y-8 max-w-3xl">
-              <div className="flex items-center gap-6 p-6 bg-linear-to-br from-blue-50 to-purple-50 rounded-lg border border-blue-100">
+              <div className="flex flex-col md:flex-row items-center gap-4 md:gap-6 p-4 md:p-6 bg-linear-to-br from-blue-50 to-purple-50 rounded-lg border border-blue-100 text-center md:text-left">
                 <div className="uppercase w-24 h-24 rounded-full bg-linear-to-br from-[#2271b1] to-[#135e96] flex items-center justify-center text-white text-3xl font-bold shadow-lg ring-4 ring-white">
                   {user?.firstName?.[0]}{user?.lastName?.[0]}
                 </div>

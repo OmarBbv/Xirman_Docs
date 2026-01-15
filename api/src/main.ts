@@ -8,7 +8,6 @@ async function bootstrap() {
   app.enableCors();
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  // Seed Admin
   const usersService = app.get(UsersService);
   await usersService.seedAdmin();
 

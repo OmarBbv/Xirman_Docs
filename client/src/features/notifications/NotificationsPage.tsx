@@ -44,11 +44,11 @@ export default function NotificationsPage() {
   };
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="space-y-4 md:space-y-6 animate-in fade-in duration-500">
       {/* Header */}
-      <div className="bg-linear-to-br from-[#2271b1] to-[#135e96] rounded-lg shadow-lg p-8 text-white">
-        <h1 className="text-3xl font-bold mb-2">Bildirişlər</h1>
-        <p className="text-blue-100 text-sm">Bu gün sistemə əlavə edilən yeni sənədlər</p>
+      <div className="bg-linear-to-br from-[#2271b1] to-[#135e96] rounded-lg md:shadow-lg p-5 md:p-8 text-white">
+        <h1 className="text-xl md:text-3xl font-bold mb-2">Bildirişlər</h1>
+        <p className="text-blue-100 text-xs md:text-sm">Bu gün sistemə əlavə edilən yeni sənədlər</p>
       </div>
 
       {isLoading ? (
@@ -56,39 +56,48 @@ export default function NotificationsPage() {
           <Spin size="large" />
         </div>
       ) : (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="bg-transparent md:bg-white rounded-lg md:shadow-sm md:border border-gray-200 p-0 md:p-6">
           {data?.data && data.data.length > 0 ? (
-            <List
-              grid={{ gutter: 16, xs: 1, sm: 2, md: 3, lg: 3, xl: 4, xxl: 4 }}
-              dataSource={data.data}
-              renderItem={(item) => (
-                <List.Item>
-                  <Card
-                    hoverable
-                    className="h-full shadow-sm hover:shadow-md transition-shadow border-gray-200"
-                    actions={[
-                      <Button type="link" onClick={() => navigate(`/dashboard/docs/${item.id}`)}>Bax</Button>
-                    ]}
-                  >
-                    <Card.Meta
-                      avatar={getFileIcon(item.fileFormat)}
-                      title={<span className="text-gray-800 font-semibold truncate block" title={item.id.toString()}>{item.companyName}</span>}
-                      description={
-                        <div className="space-y-2 mt-2">
-                          <Tag color="blue">{item.documentType}</Tag>
-                          <div className="flex items-center gap-2 text-xs text-gray-500 mt-2">
-                            <UserOutlined /> <span>{item.uploadedBy?.firstName} {item.uploadedBy?.lastName}</span>
-                          </div>
-                          <div className="flex items-center gap-2 text-xs text-gray-400">
-                            <ClockCircleOutlined /> <span>{formatTime(item.uploadedAt)}</span>
+            <div className="flex flex-col gap-3">
+              {data.data.map((item: any) => (
+                <div
+                  key={item.id}
+                  className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow group cursor-pointer"
+                  onClick={() => navigate(`/dashboard/docs/${item.id}`)}
+                >
+                  <div className="flex items-start md:items-center gap-4">
+                    <div className="shrink-0 p-2 bg-gray-50 rounded-lg group-hover:bg-blue-50 transition-colors">
+                      {getFileIcon(item.fileFormat)}
+                    </div>
+
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+                        <div>
+                          <h3 className="font-semibold text-gray-900 truncate pr-4">{item.companyName}</h3>
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 mt-1 text-xs text-gray-500">
+                            <span className="bg-blue-50 text-blue-700 px-2 py-0.5 rounded font-medium">
+                              {item.documentType}
+                            </span>
+                            <div className="flex items-center gap-1">
+                              <UserOutlined />
+                              <span>{item.uploadedBy?.firstName} {item.uploadedBy?.lastName}</span>
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <ClockCircleOutlined />
+                              <span>{formatTime(item.uploadedAt)}</span>
+                            </div>
                           </div>
                         </div>
-                      }
-                    />
-                  </Card>
-                </List.Item>
-              )}
-            />
+
+                        <div className="hidden md:flex items-center text-[#2271b1] text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                          Sənədə bax →
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           ) : (
             <Empty description="Bu gün heç bir sənəd əlavə edilməyib" />
           )}
