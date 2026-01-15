@@ -13,7 +13,6 @@ import {
 export default function NotificationsPage() {
   const navigate = useNavigate();
 
-  // Bu günün tarixini al (Local Time)
   const today = new Date();
   const year = today.getFullYear();
   const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -45,7 +44,6 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-4 md:space-y-6 animate-in fade-in duration-500">
-      {/* Header */}
       <div className="bg-linear-to-br from-[#2271b1] to-[#135e96] rounded-lg md:shadow-lg p-5 md:p-8 text-white">
         <h1 className="text-xl md:text-3xl font-bold mb-2">Bildirişlər</h1>
         <p className="text-blue-100 text-xs md:text-sm">Bu gün sistemə əlavə edilən yeni sənədlər</p>

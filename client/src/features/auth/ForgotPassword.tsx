@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useForgotPassword, useVerifyResetOtp, useResetPassword } from "../hooks/authHooks";
+import { EyeIcon, EyeOffIcon } from "../ui/Icons";
 
 type Props = {
   onNavigateToLogin: () => void;
@@ -13,6 +14,8 @@ export default function ForgotPassword({ onNavigateToLogin }: Props) {
   const [otp, setOtp] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const forgotPasswordMutation = useForgotPassword();
   const verifyResetOtpMutation = useVerifyResetOtp();
@@ -40,7 +43,6 @@ export default function ForgotPassword({ onNavigateToLogin }: Props) {
   const handleResetPassword = (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
-      // Should show error, relying on UI or toast
       return;
     }
     resetPasswordMutation.mutate(
@@ -139,7 +141,7 @@ export default function ForgotPassword({ onNavigateToLogin }: Props) {
       {step === 3 && (
         <form className="space-y-6" onSubmit={handleResetPassword}>
           <Input
-            type="password"
+            type={showPassword ? "text" : "password"}
             placeholder="Yeni şifrə"
             label="Yeni Şifrə"
             className="w-full"
@@ -147,15 +149,33 @@ export default function ForgotPassword({ onNavigateToLogin }: Props) {
             onChange={(e) => setNewPassword(e.target.value)}
             required
             autoFocus
+            suffix={
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="focus:outline-none"
+              >
+                {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+              </button>
+            }
           />
           <Input
-            type="password"
+            type={showConfirmPassword ? "text" : "password"}
             placeholder="Şifrəni təsdiqləyin"
             label="Təkrar Şifrə"
             className="w-full"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
+            suffix={
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="focus:outline-none"
+              >
+                {showConfirmPassword ? <EyeOffIcon /> : <EyeIcon />}
+              </button>
+            }
           />
 
           {newPassword !== confirmPassword && confirmPassword && (
@@ -165,7 +185,7 @@ export default function ForgotPassword({ onNavigateToLogin }: Props) {
           <div className="flex items-center justify-between pt-4">
             <button
               type="button"
-              onClick={() => setStep(2)} // Or disabled
+              onClick={() => setStep(2)}
               className="text-[#1a73e8] font-medium text-sm py-2 rounded transition-colors hover:bg-blue-50 px-2"
             >
               Geri

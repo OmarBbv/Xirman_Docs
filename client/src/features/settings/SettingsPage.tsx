@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useUpdateUser } from "../hooks/userHooks";
 import { useLanguage } from "../../context/LanguageContext";
 import { message } from "antd";
+import { EyeIcon, EyeOffIcon } from "../ui/Icons";
 
 type TabType = "profile" | "security" | "app";
 
@@ -35,6 +36,16 @@ export default function SettingsPage() {
     newPass: "",
     confirm: ""
   });
+
+  const [showPasswords, setShowPasswords] = useState({
+    current: false,
+    newPass: false,
+    confirm: false
+  });
+
+  const toggleVisibility = (field: keyof typeof showPasswords) => {
+    setShowPasswords(prev => ({ ...prev, [field]: !prev[field] }));
+  };
 
   const handleProfileSave = () => {
     if (!user) return;
@@ -236,25 +247,40 @@ export default function SettingsPage() {
                 </h3>
                 <div className="grid grid-cols-1 gap-5 max-w-md">
                   <Input
-                    type="password"
+                    type={showPasswords.current ? "text" : "password"}
                     label="Cari şifrə"
                     placeholder="Cari şifrənizi daxil edin"
                     value={passwords.current}
                     onChange={(e) => setPasswords({ ...passwords, current: e.target.value })}
+                    suffix={
+                      <button type="button" onClick={() => toggleVisibility('current')} className="focus:outline-none">
+                        {showPasswords.current ? <EyeOffIcon /> : <EyeIcon />}
+                      </button>
+                    }
                   />
                   <Input
-                    type="password"
+                    type={showPasswords.newPass ? "text" : "password"}
                     label="Yeni şifrə"
                     placeholder="Yeni şifrənizi daxil edin"
                     value={passwords.newPass}
                     onChange={(e) => setPasswords({ ...passwords, newPass: e.target.value })}
+                    suffix={
+                      <button type="button" onClick={() => toggleVisibility('newPass')} className="focus:outline-none">
+                        {showPasswords.newPass ? <EyeOffIcon /> : <EyeIcon />}
+                      </button>
+                    }
                   />
                   <Input
-                    type="password"
+                    type={showPasswords.confirm ? "text" : "password"}
                     label="Yeni şifrə (Təkrar)"
                     placeholder="Yeni şifrəni təkrar edin"
                     value={passwords.confirm}
                     onChange={(e) => setPasswords({ ...passwords, confirm: e.target.value })}
+                    suffix={
+                      <button type="button" onClick={() => toggleVisibility('confirm')} className="focus:outline-none">
+                        {showPasswords.confirm ? <EyeOffIcon /> : <EyeIcon />}
+                      </button>
+                    }
                   />
                 </div>
                 <Button

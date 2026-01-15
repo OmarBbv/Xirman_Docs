@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Table, Tag, Space, Button, Input, Select, Tooltip, Popconfirm, Avatar, Badge, Spin } from "antd";
+import { Table, Tag, Space, Button, Input, Select, Dropdown, Modal, Avatar, Badge, Spin } from "antd";
 import type { ColumnsType } from 'antd/es/table';
 import { useUsers, useDeleteUser } from "../hooks/userHooks";
 import type { User } from "../services/userService";
@@ -12,7 +12,8 @@ import {
   TeamOutlined,
   SafetyCertificateOutlined,
   CheckCircleOutlined,
-  CloseCircleOutlined
+  CloseCircleOutlined,
+  MoreOutlined
 } from "@ant-design/icons";
 
 export default function UserPage() {
@@ -91,33 +92,45 @@ export default function UserPage() {
       title: 'Əməliyyatlar',
       key: 'actions',
       render: (_, record) => (
-        <Space size="small">
-          <Tooltip title="Düzəliş et">
-            <Button
-              type="text"
-              icon={<EditOutlined />}
-              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-            />
-          </Tooltip>
-          <Tooltip title="Sil">
-            <Popconfirm
-              title="İstifadəçini sil"
-              description="Bu istifadəçini silmək istədiyinizə əminsiniz?"
-              onConfirm={() => deleteUser.mutate(record.id)}
-              okText="Bəli"
-              cancelText="Xeyr"
-              okButtonProps={{ danger: true }}
-            >
-              <Button
-                type="text"
-                icon={<DeleteOutlined />}
-                danger
-                className="hover:bg-red-50"
-              />
-            </Popconfirm>
-          </Tooltip>
-        </Space>
+        <Dropdown
+          trigger={['click']}
+          menu={{
+            items: [
+              {
+                key: 'edit',
+                label: 'Düzəliş et',
+                icon: <EditOutlined />,
+                onClick: () => { },
+              },
+              {
+                key: 'delete',
+                label: 'Sil',
+                icon: <DeleteOutlined />,
+                danger: true,
+                onClick: (e) => {
+                  e.domEvent.stopPropagation();
+                  Modal.confirm({
+                    title: 'İstifadəçini sil',
+                    content: 'Bu istifadəçini silmək istədiyinizə əminsiniz?',
+                    okText: 'Bəli',
+                    cancelText: 'Xeyr',
+                    okButtonProps: { danger: true },
+                    onOk: () => deleteUser.mutate(record.id),
+                  });
+                },
+              },
+            ],
+          }}
+        >
+          <Button
+            type="text"
+            icon={<MoreOutlined style={{ fontSize: '20px', transform: 'rotate(90deg)' }} />}
+            className="text-gray-500 hover:text-gray-700"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </Dropdown >
       ),
+
     },
   ];
 

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Register from "./Register";
 import ForgotPassword from "./ForgotPassword";
 import { useLogin } from "../hooks/authHooks";
+import { EyeIcon, EyeOffIcon } from "../ui/Icons";
 
 type AuthView = "login" | "register" | "forgot-password";
 
@@ -16,6 +17,8 @@ export default function Login() {
     email: '',
     password: ''
   });
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -95,7 +98,7 @@ export default function Login() {
                       required
                     />
                     <Input
-                      type="password"
+                      type={showPassword ? "text" : "password"}
                       name="password"
                       placeholder="Şifrəni daxil edin"
                       label="Şifrə"
@@ -103,6 +106,15 @@ export default function Login() {
                       value={formData.password}
                       onChange={handleInputChange}
                       required
+                      suffix={
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="focus:outline-none"
+                        >
+                          {showPassword ? <EyeOffIcon /> : <EyeIcon />}
+                        </button>
+                      }
                     />
 
                     <div className="text-sm">

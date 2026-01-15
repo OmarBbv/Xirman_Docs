@@ -21,19 +21,16 @@ export class UsersService {
       const salt = await bcrypt.genSalt();
       const hashedPassword = await bcrypt.hash(password, salt);
 
-      // 6 rəqəmli OTP kodu yaradılır
       const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
 
       const user = this.usersRepository.create({
         ...rest,
         password: hashedPassword,
         otpCode: otpCode,
-        isVerified: false, // İlk olaraq təsdiqlənməmiş hesab
+        isVerified: false,
       });
 
       const savedUser = await this.usersRepository.save(user);
-
-      // Emaili göndəririk
       await this.mailService.sendOtpEmail(savedUser.email, otpCode);
 
       return savedUser;
@@ -58,7 +55,7 @@ export class UsersService {
     }
 
     user.isVerified = true;
-    user.otpCode = null; // Kodu təmizləyirik
+    user.otpCode = null;
 
     return this.usersRepository.save(user);
   }
@@ -70,9 +67,12 @@ export class UsersService {
     }
 
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    user.otpCode = otpCode;
-    await this.usersRepository.save(user);
+    console.log(`[ForgotPassword] New OTP generated for ${email}: ${otpCode}`);
 
+    // Update only the OTP code directly
+    await this.usersRepository.update(user.id, { otpCode });
+
+    // Send email (after DB update)
     await this.mailService.sendOtpEmail(user.email, otpCode);
   }
 
@@ -81,6 +81,9 @@ export class UsersService {
     if (!user) {
       throw new BadRequestException('İstifadəçi tapılmadı');
     }
+
+    console.log(`[VerifyReset] Checking OTP for ${email}. Expected: ${user.otpCode}, Received: ${code}`);
+
     if (user.otpCode !== code) {
       throw new BadRequestException('Yanlış OTP kodu');
     }
@@ -99,9 +102,11 @@ export class UsersService {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(newPass, salt);
 
-    user.password = hashedPassword;
-    user.otpCode = null; // Kodu təmizləyirik
-    await this.usersRepository.save(user);
+    // Update password and clear OTP using update method
+    await this.usersRepository.update(user.id, {
+      password: hashedPassword,
+      otpCode: null
+    });
   }
 
   async findByEmail(email: string): Promise<User | null> {
@@ -128,7 +133,6 @@ export class UsersService {
     return this.usersRepository.delete(id);
   }
 
-  // Admin hesabı varmı yoxla, yoxdursa yarat
   async seedAdmin() {
     const adminEmail = 'admin@xirman.az';
     const adminExists = await this.findByEmail(adminEmail);
@@ -142,7 +146,7 @@ export class UsersService {
         lastName: 'User',
         email: adminEmail,
         password: hashedPassword,
-        position: UserPosition.DIRECTOR, // Default olaraq Director
+        position: UserPosition.DIRECTOR,
         role: 'admin',
         isVerified: true,
       });

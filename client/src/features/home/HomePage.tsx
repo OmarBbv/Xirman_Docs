@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useDocuments, useDocumentStats, useRecentActivities } from "../hooks/documentHooks";
-import { Spin, Table, Tag, Button, Card } from "antd";
+import { Spin, Table, Tag, Button, Card, Dropdown } from "antd";
+import { MoreOutlined, EyeOutlined } from "@ant-design/icons";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -71,14 +72,26 @@ export default function HomePage() {
       key: 'action',
       align: 'right' as const,
       render: (_: any, record: any) => (
-        <Button
-          type="link"
-          size="small"
-          onClick={() => navigate(`/dashboard/docs/${record.id}`)}
-          className="text-[#2271b1] p-0"
+        <Dropdown
+          trigger={['click']}
+          menu={{
+            items: [
+              {
+                key: 'view',
+                label: 'Bax',
+                icon: <EyeOutlined />,
+                onClick: () => navigate(`/dashboard/docs/${record.id}`),
+              },
+            ]
+          }}
         >
-          Bax
-        </Button>
+          <Button
+            type="text"
+            icon={<MoreOutlined style={{ fontSize: '20px', transform: 'rotate(90deg)' }} />}
+            className="text-gray-500 hover:text-gray-700"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </Dropdown>
       ),
     },
   ];
@@ -282,14 +295,26 @@ export default function HomePage() {
                 </div>
 
                 <div className="mt-3 pt-3 border-t border-gray-100 flex justify-end">
-                  <Button
-                    type="link"
-                    size="small"
-                    onClick={() => navigate(`/dashboard/docs/${doc.id}`)}
-                    className="text-[#2271b1] p-0 h-auto text-sm font-medium"
+                  <Dropdown
+                    trigger={['click']}
+                    menu={{
+                      items: [
+                        {
+                          key: 'view',
+                          label: 'Sənədə Bax',
+                          icon: <EyeOutlined />,
+                          onClick: () => navigate(`/dashboard/docs/${doc.id}`),
+                        },
+                      ]
+                    }}
                   >
-                    Sənədə Bax →
-                  </Button>
+                    <Button
+                      size="small"
+                      icon={<MoreOutlined style={{ fontSize: '18px', transform: 'rotate(90deg)' }} />}
+                      className="text-gray-500 border-gray-200"
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </Dropdown>
                 </div>
               </Card>
             ))

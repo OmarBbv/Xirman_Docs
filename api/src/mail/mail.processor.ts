@@ -5,6 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import * as brevo from '@getbrevo/brevo';
 
 export interface EmailJobData {
+  type: 'otp' | 'document';
   email: string;
   otp: string;
 }

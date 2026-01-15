@@ -1,4 +1,4 @@
-import { Table, Tag, Space, Button, Tooltip, Popconfirm, Card } from 'antd';
+import { Table, Tag, Space, Button, Dropdown, Modal, Card } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
   EyeOutlined,
@@ -7,7 +7,8 @@ import {
   FilePdfOutlined,
   FileWordOutlined,
   FileExcelOutlined,
-  FileOutlined
+  FileOutlined,
+  MoreOutlined
 } from '@ant-design/icons';
 import type { Document, FileFormat } from "../types/document.types";
 
@@ -150,48 +151,55 @@ export const DocumentTable = ({
       title: 'Əməliyyatlar',
       key: 'actions',
       render: (_, record) => (
-        <Space size="small" onClick={(e) => e.stopPropagation()}>
-          <Tooltip title="Bax">
-            <Button
-              type="text"
-              icon={<EyeOutlined />}
-              onClick={() => onView?.(record.id)}
-              className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-            />
-          </Tooltip>
-          <Tooltip title="Yüklə">
-            <Button
-              type="text"
-              icon={<DownloadOutlined />}
-              onClick={(e) => {
-                e.stopPropagation();
-                onDownload?.(record.id, record.fileName);
-              }}
-              className="text-green-600 hover:text-green-700 hover:bg-green-50"
-            />
-          </Tooltip>
-          <Tooltip title="Sil">
-            <Popconfirm
-              title="Sənədi sil"
-              description="Bu sənədi silmək istədiyinizə əminsiniz?"
-              onConfirm={(e) => {
-                e?.stopPropagation();
-                onDelete?.(record.id);
-              }}
-              onCancel={(e) => e?.stopPropagation()}
-              okText="Bəli"
-              cancelText="Xeyr"
-              okButtonProps={{ danger: true }}
-            >
-              <Button
-                type="text"
-                icon={<DeleteOutlined />}
-                onClick={(e) => e.stopPropagation()}
-                className="text-red-500 hover:text-red-600 hover:bg-red-50"
-              />
-            </Popconfirm>
-          </Tooltip>
-        </Space>
+        <Dropdown
+          trigger={['click']}
+          menu={{
+            items: [
+              {
+                key: 'view',
+                label: 'Bax',
+                icon: <EyeOutlined />,
+                onClick: () => onView?.(record.id),
+              },
+              {
+                key: 'download',
+                label: 'Yüklə',
+                icon: <DownloadOutlined />,
+                onClick: (e) => {
+                  e.domEvent.stopPropagation();
+                  onDownload?.(record.id, record.fileName);
+                },
+              },
+              {
+                type: 'divider',
+              },
+              {
+                key: 'delete',
+                label: 'Sil',
+                icon: <DeleteOutlined />,
+                danger: true,
+                onClick: (e) => {
+                  e.domEvent.stopPropagation();
+                  Modal.confirm({
+                    title: 'Sənədi sil',
+                    content: 'Bu sənədi silmək istədiyinizə əminsiniz?',
+                    okText: 'Bəli',
+                    cancelText: 'Xeyr',
+                    okButtonProps: { danger: true },
+                    onOk: () => onDelete?.(record.id),
+                  });
+                },
+              },
+            ],
+          }}
+        >
+          <Button
+            type="text"
+            icon={<MoreOutlined style={{ fontSize: '20px', transform: 'rotate(90deg)' }} />}
+            onClick={(e) => e.stopPropagation()}
+            className="text-gray-500 hover:text-gray-700"
+          />
+        </Dropdown>
       ),
     },
   ];
@@ -260,34 +268,46 @@ export const DocumentTable = ({
                   {formatFileSize(record.fileSize)}
                 </div>
                 <Space size="small" onClick={(e) => e.stopPropagation()}>
-                  <Button
-                    icon={<DownloadOutlined />}
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      onDownload?.(record.id, record.fileName);
+                  <Dropdown
+                    trigger={['click']}
+                    menu={{
+                      items: [
+                        {
+                          key: 'download',
+                          label: 'Yüklə',
+                          icon: <DownloadOutlined />,
+                          onClick: (info) => {
+                            info.domEvent.stopPropagation();
+                            onDownload?.(record.id, record.fileName);
+                          },
+                        },
+                        {
+                          key: 'delete',
+                          label: 'Sil',
+                          icon: <DeleteOutlined />,
+                          danger: true,
+                          onClick: (info) => {
+                            info.domEvent.stopPropagation();
+                            Modal.confirm({
+                              title: 'Sənədi sil',
+                              content: 'Sənədi silmək istədiyinizə əminsiniz?',
+                              okText: 'Bəli',
+                              cancelText: 'Xeyr',
+                              okButtonProps: { danger: true },
+                              onOk: () => onDelete?.(record.id),
+                            });
+                          },
+                        },
+                      ],
                     }}
-                    className="text-green-600 bg-green-50 border-green-200"
-                  />
-                  <Popconfirm
-                    title="Sənədi sil"
-                    description="Sənədi silmək istədiyinizə əminsiniz?"
-                    onConfirm={(e) => {
-                      e?.stopPropagation();
-                      onDelete?.(record.id);
-                    }}
-                    onCancel={(e) => e?.stopPropagation()}
-                    okText="Bəli"
-                    cancelText="Xeyr"
-                    okButtonProps={{ danger: true }}
                   >
                     <Button
-                      icon={<DeleteOutlined />}
                       size="small"
+                      icon={<MoreOutlined style={{ fontSize: '18px', transform: 'rotate(90deg)' }} />}
                       onClick={(e) => e.stopPropagation()}
-                      className="text-red-500 bg-red-50 border-red-200"
+                      className="text-gray-500 border-gray-200"
                     />
-                  </Popconfirm>
+                  </Dropdown>
                 </Space>
               </div>
             </Card>
