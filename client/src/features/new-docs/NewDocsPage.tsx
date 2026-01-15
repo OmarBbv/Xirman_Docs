@@ -7,7 +7,8 @@ import { Button } from '../ui/button';
 import { ArrowLeftIcon } from '../ui/Icons';
 import { useUploadDocument } from '../hooks/documentHooks';
 import { DocumentType } from '../types/document.types';
-import { Select } from 'antd';
+import { Select, DatePicker } from 'antd';
+import dayjs from 'dayjs';
 
 interface NewDocumentForm {
   companyName: string;
@@ -73,7 +74,7 @@ export default function NewDocsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-linear-to-br from-[#f8f9fa] to-[#e8eaed]">
+    <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="bg-linear-to-r from-[#1a73e8] to-[#4285f4] p-8 shadow-lg flex items-center gap-6">
         <button
@@ -116,12 +117,32 @@ export default function NewDocsPage() {
 
           {/* Document Date & Type */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <Input
-              type="date"
-              label="Sənədin tarixi"
-              {...register('documentDate', { required: 'Sənədin tarixi mütləqdir' })}
-              error={errors.documentDate?.message}
-            />
+            <div className="relative">
+              <label className="text-[12px] text-[#1a73e8] bg-white px-1 absolute -top-2.5 left-3 z-10">
+                Sənədin tarixi
+              </label>
+              <Controller
+                name="documentDate"
+                control={control}
+                rules={{ required: 'Sənədin tarixi mütləqdir' }}
+                render={({ field }) => (
+                  <DatePicker
+                    className="w-full h-[54px]"
+                    placeholder="Tarix seçin"
+                    status={errors.documentDate ? 'error' : ''}
+                    value={field.value ? dayjs(field.value) : null}
+                    onChange={(_, dateString) => field.onChange(dateString)}
+                    format="YYYY-MM-DD"
+                  />
+                )}
+              />
+              {errors.documentDate && (
+                <p className="text-red-500 text-[12px] mt-1 ml-1">
+                  {errors.documentDate.message}
+                </p>
+              )}
+            </div>
+
             <div className="relative">
               <label className="text-[12px] text-[#1a73e8] bg-white px-1 absolute -top-2.5 left-3 z-10">
                 Sənəd növü
@@ -137,6 +158,7 @@ export default function NewDocsPage() {
                     className="w-full h-[54px]"
                     options={documentTypeOptions}
                     status={errors.documentType ? 'error' : ''}
+                    value={field.value || undefined}
                   />
                 )}
               />

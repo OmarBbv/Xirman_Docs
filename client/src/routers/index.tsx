@@ -10,6 +10,7 @@ import UserPage from "../features/user/UserPage";
 import SettingsPage from "../features/settings/SettingsPage";
 // import { ProtectedRole } from "../features/utils/ProtectedRole";
 import NewDocsPage from "../features/new-docs/NewDocsPage";
+import NotificationsPage from "../features/notifications/NotificationsPage";
 
 export const router = createBrowserRouter([
   {
@@ -56,6 +57,10 @@ export const router = createBrowserRouter([
       {
         path: "docs/new",
         element: <NewDocsPage />,
+      },
+      {
+        path: "notifications",
+        element: <NotificationsPage />,
       }
     ],
   },

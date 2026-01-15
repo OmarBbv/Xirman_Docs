@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
-import { Table } from "../ui/table";
 import { useDocuments, useDocumentStats, useRecentActivities } from "../hooks/documentHooks";
-import { Spin } from "antd";
+import { Spin, Table, Tag, Button } from "antd";
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -36,8 +35,53 @@ export default function HomePage() {
     title: doc.fileName,
     author: `${doc.uploadedBy?.firstName} ${doc.uploadedBy?.lastName}`,
     date: new Date(doc.uploadedAt).toLocaleString('az-AZ'),
-    status: doc.amount ? `${doc.amount} AZN` : 'Məbləğ yoxdur'
+    amount: doc.amount
   })) || [];
+
+  const columns = [
+    {
+      title: 'Sənəd',
+      dataIndex: 'title',
+      key: 'title',
+      render: (text: string) => <span className="font-medium text-gray-900">{text}</span>,
+    },
+    {
+      title: 'Yükləyən',
+      dataIndex: 'author',
+      key: 'author',
+      render: (text: string) => <span className="text-gray-600">{text}</span>,
+    },
+    {
+      title: 'Tarix',
+      dataIndex: 'date',
+      key: 'date',
+      render: (text: string) => <span className="text-gray-500 text-sm">{text}</span>,
+    },
+    {
+      title: 'Məbləğ / Status',
+      key: 'amount',
+      render: (_: any, record: any) => (
+        <Tag color={record.amount ? 'green' : 'default'}>
+          {record.amount ? `${record.amount} AZN` : 'Məbləğ yoxdur'}
+        </Tag>
+      ),
+    },
+    {
+      title: '',
+      key: 'action',
+      align: 'right' as const,
+      render: (_: any, record: any) => (
+        <Button
+          type="link"
+          size="small"
+          onClick={() => navigate(`/dashboard/docs/${record.id}`)}
+          className="text-[#2271b1] p-0"
+        >
+          Bax
+        </Button>
+      ),
+    },
+  ];
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -204,8 +248,12 @@ export default function HomePage() {
           </button>
         </div>
         <Table
-          data={formattedRecentDocs}
-          onView={(id) => navigate(`/dashboard/docs/${id}`)}
+          columns={columns}
+          dataSource={formattedRecentDocs}
+          pagination={false}
+          rowKey="id"
+          size="middle"
+          className="overflow-x-auto"
         />
       </div>
     </div>

@@ -128,7 +128,7 @@ export default function DocumentDetailsPage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                <p className="text-sm text-gray-500 mb-1">Yüklənib</p>
+                <p className="text-sm text-gray-500 mb-1">Yüklənmə tarixi</p>
                 <p className="font-semibold text-gray-900">
                   {new Date(document.uploadedAt).toLocaleString('az-AZ')}
                 </p>
