@@ -1,6 +1,7 @@
 # Dependencies
 **/node_modules/
-**/pnpm-lock.yaml
+# **/pnpm-lock.yaml  <-- Comment-ə alırıq və ya silirik
+
 
 # Environment variables
 **/.env
@@ -21,7 +22,7 @@
 # OS
 **/.DS_Store
 **/Thumbs.db
-
+w
 # IDE
 **/.vscode/
 **/.idea/
