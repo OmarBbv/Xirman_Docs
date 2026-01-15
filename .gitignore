@@ -1,0 +1,35 @@
+# Dependencies
+**/node_modules/
+**/pnpm-lock.yaml
+
+# Environment variables
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Build outputs
+**/dist/
+**/build/
+**/*.tsbuildinfo
+
+# Logs
+**/logs/
+**/*.log
+**/npm-debug.log*
+**/pnpm-debug.log*
+
+# OS
+**/.DS_Store
+**/Thumbs.db
+
+# IDE
+**/.vscode/
+**/.idea/
+**/*.swp
+**/*.swo
+
+# Uploads
+api/uploads/
+
+# Redis docs (optional - local docs)
+api/README-REDIS.md
