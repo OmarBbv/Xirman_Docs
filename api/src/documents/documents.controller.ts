@@ -52,8 +52,8 @@ export class DocumentsController {
   }
 
   @Get('stats')
-  async getStats() {
-    return this.documentsService.getStats();
+  async getStats(@Req() req: any) {
+    return this.documentsService.getStats(req.user);
   }
 
   @Get('activities')

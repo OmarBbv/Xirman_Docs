@@ -117,11 +117,16 @@ export class DocumentsService {
 
     if (user && user.role !== 'admin') {
       const userPosition = user.position || user['position'];
-      queryBuilder.andWhere(new Brackets(qb => {
-        qb.where("document.allowedPositions IS NULL")
-          .orWhere("document.allowedPositions = ''")
-          .orWhere("document.allowedPositions LIKE :pos", { pos: `%${userPosition}%` });
-      }));
+      if (userPosition) {
+        queryBuilder.andWhere(new Brackets(qb => {
+          qb.where("document.allowedPositions IS NULL")
+            .orWhere("document.allowedPositions = ''")
+            .orWhere("document.allowedPositions = :emptyArray", { emptyArray: '' })
+            .orWhere("document.allowedPositions LIKE :positionPattern", {
+              positionPattern: `%${userPosition}%`
+            });
+        }));
+      }
     }
 
     if (companyName) {
@@ -183,17 +188,41 @@ export class DocumentsService {
     };
   }
 
-  async getStats() {
-    const total = await this.documentRepository.count();
+  async getStats(user?: User) {
+    const baseQueryBuilder = () => {
+      const qb = this.documentRepository.createQueryBuilder('document');
 
-    const { sum } = await this.documentRepository
-      .createQueryBuilder('document')
+      if (user && user.role !== 'admin') {
+        const userPosition = user.position || user['position'];
+        if (userPosition) {
+          qb.andWhere(
+            "(document.allowedPositions IS NULL OR document.allowedPositions = '' OR document.allowedPositions LIKE :positionPattern)",
+            { positionPattern: `%${userPosition}%` }
+          );
+        }
+      }
+
+      return qb;
+    };
+
+    const total = await baseQueryBuilder().getCount();
+
+    const { sum } = await baseQueryBuilder()
       .select('SUM(document.amount)', 'sum')
       .getRawOne();
 
-    const pdfCount = await this.documentRepository.count({ where: { fileFormat: FileFormat.PDF } });
-    const wordCount = await this.documentRepository.count({ where: { fileFormat: FileFormat.WORD } });
-    const excelCount = await this.documentRepository.count({ where: { fileFormat: FileFormat.EXCEL } });
+    const pdfCount = await baseQueryBuilder()
+      .andWhere('document.fileFormat = :format', { format: FileFormat.PDF })
+      .getCount();
+
+    const wordCount = await baseQueryBuilder()
+      .andWhere('document.fileFormat = :format', { format: FileFormat.WORD })
+      .getCount();
+
+    const excelCount = await baseQueryBuilder()
+      .andWhere('document.fileFormat = :format', { format: FileFormat.EXCEL })
+      .getCount();
+
     const otherCount = total - (pdfCount + wordCount + excelCount);
 
     const now = new Date();

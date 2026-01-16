@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { UploadIcon, FileIcon, XIcon } from './Icons';
+import { UploadIcon, FileIcon, XIcon, EyeIcon } from './Icons';
+import { FilePreviewModal } from './FilePreviewModal';
 
 interface Props {
   label: string;
@@ -11,6 +12,7 @@ interface Props {
 export const FileUpload = ({ label, accept = ".pdf,.doc,.docx,.xls,.xlsx", onChange, className = "" }: Props) => {
   const [file, setFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0] || null;
@@ -50,6 +52,18 @@ export const FileUpload = ({ label, accept = ".pdf,.doc,.docx,.xls,.xlsx", onCha
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
   };
 
+  const getFileTypeLabel = (fileName: string) => {
+    const ext = fileName.split('.').pop()?.toLowerCase();
+    switch (ext) {
+      case 'pdf': return 'PDF';
+      case 'doc':
+      case 'docx': return 'Word';
+      case 'xls':
+      case 'xlsx': return 'Excel';
+      default: return 'Fayl';
+    }
+  };
+
   return (
     <div className={`relative ${className}`}>
       <label className="block text-[14px] font-medium text-[#5f6368] mb-2">
@@ -86,29 +100,54 @@ export const FileUpload = ({ label, accept = ".pdf,.doc,.docx,.xls,.xlsx", onCha
           </div>
         </div>
       ) : (
-        <div className="border border-[#dadce0] rounded-lg p-4 bg-white">
+        <div className="border border-[#dadce0] rounded-lg p-4 bg-white hover:shadow-md transition-shadow">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-lg bg-[#e8f0fe] flex items-center justify-center shrink-0">
+            <div
+              className="w-12 h-12 rounded-lg bg-[#e8f0fe] flex items-center justify-center shrink-0 cursor-pointer hover:bg-[#d2e3fc] transition-colors"
+              onClick={() => setIsPreviewOpen(true)}
+              title="Önizləmə"
+            >
               <FileIcon className="w-6 h-6 text-[#1a73e8]" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-[14px] font-medium text-[#202124] truncate">
                 {file.name}
               </p>
-              <p className="text-[12px] text-[#5f6368]">
-                {formatFileSize(file.size)}
-              </p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="text-[12px] text-[#5f6368]">
+                  {formatFileSize(file.size)}
+                </span>
+                <span className="text-[10px] px-1.5 py-0.5 bg-[#e8f0fe] text-[#1a73e8] rounded font-medium">
+                  {getFileTypeLabel(file.name)}
+                </span>
+              </div>
             </div>
             <button
               type="button"
-              onClick={handleRemove}
-              className="w-8 h-8 rounded-full hover:bg-[#f1f3f4] flex items-center justify-center transition-colors shrink-0"
+              onClick={() => setIsPreviewOpen(true)}
+              className="w-9 h-9 rounded-full hover:bg-[#e8f0fe] flex items-center justify-center transition-colors shrink-0"
+              title="Önizləmə"
             >
-              <XIcon className="w-5 h-5 text-[#5f6368]" />
+              <EyeIcon className="w-5 h-5 text-[#1a73e8]" />
+            </button>
+            <button
+              type="button"
+              onClick={handleRemove}
+              className="w-9 h-9 rounded-full hover:bg-[#fce8e6] flex items-center justify-center transition-colors shrink-0"
+              title="Sil"
+            >
+              <XIcon className="w-5 h-5 text-[#d93025]" />
             </button>
           </div>
         </div>
       )}
+
+      {/* Preview Modal */}
+      <FilePreviewModal
+        file={file}
+        isOpen={isPreviewOpen}
+        onClose={() => setIsPreviewOpen(false)}
+      />
     </div>
   );
 };

@@ -8,6 +8,7 @@ import { useAuth } from "../../context/AuthContext";
 import { Badge, Popover, List, Empty, Drawer, Button } from "antd";
 import { MenuOutlined } from "@ant-design/icons";
 import { useDocuments } from "../hooks/documentHooks";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Layout() {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -17,6 +18,7 @@ export default function Layout() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -91,6 +93,7 @@ export default function Layout() {
       </div>
       <button
         onClick={() => {
+          queryClient.clear();
           logout();
           navigate('/login');
         }}
