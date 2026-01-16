@@ -309,9 +309,7 @@
     "createAccount": "Hesab yaradın",
     "login": "Daxil ol",
     "loggingIn": "Giriş edilir...",
-    "help": "Kömək",
-    "privacy": "Məxfilik",
-    "terms": "Şərtlər"
+    "contact": "Bizimlə əlaqə"
   },
   "RegisterPage": {
     "title": "Qeydiyyat",

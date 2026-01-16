@@ -309,9 +309,7 @@
     "createAccount": "Создать аккаунт",
     "login": "Войти",
     "loggingIn": "Вход...",
-    "help": "Помощь",
-    "privacy": "Конфиденциальность",
-    "terms": "Условия"
+    "contact": "Связаться с нами"
   },
   "RegisterPage": {
     "title": "Регистрация",

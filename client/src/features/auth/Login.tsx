@@ -222,9 +222,9 @@ export default function Login() {
       <div className="w-full flex justify-center py-6">
         <div className="w-full max-w-[450px] flex justify-between text-[12px] text-[#70757a] px-4">
           <div className="space-x-4">
-            <a href="#" className="hover:bg-gray-100 p-1 rounded">{t('help')}</a>
-            <a href="#" className="hover:bg-gray-100 p-1 rounded">{t('privacy')}</a>
-            <a href="#" className="hover:bg-gray-100 p-1 rounded">{t('terms')}</a>
+            <a href="https://www.saytyarat.online/contact.html" target="_blank" rel="noopener noreferrer" className="hover:bg-gray-100 p-1 rounded">
+              {t('contact')}
+            </a>
           </div>
         </div>
       </div>
