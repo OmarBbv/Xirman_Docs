@@ -1,5 +1,5 @@
-import { IsString, IsNumber, IsOptional, IsEnum, IsDateString } from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsString, IsNumber, IsOptional, IsEnum, IsDateString, IsBoolean } from 'class-validator';
+import { Type, Transform } from 'class-transformer';
 import { DocumentType, FileFormat } from '../enums/document-enums';
 
 export class FilterDocumentDto {
@@ -42,4 +42,9 @@ export class FilterDocumentDto {
   @IsOptional()
   @Type(() => Number)
   limit?: number = 10;
+
+  @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  excludeRead?: boolean;
 }

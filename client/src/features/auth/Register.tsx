@@ -7,20 +7,7 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { useRegister, useVerifyOtp } from "../hooks/authHooks";
-
-const registerSchema = z.object({
-  firstName: z.string().min(2, "Ad ən azı 2 simvoldan ibarət olmalıdır"),
-  lastName: z.string().min(2, "Soyad ən azı 2 simvoldan ibarət olmalıdır"),
-  email: z.string().email("Düzgün email daxil edin"),
-  position: z.string().min(1, "Vəzifə seçilməlidir"),
-  password: z.string().min(6, "Şifrə ən azı 6 simvoldan ibarət olmalıdır"),
-  confirmPassword: z.string()
-}).refine((data) => data.password === data.confirmPassword, {
-  message: "Şifrələr uyğun gəlmir",
-  path: ["confirmPassword"],
-});
-
-type RegisterSchema = z.infer<typeof registerSchema>;
+import { useTranslations } from "use-intl";
 
 interface RegisterProps {
   onNavigateToLogin: () => void;
@@ -31,6 +18,23 @@ export default function Register({ onNavigateToLogin }: RegisterProps) {
   const [userEmail, setUserEmail] = useState("");
   const [otpCode, setOtpCode] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const t = useTranslations('RegisterPage');
+  const tErrors = useTranslations('RegisterPage.errors');
+  const tPositions = useTranslations('RegisterPage.positions');
+
+  const registerSchema = z.object({
+    firstName: z.string().min(2, tErrors('firstNameMin')),
+    lastName: z.string().min(2, tErrors('lastNameMin')),
+    email: z.string().email(tErrors('emailInvalid')),
+    position: z.string().min(1, tErrors('positionRequired')),
+    password: z.string().min(6, tErrors('passwordMin')),
+    confirmPassword: z.string()
+  }).refine((data) => data.password === data.confirmPassword, {
+    message: tErrors('passwordMismatch'),
+    path: ["confirmPassword"],
+  });
+
+  type RegisterSchema = z.infer<typeof registerSchema>;
 
   const { mutate: registerUser, isPending: isRegisterPending } = useRegister();
   const { mutate: verifyOtp, isPending: isVerifyPending } = useVerifyOtp();
@@ -72,9 +76,9 @@ export default function Register({ onNavigateToLogin }: RegisterProps) {
     return (
       <div className="w-full">
         <div className="text-center mb-8">
-          <h2 className="text-2xl font-semibold text-[#202124] mb-2">Təsdiqləmə</h2>
+          <h2 className="text-2xl font-semibold text-[#202124] mb-2">{t('verifyTitle')}</h2>
           <p className="text-[16px] text-[#202124]">
-            {userEmail} ünvanına göndərilən 6 rəqəmli kodu daxil edin
+            {t('verifySubtitle', { email: userEmail })}
           </p>
         </div>
 
@@ -97,7 +101,7 @@ export default function Register({ onNavigateToLogin }: RegisterProps) {
               className="py-2.5 px-8 w-full md:w-fit"
               disabled={isVerifyPending || otpCode.length !== 6}
             >
-              {isVerifyPending ? "Yoxlanılır..." : "Təsdiqlə"}
+              {isVerifyPending ? t('verifying') : t('verify')}
             </Button>
 
             <button
@@ -105,7 +109,7 @@ export default function Register({ onNavigateToLogin }: RegisterProps) {
               onClick={() => setStep("register")}
               className="text-[#5f6368] text-sm hover:underline cursor-pointer"
             >
-              Geri qayıt və məlumatları düzəlt
+              {t('backToEdit')}
             </button>
           </div>
         </form>
@@ -116,19 +120,19 @@ export default function Register({ onNavigateToLogin }: RegisterProps) {
   return (
     <div className="w-full">
       <div className="text-center mb-8">
-        <h2 className="text-2xl font-semibold text-[#202124] mb-2">Qeydiyyat</h2>
-        <p className="text-[16px] text-[#202124]">Yeni hesab yaradın</p>
+        <h2 className="text-2xl font-semibold text-[#202124] mb-2">{t('title')}</h2>
+        <p className="text-[16px] text-[#202124]">{t('subtitle')}</p>
       </div>
 
       <form className="space-y-4" onSubmit={handleSubmit(onRegisterSubmit)}>
         <div className="grid grid-cols-2 gap-4">
           <Input
-            label="Ad"
+            label={t('firstName')}
             {...register("firstName")}
             error={errors.firstName?.message}
           />
           <Input
-            label="Soyad"
+            label={t('lastName')}
             {...register("lastName")}
             error={errors.lastName?.message}
           />
@@ -136,14 +140,14 @@ export default function Register({ onNavigateToLogin }: RegisterProps) {
 
         <Input
           type="email"
-          label="Email"
+          label={t('email')}
           {...register("email")}
           error={errors.email?.message}
         />
 
         <div className="relative">
           <label className={`text-[12px] ${errors.position ? 'text-red-500' : 'text-[#1a73e8]'} bg-white px-1 absolute -top-2.5 left-3 z-10`}>
-            Vəzifə
+            {t('position')}
           </label>
           <Controller
             name="position"
@@ -151,16 +155,16 @@ export default function Register({ onNavigateToLogin }: RegisterProps) {
             render={({ field }) => (
               <Select
                 {...field}
-                placeholder="Vəzifə seçin"
+                placeholder={t('positionPlaceholder')}
                 className={`w-full h-[54px] ant-select-custom ${errors.position ? 'ant-select-status-error' : ''}`}
                 options={[
-                  { value: '', label: 'Vəzifə seçin', disabled: true },
-                  { value: 'finance_manager', label: 'Maliyyə müdiri' },
-                  { value: 'accountant', label: 'Mühasib' },
-                  { value: 'sales_specialist', label: 'Satış mütəxəssisi' },
-                  { value: 'warehouseman', label: 'Anbardar' },
-                  { value: 'director', label: 'Direktor' },
-                  { value: 'hr', label: 'HR' },
+                  { value: '', label: t('positionPlaceholder'), disabled: true },
+                  { value: 'finance_manager', label: tPositions('finance_manager') },
+                  { value: 'accountant', label: tPositions('accountant') },
+                  { value: 'sales_specialist', label: tPositions('sales_specialist') },
+                  { value: 'warehouseman', label: tPositions('warehouseman') },
+                  { value: 'director', label: tPositions('director') },
+                  { value: 'hr', label: tPositions('hr') },
                 ]}
                 status={errors.position ? "error" : ""}
                 style={{ width: '100%' }}
@@ -172,7 +176,7 @@ export default function Register({ onNavigateToLogin }: RegisterProps) {
 
         <Input
           type={showPassword ? "text" : "password"}
-          label="Şifrə"
+          label={t('password')}
           {...register("password")}
           error={errors.password?.message}
           suffix={
@@ -183,7 +187,7 @@ export default function Register({ onNavigateToLogin }: RegisterProps) {
         />
         <Input
           type={showPassword ? "text" : "password"}
-          label="Şifrəni təsdiqlə"
+          label={t('confirmPassword')}
           {...register("confirmPassword")}
           error={errors.confirmPassword?.message}
           suffix={
@@ -199,10 +203,10 @@ export default function Register({ onNavigateToLogin }: RegisterProps) {
             onClick={onNavigateToLogin}
             className="text-[#1a73e8] font-medium text-sm py-2 rounded transition-colors hover:underline cursor-pointer"
           >
-            Artıq hesabınız var?
+            {t('alreadyHaveAccount')}
           </button>
           <Button type="submit" className="py-1.5 px-6 w-fit" disabled={isRegisterPending}>
-            {isRegisterPending ? "Gözləyin..." : "Qeydiyyatdan keç"}
+            {isRegisterPending ? t('registering') : t('register')}
           </Button>
         </div>
       </form>

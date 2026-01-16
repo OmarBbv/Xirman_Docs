@@ -4,7 +4,10 @@ import { ArrowLeftIcon, DetailIcon, ExternalLinkIcon, EyeIcon } from "../ui/Icon
 import { useDocument, useDocumentViews, useDownloadDocument, useUpdateDocument, useDocumentVersions, useDownloadVersion } from "../hooks/documentHooks";
 import { Spin, Alert, Tag, Avatar, Button as AntButton } from "antd";
 import { useDebounce } from "../hooks/useDebounce";
-import { UploadOutlined, HistoryOutlined, FileTextOutlined, DownOutlined, RightOutlined, DownloadOutlined } from "@ant-design/icons";
+import { UploadOutlined, HistoryOutlined, FileTextOutlined, DownOutlined, RightOutlined, DownloadOutlined, ShareAltOutlined } from "@ant-design/icons";
+import { useTranslations, useLocale } from "use-intl";
+import { documentService } from "../services/documentServices";
+import { message } from "antd";
 
 export default function DocumentDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -13,6 +16,9 @@ export default function DocumentDetailsPage() {
   const [viewSearch, setViewSearch] = useState("");
   const debouncedSearch = useDebounce(viewSearch, 500);
   const [showHistory, setShowHistory] = useState(false);
+  const t = useTranslations('DocumentDetailsPage');
+  const tCommon = useTranslations('DocumentsPage');
+  const locale = useLocale();
 
   const { data: document, isLoading: isDocLoading, error: docError } = useDocument(documentId);
   const { data: views, isLoading: isViewsLoading } = useDocumentViews(documentId, debouncedSearch);
@@ -31,8 +37,25 @@ export default function DocumentDetailsPage() {
   };
 
   const handleVersionDownload = (ver: any) => {
-    // e.stopPropagation() lazım ola bilər əgər iç-içə elementlər varsa, amma burada lazım deyil
     downloadVersion.mutate({ id: ver.id, fileName: ver.fileName });
+  };
+
+  const handleShare = async () => {
+    if (!document) return;
+
+    try {
+      const response = await documentService.getShareLink(documentId);
+      const { downloadUrl, document: doc } = response;
+
+      const subject = encodeURIComponent(`Sənəd: ${doc.fileName}`);
+      const body = encodeURIComponent(
+        `Salam,\n\nSizinlə "${doc.fileName}" sənədini paylaşmaq istəyirəm.\n\nSənəd məlumatları:\n- Şirkət: ${doc.companyName}\n- Məbləğ: ${doc.amount ? doc.amount + ' AZN' : 'Göstərilməyib'}\n- Növ: ${doc.documentType}\n\nSənədi yükləmək üçün bu linkə klikləyin:\n${downloadUrl}\n\nXirman EAS`
+      );
+
+      window.open(`https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`, '_blank');
+    } catch (error) {
+      message.error('Link yaradılarkən xəta baş verdi');
+    }
   };
 
   if (isDocLoading) {
@@ -47,8 +70,8 @@ export default function DocumentDetailsPage() {
     return (
       <div className="p-8">
         <Alert
-          message="Xəta"
-          description="Sənəd tapılmadı və ya yüklənərkən xəta baş verdi."
+          message={t('error.title')}
+          description={t('error.description')}
           type="error"
           showIcon
           action={
@@ -56,7 +79,7 @@ export default function DocumentDetailsPage() {
               onClick={() => navigate('/dashboard/docs')}
               className="text-red-500 hover:text-red-700 font-medium"
             >
-              Geri qayıt
+              {t('back')}
             </button>
           }
         />
@@ -69,16 +92,7 @@ export default function DocumentDetailsPage() {
   };
 
   const getDocumentTypeLabel = (type: string) => {
-    const labels: Record<string, string> = {
-      contract: "Müqavilə",
-      invoice: "Faktura",
-      act: "Akt",
-      report: "Hesabat",
-      letter: "Məktub",
-      order: "Sifariş",
-      other: "Digər",
-    };
-    return labels[type] || type;
+    return tCommon(`types.${type}`);
   };
 
   const formatFileSize = (bytes?: number) => {
@@ -91,7 +105,6 @@ export default function DocumentDetailsPage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      {/* Header */}
       <div className="bg-linear-to-br from-[#2271b1] to-[#135e96] rounded-lg shadow-lg p-8 text-white">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex-1">
@@ -99,19 +112,19 @@ export default function DocumentDetailsPage() {
               <button
                 onClick={() => navigate('/dashboard/docs')}
                 className="bg-white/10 hover:bg-white/20 p-2 rounded-lg transition-colors cursor-pointer"
-                title="Geri qayıt"
+                title={t('back')}
               >
                 <ArrowLeftIcon className="w-5 h-5" />
               </button>
               <h1 className="text-3xl font-bold">{document.companyName}</h1>
             </div>
             <p className="text-blue-100 text-sm ml-12">
-              Sənəd № {document.id} • {new Date(document.documentDate).toLocaleDateString('az-AZ')}
+              {t('document.number')} {document.id} • {new Date(document.documentDate).toLocaleDateString(locale === 'az' ? 'az-AZ' : 'ru-RU')}
             </p>
           </div>
           <div className="flex items-center gap-3">
             <Tag color="green" className="px-3 py-1 text-sm font-medium border-0">
-              Aktiv
+              {t('document.status')}
             </Tag>
           </div>
         </div>
@@ -122,40 +135,40 @@ export default function DocumentDetailsPage() {
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-full">
             <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
               <DetailIcon className="w-5 h-5 text-[#2271b1]" />
-              Sənəd Məlumatları
+              {t('title')}
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                <p className="text-sm text-gray-500 mb-1">Yüklənmə tarixi</p>
+                <p className="text-sm text-gray-500 mb-1">{t('document.uploadDate')}</p>
                 <p className="font-semibold text-gray-900">
-                  {new Date(document.uploadedAt).toLocaleString('az-AZ')}
+                  {new Date(document.uploadedAt).toLocaleString(locale === 'az' ? 'az-AZ' : 'ru-RU')}
                 </p>
               </div>
 
               <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                <p className="text-sm text-gray-500 mb-1">Məbləğ</p>
+                <p className="text-sm text-gray-500 mb-1">{t('document.amount')}</p>
                 <p className="font-semibold text-gray-900">
                   {document.amount ? `${document.amount} AZN` : '-'}
                 </p>
               </div>
 
               <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                <p className="text-sm text-gray-500 mb-1">Sənəd növü</p>
+                <p className="text-sm text-gray-500 mb-1">{t('document.type')}</p>
                 <p className="font-semibold text-gray-900">
                   {getDocumentTypeLabel(document.documentType)}
                 </p>
               </div>
 
               <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                <p className="text-sm text-gray-500 mb-1">Sənəd formatı</p>
+                <p className="text-sm text-gray-500 mb-1">{t('document.format')}</p>
                 <p className="font-semibold text-gray-900 uppercase">
                   {document.fileFormat}
                 </p>
               </div>
 
               <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
-                <p className="text-sm text-gray-500 mb-1">Yükləyən istifadəçi</p>
+                <p className="text-sm text-gray-500 mb-1">{t('document.uploader')}</p>
                 <div className="flex items-center gap-2 mt-1">
                   <Avatar style={{ backgroundColor: '#2271b1' }} size="small">
                     {document.uploadedBy?.firstName?.[0] || 'U'}
@@ -168,7 +181,7 @@ export default function DocumentDetailsPage() {
             </div>
 
             <div className="mt-6 pt-6 border-t border-gray-100">
-              <h3 className="text-sm font-semibold text-gray-900 mb-3">Sənəd Faylı</h3>
+              <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('file.title')}</h3>
               <div
                 onClick={handleDownload}
                 className="flex items-center justify-between p-4 bg-blue-50 border border-blue-100 rounded-lg hover:bg-blue-100 transition-colors group cursor-pointer"
@@ -180,14 +193,13 @@ export default function DocumentDetailsPage() {
                       {document.fileName}
                     </p>
                     <p className="text-xs text-blue-600">
-                      Ölçü: {formatFileSize(document.fileSize)} • Yükləmək üçün klikləyin
+                      {t('file.size')}: {formatFileSize(document.fileSize)} • {t('file.clickToDownload')}
                     </p>
                   </div>
                 </div>
                 <ExternalLinkIcon className="w-5 h-5 text-blue-400 group-hover:text-blue-600 shrink-0" />
               </div>
 
-              {/* Faylın Yenilənməsi Bölməsi */}
               <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100">
                 <div className="text-xs text-gray-500">
                   {document.updatedBy ? (
@@ -196,18 +208,18 @@ export default function DocumentDetailsPage() {
                         {document.updatedBy.firstName?.[0]}
                       </Avatar>
                       <span>
-                        Son düzəliş: <b>{document.updatedBy.firstName} {document.updatedBy.lastName}</b>
+                        {t('file.lastEdit')}: <b>{document.updatedBy.firstName} {document.updatedBy.lastName}</b>
                         <span className="text-gray-400 ml-1">
-                          ({new Date(document.updatedAt).toLocaleString('az-AZ')})
+                          ({new Date(document.updatedAt).toLocaleString(locale === 'az' ? 'az-AZ' : 'ru-RU')})
                         </span>
                       </span>
                     </div>
                   ) : (
-                    <span>Bu sənəddə hələ düzəliş edilməyib</span>
+                    <span>{t('file.noEdit')}</span>
                   )}
                 </div>
 
-                <div>
+                <div className="flex gap-2">
                   <input
                     type="file"
                     ref={fileInputRef}
@@ -222,12 +234,21 @@ export default function DocumentDetailsPage() {
                     type="default"
                     className="text-xs"
                   >
-                    Yeni Versiya Yüklə
+                    {t('file.uploadNew')}
+                  </AntButton>
+
+                  <AntButton
+                    icon={<ShareAltOutlined />}
+                    size="small"
+                    onClick={handleShare}
+                    type="default"
+                    className="text-xs"
+                  >
+                    Paylaş
                   </AntButton>
                 </div>
               </div>
 
-              {/* Versiya Tarixçəsi */}
               <div className="mt-4 border-t border-gray-100 pt-4">
                 <button
                   onClick={() => setShowHistory(!showHistory)}
@@ -235,7 +256,7 @@ export default function DocumentDetailsPage() {
                 >
                   {showHistory ? <DownOutlined className="text-xs" /> : <RightOutlined className="text-xs" />}
                   <HistoryOutlined />
-                  Versiya Tarixçəsi ({versions?.length || 0})
+                  {t('history.title')} ({versions?.length || 0})
                 </button>
 
                 {showHistory && versions && versions.length > 0 && (
@@ -252,9 +273,9 @@ export default function DocumentDetailsPage() {
                             <FileTextOutlined />
                           </div>
                           <div className="min-w-0">
-                            <p className="font-medium text-gray-700 truncate" title={ver.fileName}>Version {ver.version} - {ver.fileName}</p>
+                            <p className="font-medium text-gray-700 truncate" title={ver.fileName}>{t('history.version')} {ver.version} - {ver.fileName}</p>
                             <p className="text-xs text-gray-400">
-                              {new Date(ver.createdAt).toLocaleString('az-AZ')} • {formatFileSize(ver.fileSize)}
+                              {new Date(ver.createdAt).toLocaleString(locale === 'az' ? 'az-AZ' : 'ru-RU')} • {formatFileSize(ver.fileSize)}
                             </p>
                           </div>
                         </div>
@@ -276,20 +297,19 @@ export default function DocumentDetailsPage() {
           </div>
         </div>
 
-        {/* Viewers Sidebar */}
         <div className="flex flex-col h-full w-full lg:w-[350px] shrink-0">
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 h-full flex flex-col">
             <div className="flex items-center justify-between mb-4 shrink-0">
               <h2 className="text-lg font-bold text-gray-900 flex items-center gap-2">
                 <EyeIcon className="w-5 h-5 text-[#2271b1]" />
-                Baxış Tarixçəsi
+                {t('viewers.title')}
               </h2>
             </div>
 
             <div className="mb-4 shrink-0">
               <input
                 type="text"
-                placeholder="İstifadəçi axtar..."
+                placeholder={t('viewers.search')}
                 value={viewSearch}
                 onChange={(e) => setViewSearch(e.target.value)}
                 className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-[#2271b1] transition-colors bg-gray-50 focus:bg-white"
@@ -322,14 +342,14 @@ export default function DocumentDetailsPage() {
                       </div>
                     </div>
                     <span className="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded whitespace-nowrap ml-2 shrink-0">
-                      {new Date(view.viewedAt).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(view.viewedAt).toLocaleTimeString(locale === 'az' ? 'az-AZ' : 'ru-RU', { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </div>
                 ))}
               </div>
             ) : (
               <p className="text-gray-500 text-sm text-center py-4">
-                Hələ baxış yoxdur
+                {t('viewers.empty')}
               </p>
             )}
           </div>

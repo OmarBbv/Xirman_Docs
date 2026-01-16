@@ -23,13 +23,13 @@ import { DocumentsService } from './documents.service';
 import { CreateDocumentDto, UpdateDocumentDto, FilterDocumentDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { documentUploadOptions } from './config/file-upload.config';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('documents')
 @UseGuards(JwtAuthGuard)
 export class DocumentsController {
   constructor(private readonly documentsService: DocumentsService) { }
 
-  // Sənəd yüklə
   @Post('upload')
   @UseInterceptors(FileInterceptor('file', documentUploadOptions))
   async create(
@@ -40,25 +40,21 @@ export class DocumentsController {
     return this.documentsService.create(createDocumentDto, file, req.user);
   }
 
-  // Bütün sənədləri gətir (filtrləmə ilə)
   @Get()
-  async findAll(@Query() filterDto: FilterDocumentDto) {
-    return this.documentsService.findAll(filterDto);
+  async findAll(@Query() filterDto: FilterDocumentDto, @Req() req: any) {
+    return this.documentsService.findAll(filterDto, req.user);
   }
 
-  // Mənim sənədlərim
   @Get('my')
   async findMyDocuments(@Query() filterDto: FilterDocumentDto, @Req() req: any) {
     return this.documentsService.findByUser(req.user.id, filterDto);
   }
 
-  // Tək sənəd gətir
   @Get('stats')
   async getStats() {
     return this.documentsService.getStats();
   }
 
-  // Son aktivlikləri gətir
   @Get('activities')
   async getRecentActivities() {
     return this.documentsService.getRecentActivities();
@@ -72,7 +68,7 @@ export class DocumentsController {
     return document;
   }
 
-  // Sənədi yüklə (download)
+  @Public()
   @Get(':id/download')
   async download(
     @Param('id', ParseIntPipe) id: number,
@@ -81,10 +77,10 @@ export class DocumentsController {
   ) {
     const document = await this.documentsService.findOne(id);
 
-    // Baxışı qeyd et
-    await this.documentsService.recordView(id, req.user);
+    if (req.user) {
+      await this.documentsService.recordView(id, req.user).catch(err => console.error('View record error:', err));
+    }
 
-    // Faylı göndər
     const filePath = path.resolve(document.filePath);
     if (!fs.existsSync(filePath)) {
       return res.status(404).json({ message: 'Fayl tapılmadı' });
@@ -93,7 +89,6 @@ export class DocumentsController {
     res.download(filePath, document.fileName);
   }
 
-  // Sənəd baxış tarixçəsi
   @Get(':id/views')
   async getViewHistory(
     @Param('id', ParseIntPipe) id: number,
@@ -102,7 +97,6 @@ export class DocumentsController {
     return this.documentsService.getViewHistory(id, search);
   }
 
-  // Sənədi yenilə
   @Patch(':id')
   @UseInterceptors(FileInterceptor('file', documentUploadOptions))
   async update(
@@ -114,13 +108,11 @@ export class DocumentsController {
     return this.documentsService.update(id, updateDocumentDto, req.user, file);
   }
 
-  // Sənəd versiyalarını gətir
   @Get(':id/versions')
   async getVersions(@Param('id', ParseIntPipe) id: number) {
     return this.documentsService.getVersions(id);
   }
 
-  // Versiya yüklə (download)
   @Get('versions/:id/download')
   async downloadVersion(@Param('id', ParseIntPipe) id: number, @Res() res: Response) {
     const { filePath, fileName } = await this.documentsService.getVersionFile(id);
@@ -135,9 +127,20 @@ export class DocumentsController {
     });
   }
 
-  // Sənədi sil
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number) {
     return this.documentsService.remove(id);
+  }
+
+  @Post(':id/read')
+  async markAsRead(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
+    return this.documentsService.markAsRead(id, req.user);
+  }
+
+  @Post(':id/share')
+  async getShareLink(
+    @Param('id', ParseIntPipe) id: number,
+  ) {
+    return this.documentsService.getPublicShareLink(id);
   }
 }

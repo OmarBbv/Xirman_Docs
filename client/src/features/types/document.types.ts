@@ -52,6 +52,7 @@ export interface DocumentVersion {
 export interface Document {
   id: number;
   companyName: string;
+  documentNumber: string | null;
   amount: number | null;
   documentType: DocumentType;
   documentDate: string;
@@ -71,6 +72,7 @@ export interface Document {
 
 export interface CreateDocumentDto {
   companyName: string;
+  documentNumber?: string;
   amount?: number;
   documentType?: DocumentType;
   documentDate: string;
@@ -78,6 +80,7 @@ export interface CreateDocumentDto {
 
 export interface UpdateDocumentDto {
   companyName?: string;
+  documentNumber?: string;
   amount?: number;
   documentType?: DocumentType;
   documentDate?: string;
@@ -93,6 +96,7 @@ export interface FilterDocumentDto {
   endDate?: string;
   page?: number;
   limit?: number;
+  excludeRead?: boolean;
 }
 
 export interface PaginatedDocuments {

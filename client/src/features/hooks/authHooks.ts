@@ -14,9 +14,9 @@ export const useLogin = () => {
       if (data.access_token) {
         login(data.user, data.access_token);
         if (data.user.role === 'admin') {
-          navigate("/dashboard");
+          navigate("/dashboard", { replace: true });
         } else {
-          navigate("/dashboard/docs");
+          navigate("/dashboard/docs", { replace: true });
         }
       }
     },
@@ -55,9 +55,9 @@ export const useVerifyOtp = () => {
         login(data.user, data.access_token);
         message.success("Qeydiyyat tamamlandı!");
         if (data.user.role === 'admin') {
-          navigate("/dashboard");
+          navigate("/dashboard", { replace: true });
         } else {
-          navigate("/dashboard/docs");
+          navigate("/dashboard/docs", { replace: true });
         }
       }
     },

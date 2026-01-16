@@ -215,7 +215,7 @@ export default function UserPage() {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           { label: t("totalUsers"), value: totalUsers, icon: <TeamOutlined />, color: "text-blue-600", bg: "bg-blue-50" },
           { label: t("admins"), value: adminCount, icon: <SafetyCertificateOutlined />, color: "text-purple-600", bg: "bg-purple-50" },
@@ -292,7 +292,7 @@ export default function UserPage() {
               />
             </div>
 
-            <div className="md:hidden space-y-3">
+            <div className="md:hidden flex flex-col gap-3">
               {(users?.length || 0) > 0 ? (
                 users?.map((user) => {
                   let roleColor = 'default';
@@ -301,7 +301,7 @@ export default function UserPage() {
                   if (user.role === 'user') roleColor = 'green';
 
                   return (
-                    <Card key={user.id} className="shadow-none border border-gray-200" bodyStyle={{ padding: '16px' }}>
+                    <Card key={user.id} className="shadow-none border border-gray-200" styles={{ body: { padding: '16px' } }}>
                       <div className="flex justify-between items-start mb-3">
                         <div className="flex items-center gap-3">
                           <Avatar style={{ backgroundColor: '#2271b1' }} icon={<UserOutlined />} />

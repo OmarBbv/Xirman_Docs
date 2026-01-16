@@ -9,7 +9,18 @@
     "admin_panel": "İdarə Paneli",
     "logout": "Çıxış",
     "notifications": "Bildiriş",
-    "greeting": "Salam"
+    "greeting": "Salam",
+    "menu": "Menyu",
+    "newDocsToday": "Yeni Sənədlər (Bu gün)",
+    "viewAll": "Hamısına bax",
+    "noNotifications": "Yeni bildiriş yoxdur"
+  },
+  "NotificationsPage": {
+    "title": "Bildirişlər",
+    "subtitle": "Bu gün sistemə əlavə edilən yeni sənədlər",
+    "empty": "Bu gün heç bir sənəd əlavə edilməyib",
+    "markRead": "Oxunmuş kimi işarələ",
+    "viewDoc": "Sənədə bax →"
   },
   "UserPage": {
     "title": "İstifadəçi İdarəetməsi",
@@ -110,5 +121,257 @@
       "twoFactorHint": "Hesabınızı daha təhlükəsiz edin",
       "soon": "Tezliklə"
     }
+  },
+  "DocumentsPage": {
+    "title": "Sənəd İdarəetməsi",
+    "subtitle": "Bütün sənədlərinizi buradan idarə edə bilərsiniz",
+    "newDocument": "Yeni Sənəd",
+    "stats": {
+      "total": "Toplam Sənəd"
+    },
+    "filters": {
+      "all": "Hamısı",
+      "detailedSearch": "Ətraflı Axtarış",
+      "companyName": "Şirkət adı",
+      "companyPlaceholder": "Şirkət adı daxil edin",
+      "documentType": "Sənəd növü",
+      "selectRequest": "Seçin",
+      "dateRange": "Tarix aralığı",
+      "startDate": "Başlama",
+      "endDate": "Bitmə",
+      "amountRange": "Məbləğ aralığı (AZN)",
+      "min": "Min",
+      "max": "Max",
+      "clear": "Təmizlə",
+      "search": "Axtar"
+    },
+    "table": {
+      "file": "Fayl",
+      "company": "Şirkət",
+      "type": "Növ",
+      "amount": "Məbləğ",
+      "date": "Sənədin Tarixi",
+      "uploadedBy": "Yükləyən",
+      "size": "Ölçü",
+      "actions": "Əməliyyatlar",
+      "view": "Bax",
+      "download": "Yüklə",
+      "share": "Paylaş",
+      "delete": "Sil",
+      "deleteConfirmTitle": "Sənədi sil",
+      "deleteConfirmContent": "Bu sənədi silmək istədiyinizə əminsiniz?",
+      "yes": "Bəli",
+      "no": "Xeyr",
+      "loading": "Yüklənir...",
+      "notFound": "Heç bir sənəd tapılmadı",
+      "back": "Geri",
+      "forward": "İrəli",
+      "page": "Səhifə"
+    },
+    "types": {
+      "contract": "Müqavilə",
+      "invoice": "Faktura",
+      "act": "Akt",
+      "report": "Hesabat",
+      "letter": "Məktub",
+      "order": "Sifariş",
+      "other": "Digər"
+    }
+  },
+  "NewDocumentPage": {
+    "back": "Geri qayıt",
+    "title": "Yeni Sənəd Yarat",
+    "subtitle": "Sistemə yeni sənəd əlavə etmək üçün aşağıdakı formu doldurun",
+    "form": {
+      "companyName": "Şirkət adı",
+      "companyPlaceholder": "Şirkət adını daxil edin",
+      "companyRequired": "Şirkət adı mütləqdir",
+      "documentNumber": "Sənəd nömrəsi",
+      "documentNumberPlaceholder": "Sənəd nömrəsini daxil edin",
+      "amount": "Məbləğ (AZN)",
+      "amountPlaceholder": "Məbləği daxil edin",
+      "date": "Sənədin tarixi",
+      "dateRequired": "Sənədin tarixi mütləqdir",
+      "datePlaceholder": "Tarix seçin",
+      "type": "Sənəd növü",
+      "typeRequired": "Sənəd növü seçilməlidir",
+      "typePlaceholder": "Sənəd növünü seçin",
+      "file": "Sənəd faylı (PDF, Word, Excel)",
+      "fileRequired": "* Fayl seçilməlidir"
+    },
+    "buttons": {
+      "cancel": "Ləğv et",
+      "create": "Sənəd Yarat",
+      "loading": "Yüklənir..."
+    },
+    "types": {
+      "contract": "Müqavilə",
+      "invoice": "Faktura",
+      "act": "Akt",
+      "report": "Hesabat",
+      "letter": "Məktub",
+      "order": "Sifariş",
+      "other": "Digər"
+    },
+    "info": {
+      "title": "Məlumat",
+      "content": "Sənəd yükləndikdən sonra yükləyən istifadəçi avtomatik olaraq sizin hesabınız kimi qeyd olunacaq. Maksimum fayl ölçüsü 10MB-dır. Yalnız PDF, Word və Excel formatları qəbul edilir."
+    }
+  },
+  "DashboardPage": {
+    "welcome": {
+      "title": "Xoş gəldiniz, {name}",
+      "subtitle": "Sistemin ümumi vəziyyəti və son hərəkətlər burada görüntülənir",
+      "newDocument": "Yeni Sənəd"
+    },
+    "stats": {
+      "totalDocuments": "Toplam Sənəd",
+      "totalAmount": "Toplam Məbləğ",
+      "activeUsers": "Aktiv İstifadəçilər",
+      "otherDocuments": "Digər Sənədlər",
+      "trends": {
+        "general": "Ümumi",
+        "total": "Cəmi",
+        "last24h": "Son 24 saat",
+        "formats": "Formatlar"
+      }
+    },
+    "charts": {
+      "documentDistribution": "Sənəd Növü Dağılımı",
+      "pdf": "PDF Sənədlər",
+      "word": "Word (DOCX)",
+      "excel": "Excel (XLSX)",
+      "other": "Digər",
+      "docsCount": "sənəd"
+    },
+    "activity": {
+      "title": "Son Hərəkətlər",
+      "viewed": "'{file}' sənədinə baxdı",
+      "empty": "Hələ heç bir hərəkət yoxdur"
+    },
+    "recentDocs": {
+      "title": "Son Yüklənən Sənədlər",
+      "viewAll": "Hamısına bax →",
+      "notFound": "Heç bir sənəd yoxdur",
+      "table": {
+        "document": "Sənəd",
+        "uploader": "Yükləyən",
+        "date": "Tarix",
+        "amountStatus": "Məbləğ / Status",
+        "noAmount": "Məbləğ yoxdur",
+        "view": "Bax",
+        "viewDoc": "Sənədə Bax"
+      }
+    }
+  },
+  "DocumentDetailsPage": {
+    "back": "Geri qayıt",
+    "title": "Sənəd Məlumatları",
+    "document": {
+      "number": "Sənəd №",
+      "status": "Aktiv",
+      "uploadDate": "Yüklənmə tarixi",
+      "amount": "Məbləğ",
+      "type": "Sənəd növü",
+      "format": "Sənəd formatı",
+      "uploader": "Yükləyən istifadəçi"
+    },
+    "file": {
+      "title": "Sənəd Faylı",
+      "size": "Ölçü",
+      "clickToDownload": "Yükləmək üçün klikləyin",
+      "lastEdit": "Son düzəliş",
+      "noEdit": "Bu sənəddə hələ düzəliş edilməyib",
+      "uploadNew": "Yeni Versiya Yüklə"
+    },
+    "history": {
+      "title": "Versiya Tarixçəsi",
+      "version": "Versiya"
+    },
+    "viewers": {
+      "title": "Baxış Tarixçəsi",
+      "search": "İstifadəçi axtar...",
+      "empty": "Hələ baxış yoxdur"
+    },
+    "error": {
+      "title": "Xəta",
+      "description": "Sənəd tapılmadı və ya yüklənərkən xəta baş verdi."
+    }
+  },
+  "LoginPage": {
+    "title": "Daxil olun",
+    "subtitle": "Xirman İdarəetmə Sisteminə giriş",
+    "email": "Email",
+    "emailPlaceholder": "Email daxil edin",
+    "password": "Şifrə",
+    "passwordPlaceholder": "Şifrəni daxil edin",
+    "forgotPassword": "Şifrəni unutmusunuz?",
+    "createAccount": "Hesab yaradın",
+    "login": "Daxil ol",
+    "loggingIn": "Giriş edilir...",
+    "help": "Kömək",
+    "privacy": "Məxfilik",
+    "terms": "Şərtlər"
+  },
+  "RegisterPage": {
+    "title": "Qeydiyyat",
+    "subtitle": "Yeni hesab yaradın",
+    "firstName": "Ad",
+    "lastName": "Soyad",
+    "email": "Email",
+    "position": "Vəzifə",
+    "positionPlaceholder": "Vəzifə seçin",
+    "password": "Şifrə",
+    "confirmPassword": "Şifrəni təsdiqlə",
+    "alreadyHaveAccount": "Artıq hesabınız var?",
+    "register": "Qeydiyyatdan keç",
+    "registering": "Gözləyin...",
+    "verifyTitle": "Təsdiqləmə",
+    "verifySubtitle": "{email} ünvanına göndərilən 6 rəqəmli kodu daxil edin",
+    "verify": "Təsdiqlə",
+    "verifying": "Yoxlanılır...",
+    "backToEdit": "Geri qayıt və məlumatları düzəlt",
+    "positions": {
+      "finance_manager": "Maliyyə müdiri",
+      "accountant": "Mühasib",
+      "sales_specialist": "Satış mütəxəssisi",
+      "warehouseman": "Anbardar",
+      "director": "Direktor",
+      "hr": "HR"
+    },
+    "errors": {
+      "firstNameMin": "Ad ən azı 2 simvoldan ibarət olmalıdır",
+      "lastNameMin": "Soyad ən azı 2 simvoldan ibarət olmalıdır",
+      "emailInvalid": "Düzgün email daxil edin",
+      "positionRequired": "Vəzifə seçilməlidir",
+      "passwordMin": "Şifrə ən azı 6 simvoldan ibarət olmalıdır",
+      "passwordMismatch": "Şifrələr uyğun gəlmir"
+    }
+  },
+  "ForgotPasswordPage": {
+    "step1Title": "Şifrəni unutmusunuz?",
+    "step1Subtitle": "Email ünvanınızı daxil edin",
+    "step2Title": "OTP Kodu Təsdiqləyin",
+    "step2Subtitle": "Emailinizə göndərilən kodu daxil edin",
+    "step3Title": "Yeni Şifrə Təyin Edin",
+    "step3Subtitle": "Yeni şifrənizi daxil edin",
+    "email": "Email",
+    "emailPlaceholder": "Email daxil edin",
+    "otpCode": "OTP Kod",
+    "otpCodePlaceholder": "OTP Kodu",
+    "newPassword": "Yeni Şifrə",
+    "newPasswordPlaceholder": "Yeni şifrə",
+    "confirmPassword": "Təkrar Şifrə",
+    "confirmPasswordPlaceholder": "Şifrəni təsdiqləyin",
+    "sendCode": "Kodu göndər",
+    "sending": "Göndərilir...",
+    "verify": "Təsdiqlə",
+    "verifying": "Yoxlanılır...",
+    "reset": "Yenilə",
+    "resetting": "Yenilənir...",
+    "back": "Geri qayıt",
+    "backShort": "Geri",
+    "info": "Biz sizə şifrəni yeniləmək üçün link/kod göndərəcəyik.",
+    "passwordMismatch": "Şifrələr eyni deyil"
   }
 }

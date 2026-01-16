@@ -21,6 +21,9 @@ export class Document {
   @Column()
   companyName: string;
 
+  @Column({ nullable: true })
+  documentNumber: string;
+
   @Column({ type: 'decimal', precision: 12, scale: 2, nullable: true })
   amount: number;
 

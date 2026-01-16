@@ -13,6 +13,7 @@ interface DocumentServiceTypes {
   getAll(filters?: FilterDocumentDto): Promise<PaginatedDocuments>;
   getMyDocuments(filters?: FilterDocumentDto): Promise<PaginatedDocuments>;
   getById(id: number): Promise<Document>;
+  markAsRead(id: number): Promise<{ success: boolean }>;
   upload(data: CreateDocumentDto, file: File): Promise<Document>;
   update(id: number, data: UpdateDocumentDto, file?: File): Promise<Document>;
   delete(id: number): Promise<{ message: string }>;
@@ -30,10 +31,19 @@ interface DocumentServiceTypes {
     activeUsers: number;
   }>;
   getRecentActivities(): Promise<DocumentView[]>;
+  getShareLink(id: number): Promise<{
+    success: boolean;
+    downloadUrl: string;
+    document: {
+      fileName: string;
+      companyName: string;
+      amount: number;
+      documentType: string;
+    };
+  }>;
 }
 
 class DocumentService implements DocumentServiceTypes {
-  // Statistika
   async getStats() {
     try {
       const response = await PRIVATE_API.get("/documents/stats");
@@ -43,7 +53,6 @@ class DocumentService implements DocumentServiceTypes {
     }
   }
 
-  // Bütün sənədləri gətir (filtrləmə ilə)
   async getAll(filters?: FilterDocumentDto): Promise<PaginatedDocuments> {
     try {
       const response = await PRIVATE_API.get("/documents", { params: filters });
@@ -53,7 +62,6 @@ class DocumentService implements DocumentServiceTypes {
     }
   }
 
-  // Mənim sənədlərim
   async getMyDocuments(filters?: FilterDocumentDto): Promise<PaginatedDocuments> {
     try {
       const response = await PRIVATE_API.get("/documents/my", { params: filters });
@@ -63,7 +71,6 @@ class DocumentService implements DocumentServiceTypes {
     }
   }
 
-  // Tək sənəd gətir
   async getById(id: number): Promise<Document> {
     try {
       const response = await PRIVATE_API.get(`/documents/${id}`);
@@ -73,13 +80,24 @@ class DocumentService implements DocumentServiceTypes {
     }
   }
 
-  // Sənəd yüklə
+  async markAsRead(id: number): Promise<{ success: boolean }> {
+    try {
+      const response = await PRIVATE_API.post(`/documents/${id}/read`);
+      return response.data;
+    } catch (error) {
+      throw this.errorHandler(error);
+    }
+  }
+
   async upload(data: CreateDocumentDto, file: File): Promise<Document> {
     try {
       const formData = new FormData();
       formData.append("file", file);
       formData.append("companyName", data.companyName);
       formData.append("documentDate", data.documentDate);
+      if (data.documentNumber) {
+        formData.append("documentNumber", data.documentNumber);
+      }
 
       if (data.amount !== undefined) {
         formData.append("amount", String(data.amount));
@@ -99,7 +117,6 @@ class DocumentService implements DocumentServiceTypes {
     }
   }
 
-  // Sənədi yenilə
   async update(id: number, data: UpdateDocumentDto, file?: File): Promise<Document> {
     try {
       const formData = new FormData();
@@ -107,7 +124,6 @@ class DocumentService implements DocumentServiceTypes {
         formData.append("file", file);
       }
 
-      // Digər sahələri əlavə et
       Object.keys(data).forEach((key) => {
         const value = data[key as keyof UpdateDocumentDto];
         if (value !== undefined && value !== null) {
@@ -126,7 +142,6 @@ class DocumentService implements DocumentServiceTypes {
     }
   }
 
-  // Sənədi sil
   async delete(id: number): Promise<{ message: string }> {
     try {
       const response = await PRIVATE_API.delete(`/documents/${id}`);
@@ -136,7 +151,6 @@ class DocumentService implements DocumentServiceTypes {
     }
   }
 
-  // Sənədi yüklə (download)
   async download(id: number): Promise<Blob> {
     try {
       const response = await PRIVATE_API.get(`/documents/${id}/download`, {
@@ -148,7 +162,6 @@ class DocumentService implements DocumentServiceTypes {
     }
   }
 
-  // Baxış tarixçəsi
   async getViewHistory(id: number, search?: string): Promise<DocumentView[]> {
     try {
       const response = await PRIVATE_API.get(`/documents/${id}/views`, {
@@ -160,7 +173,6 @@ class DocumentService implements DocumentServiceTypes {
     }
   }
 
-  // Versiyaları gətir
   async getVersions(id: number): Promise<DocumentVersion[]> {
     try {
       const response = await PRIVATE_API.get(`/documents/${id}/versions`);
@@ -170,7 +182,6 @@ class DocumentService implements DocumentServiceTypes {
     }
   }
 
-  // Versiyanı yüklə (download)
   async downloadVersion(id: number): Promise<Blob> {
     try {
       const response = await PRIVATE_API.get(`/documents/versions/${id}/download`, {
@@ -182,7 +193,15 @@ class DocumentService implements DocumentServiceTypes {
     }
   }
 
-  // Son aktivlikləri gətir
+  async getShareLink(id: number) {
+    try {
+      const response = await PRIVATE_API.post(`/documents/${id}/share`);
+      return response.data;
+    } catch (error) {
+      throw this.errorHandler(error);
+    }
+  }
+
   async getRecentActivities(): Promise<DocumentView[]> {
     try {
       const response = await PRIVATE_API.get("/documents/activities");

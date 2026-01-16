@@ -8,8 +8,10 @@ import {
   FileWordOutlined,
   FileExcelOutlined,
   FileOutlined,
-  MoreOutlined
+  MoreOutlined,
+  ShareAltOutlined
 } from '@ant-design/icons';
+import { useTranslations } from "use-intl";
 import type { Document, FileFormat } from "../types/document.types";
 
 interface DocumentTableProps {
@@ -18,6 +20,7 @@ interface DocumentTableProps {
   onView?: (id: number) => void;
   onDownload?: (id: number, fileName: string) => void;
   onDelete?: (id: number) => void;
+  onShare?: (id: number) => void;
   pagination?: {
     current: number;
     pageSize: number;
@@ -26,7 +29,6 @@ interface DocumentTableProps {
   };
 }
 
-// Fayl formatı üçün ikon
 const getFileIcon = (format: FileFormat) => {
   const style = { fontSize: '20px' };
   switch (format) {
@@ -41,21 +43,6 @@ const getFileIcon = (format: FileFormat) => {
   }
 };
 
-// Sənəd növü Azərbaycan dilində
-const getDocumentTypeLabel = (type: string) => {
-  const labels: Record<string, string> = {
-    contract: "Müqavilə",
-    invoice: "Faktura",
-    act: "Akt",
-    report: "Hesabat",
-    letter: "Məktub",
-    order: "Sifariş",
-    other: "Digər",
-  };
-  return labels[type] || type;
-};
-
-// Sənəd növü üçün rəng
 const getDocumentTypeColor = (type: string) => {
   const colors: Record<string, string> = {
     contract: "blue",
@@ -69,7 +56,6 @@ const getDocumentTypeColor = (type: string) => {
   return colors[type] || "default";
 };
 
-// Fayl ölçüsünü formatla
 const formatFileSize = (bytes: number) => {
   if (bytes === 0) return "0 B";
   const k = 1024;
@@ -84,12 +70,14 @@ export const DocumentTable = ({
   onView,
   onDownload,
   onDelete,
+  onShare,
   pagination
 }: DocumentTableProps) => {
+  const t = useTranslations('DocumentsPage');
 
   const columns: ColumnsType<Document> = [
     {
-      title: 'Fayl',
+      title: t('table.file'),
       key: 'file',
       render: (_, record) => (
         <Space>
@@ -99,39 +87,39 @@ export const DocumentTable = ({
       ),
     },
     {
-      title: 'Şirkət',
+      title: t('table.company'),
       dataIndex: 'companyName',
       key: 'companyName',
       render: (text) => <span className="text-gray-700 font-medium">{text}</span>,
     },
     {
-      title: 'Növ',
+      title: t('table.type'),
       dataIndex: 'documentType',
       key: 'documentType',
       render: (type) => (
         <Tag color={getDocumentTypeColor(type)} className="rounded-full px-2">
-          {getDocumentTypeLabel(type)}
+          {t(`types.${type}`)}
         </Tag>
       ),
     },
     {
-      title: 'Məbləğ',
+      title: t('table.amount'),
       dataIndex: 'amount',
       key: 'amount',
       render: (amount) => amount ? `${amount} AZN` : '-',
     },
     {
-      title: 'Tarix',
+      title: t('table.date'),
       dataIndex: 'documentDate',
       key: 'documentDate',
       render: (date) => new Date(date).toLocaleDateString('az-AZ'),
       sorter: (a, b) => new Date(a.documentDate).getTime() - new Date(b.documentDate).getTime(),
     },
     {
-      title: 'Yükləyən',
+      title: t('table.uploadedBy'),
       key: 'uploadedBy',
       render: (_, record) => (
-        <Space direction="vertical" size={0}>
+        <Space orientation="vertical" size={0}>
           <span className="text-sm font-medium text-gray-700">
             {record.uploadedBy?.firstName} {record.uploadedBy?.lastName}
           </span>
@@ -142,13 +130,13 @@ export const DocumentTable = ({
       ),
     },
     {
-      title: 'Ölçü',
+      title: t('table.size'),
       dataIndex: 'fileSize',
       key: 'fileSize',
       render: (size) => <span className="text-xs text-gray-500">{formatFileSize(size)}</span>,
     },
     {
-      title: 'Əməliyyatlar',
+      title: t('table.actions'),
       key: 'actions',
       render: (_, record) => (
         <Dropdown
@@ -157,13 +145,13 @@ export const DocumentTable = ({
             items: [
               {
                 key: 'view',
-                label: 'Bax',
+                label: t('table.view'),
                 icon: <EyeOutlined />,
                 onClick: () => onView?.(record.id),
               },
               {
                 key: 'download',
-                label: 'Yüklə',
+                label: t('table.download'),
                 icon: <DownloadOutlined />,
                 onClick: (e) => {
                   e.domEvent.stopPropagation();
@@ -171,20 +159,29 @@ export const DocumentTable = ({
                 },
               },
               {
+                key: 'share',
+                label: t('table.share'),
+                icon: <ShareAltOutlined />,
+                onClick: (e) => {
+                  e.domEvent.stopPropagation();
+                  onShare?.(record.id);
+                },
+              },
+              {
                 type: 'divider',
               },
               {
                 key: 'delete',
-                label: 'Sil',
+                label: t('table.delete'),
                 icon: <DeleteOutlined />,
                 danger: true,
                 onClick: (e) => {
                   e.domEvent.stopPropagation();
                   Modal.confirm({
-                    title: 'Sənədi sil',
-                    content: 'Bu sənədi silmək istədiyinizə əminsiniz?',
-                    okText: 'Bəli',
-                    cancelText: 'Xeyr',
+                    title: t('table.deleteConfirmTitle'),
+                    content: t('table.deleteConfirmContent'),
+                    okText: t('table.yes'),
+                    cancelText: t('table.no'),
                     okButtonProps: { danger: true },
                     onOk: () => onDelete?.(record.id),
                   });
@@ -225,40 +222,39 @@ export const DocumentTable = ({
             position: ['bottomRight'],
           } : false}
           locale={{
-            emptyText: 'Heç bir sənəd tapılmadı'
+            emptyText: t('table.notFound')
           }}
           scroll={{ x: true }}
         />
       </div>
 
-      {/* Mobile Card View */}
-      <div className="md:hidden space-y-3">
+      <div className="flex flex-col gap-3 md:hidden">
         {loading ? (
-          <div className="text-center py-8 bg-white rounded-lg">Yüklənir...</div>
+          <div className="text-center py-8 bg-white rounded-lg">{t('table.loading')}</div>
         ) : data.length > 0 ? (
           data.map((record) => (
-            <Card key={record.id} className="shadow-none border border-gray-200" bodyStyle={{ padding: '16px' }} onClick={() => onView?.(record.id)}>
+            <Card key={record.id} className="shadow-none border border-gray-200" styles={{ body: { padding: '16px' } }} onClick={() => onView?.(record.id)}>
               <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-2 overflow-hidden">
                   {getFileIcon(record.fileFormat)}
                   <span className="font-medium text-base text-gray-900 truncate">{record.fileName}</span>
                 </div>
                 <Tag color={getDocumentTypeColor(record.documentType)} className="mr-0 rounded-full px-2 text-xs">
-                  {getDocumentTypeLabel(record.documentType)}
+                  {t(`types.${record.documentType}`)}
                 </Tag>
               </div>
 
               <div className="space-y-2 text-sm text-gray-600 mb-3">
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Şirkət:</span>
+                  <span className="text-gray-500">{t('table.company')}:</span>
                   <span className="font-medium text-gray-800">{record.companyName}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Məbləğ:</span>
+                  <span className="text-gray-500">{t('table.amount')}:</span>
                   <span className="font-medium text-gray-800">{record.amount ? `${record.amount} AZN` : '-'}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-gray-500">Tarix:</span>
+                  <span className="text-gray-500">{t('table.date')}:</span>
                   <span>{new Date(record.documentDate).toLocaleDateString('az-AZ')}</span>
                 </div>
               </div>
@@ -274,7 +270,7 @@ export const DocumentTable = ({
                       items: [
                         {
                           key: 'download',
-                          label: 'Yüklə',
+                          label: t('table.download'),
                           icon: <DownloadOutlined />,
                           onClick: (info) => {
                             info.domEvent.stopPropagation();
@@ -282,17 +278,26 @@ export const DocumentTable = ({
                           },
                         },
                         {
+                          key: 'share',
+                          label: t('table.share'),
+                          icon: <ShareAltOutlined />,
+                          onClick: (info) => {
+                            info.domEvent.stopPropagation();
+                            onShare?.(record.id);
+                          },
+                        },
+                        {
                           key: 'delete',
-                          label: 'Sil',
+                          label: t('table.delete'),
                           icon: <DeleteOutlined />,
                           danger: true,
                           onClick: (info) => {
                             info.domEvent.stopPropagation();
                             Modal.confirm({
-                              title: 'Sənədi sil',
-                              content: 'Sənədi silmək istədiyinizə əminsiniz?',
-                              okText: 'Bəli',
-                              cancelText: 'Xeyr',
+                              title: t('table.deleteConfirmTitle'),
+                              content: t('table.deleteConfirmContent'),
+                              okText: t('table.yes'),
+                              cancelText: t('table.no'),
                               okButtonProps: { danger: true },
                               onOk: () => onDelete?.(record.id),
                             });
@@ -313,7 +318,7 @@ export const DocumentTable = ({
             </Card>
           ))
         ) : (
-          <div className="text-center py-10 bg-white rounded-lg border border-gray-200 text-gray-500">Heç bir sənəd tapılmadı</div>
+          <div className="text-center py-10 bg-white rounded-lg border border-gray-200 text-gray-500">{t('table.notFound')}</div>
         )}
 
         {/* Mobile Pagination */}
@@ -324,17 +329,17 @@ export const DocumentTable = ({
               onClick={() => pagination.onChange(pagination.current - 1, pagination.pageSize)}
               className="mr-2"
             >
-              Geri
+              {t('table.back')}
             </Button>
             <span className="flex items-center px-2 text-sm text-gray-600">
-              Səhifə {pagination.current}
+              {t('table.page')} {pagination.current}
             </span>
             <Button
               disabled={pagination.current * pagination.pageSize >= pagination.total}
               onClick={() => pagination.onChange(pagination.current + 1, pagination.pageSize)}
               className="ml-2"
             >
-              İrəli
+              {t('table.forward')}
             </Button>
           </div>
         )}

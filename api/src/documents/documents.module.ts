@@ -7,10 +7,11 @@ import { DocumentsController } from './documents.controller';
 import { Document } from './entities/document.entity';
 import { DocumentView } from './entities/document-view.entity';
 import { DocumentVersion } from './entities/document-version.entity';
+import { DocumentRead } from './entities/document-read.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Document, DocumentView, DocumentVersion]),
+    TypeOrmModule.forFeature([Document, DocumentView, DocumentVersion, DocumentRead]),
     MulterModule.register({
       dest: './uploads/documents',
     }),

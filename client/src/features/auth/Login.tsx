@@ -6,12 +6,16 @@ import Register from "./Register";
 import ForgotPassword from "./ForgotPassword";
 import { useLogin } from "../hooks/authHooks";
 import { EyeIcon, EyeOffIcon } from "../ui/Icons";
+import { useTranslations } from "use-intl";
+import { useLanguage } from "../../context/LanguageContext";
 
 type AuthView = "login" | "register" | "forgot-password";
 
 export default function Login() {
   const [view, setView] = useState<AuthView>("login");
   const loginMutation = useLogin();
+  const t = useTranslations('LoginPage');
+  const { locale, setLocale } = useLanguage();
 
   const [formData, setFormData] = useState({
     email: '',
@@ -57,11 +61,39 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex flex-col bg-[#f0f2f5] font-sans">
+      {/* Language Selector */}
+      <div className="absolute top-4 right-4 z-10">
+        <div className="flex items-center gap-2 bg-white rounded-lg shadow-sm border border-gray-200 p-1">
+          <button
+            onClick={() => setLocale('az')}
+            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${locale === 'az'
+              ? 'bg-[#4285F4] text-white'
+              : 'text-gray-600 hover:bg-gray-100'
+              }`}
+          >
+            🇦🇿 AZ
+          </button>
+          <button
+            onClick={() => setLocale('ru')}
+            className={`px-3 py-1.5 rounded text-sm font-medium transition-colors ${locale === 'ru'
+              ? 'bg-[#4285F4] text-white'
+              : 'text-gray-600 hover:bg-gray-100'
+              }`}
+          >
+            🇷🇺 RU
+          </button>
+        </div>
+      </div>
+
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-[450px] bg-white border border-[#dadce0] rounded-lg p-10 shadow-sm relative min-h-[400px]">
           <div className="flex justify-center mb-2">
             <div className="text-[28px] font-bold tracking-tight text-[#4285F4]">
-              Xirman<span className="text-[#34A853]">DMS</span>
+              {locale === 'ru' ? (
+                <>Хирман<span className="text-[#34A853]">ЭАС</span></>
+              ) : (
+                <>Xirman<span className="text-[#34A853]">EAS</span></>
+              )}
             </div>
           </div>
 
@@ -82,16 +114,16 @@ export default function Login() {
                   className="w-full"
                 >
                   <div className="text-center mb-8">
-                    <h2 className="text-2xl font-semibold text-[#202124] mb-2">Daxil olun</h2>
-                    <p className="text-[16px] text-[#202124]">Xirman İdarəetmə Sisteminə girişi</p>
+                    <h2 className="text-2xl font-semibold text-[#202124] mb-2">{t('title')}</h2>
+                    <p className="text-[16px] text-[#202124]">{t('subtitle')}</p>
                   </div>
 
                   <form className="space-y-6" onSubmit={handleLogin}>
                     <Input
                       type="email"
                       name="email"
-                      placeholder="Email daxil edin"
-                      label="Email"
+                      placeholder={t('emailPlaceholder')}
+                      label={t('email')}
                       className="w-full"
                       value={formData.email}
                       onChange={handleInputChange}
@@ -100,8 +132,8 @@ export default function Login() {
                     <Input
                       type={showPassword ? "text" : "password"}
                       name="password"
-                      placeholder="Şifrəni daxil edin"
-                      label="Şifrə"
+                      placeholder={t('passwordPlaceholder')}
+                      label={t('password')}
                       className="w-full"
                       value={formData.password}
                       onChange={handleInputChange}
@@ -123,7 +155,7 @@ export default function Login() {
                         onClick={() => changeView("forgot-password")}
                         className="font-medium text-[#1a73e8] p-1 -ml-1 rounded transition-colors inline-block hover:underline cursor-pointer"
                       >
-                        Şifrəni unutmusunuz?
+                        {t('forgotPassword')}
                       </button>
                     </div>
 
@@ -133,14 +165,14 @@ export default function Login() {
                         onClick={() => changeView("register")}
                         className="text-[#1a73e8] font-medium text-sm py-2 rounded transition-colors hover:underline cursor-pointer"
                       >
-                        Hesab yaradın
+                        {t('createAccount')}
                       </button>
                       <Button
                         type="submit"
                         className="py-1.5 px-6 w-fit"
                         disabled={loginMutation.isPending}
                       >
-                        {loginMutation.isPending ? "Giriş edilir..." : "Daxil ol"}
+                        {loginMutation.isPending ? t('loggingIn') : t('login')}
                       </Button>
                     </div>
                   </form>
@@ -187,14 +219,12 @@ export default function Login() {
         </div>
       </div>
 
-      {/* Footer helpers */}
       <div className="w-full flex justify-center py-6">
         <div className="w-full max-w-[450px] flex justify-between text-[12px] text-[#70757a] px-4">
-          <div className="cursor-pointer hover:bg-gray-100 p-1 rounded">Azərbaycan dili</div>
           <div className="space-x-4">
-            <a href="#" className="hover:bg-gray-100 p-1 rounded">Kömək</a>
-            <a href="#" className="hover:bg-gray-100 p-1 rounded">Məxfilik</a>
-            <a href="#" className="hover:bg-gray-100 p-1 rounded">Şərtlər</a>
+            <a href="#" className="hover:bg-gray-100 p-1 rounded">{t('help')}</a>
+            <a href="#" className="hover:bg-gray-100 p-1 rounded">{t('privacy')}</a>
+            <a href="#" className="hover:bg-gray-100 p-1 rounded">{t('terms')}</a>
           </div>
         </div>
       </div>

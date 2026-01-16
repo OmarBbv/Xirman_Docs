@@ -9,7 +9,18 @@
     "admin_panel": "Панель управления",
     "logout": "Выход",
     "notifications": "Уведомление",
-    "greeting": "Привет"
+    "greeting": "Привет",
+    "menu": "Меню",
+    "newDocsToday": "Новые документы (Сегодня)",
+    "viewAll": "Посмотреть все",
+    "noNotifications": "Нет новых уведомлений"
+  },
+  "NotificationsPage": {
+    "title": "Уведомления",
+    "subtitle": "Новые документы, добавленные в систему сегодня",
+    "empty": "Сегодня документы не добавлялись",
+    "markRead": "Отметить как прочитанное",
+    "viewDoc": "Посмотреть документ →"
   },
   "UserPage": {
     "title": "Управление пользователями",
@@ -110,5 +121,257 @@
       "twoFactorHint": "Сделайте ваш аккаунт более безопасным",
       "soon": "Скоро"
     }
+  },
+  "DocumentsPage": {
+    "title": "Управление документами",
+    "subtitle": "Вы можете управлять всеми документами отсюда",
+    "newDocument": "Новый документ",
+    "stats": {
+      "total": "Всего документов"
+    },
+    "filters": {
+      "all": "Все",
+      "detailedSearch": "Расширенный поиск",
+      "companyName": "Название компании",
+      "companyPlaceholder": "Введите название компании",
+      "documentType": "Тип документа",
+      "selectRequest": "Выберите",
+      "dateRange": "Диапазон дат",
+      "startDate": "Начало",
+      "endDate": "Конец",
+      "amountRange": "Диапазон сумм (AZN)",
+      "min": "Мин",
+      "max": "Макс",
+      "clear": "Очистить",
+      "search": "Поиск"
+    },
+    "table": {
+      "file": "Файл",
+      "company": "Компания",
+      "type": "Тип",
+      "amount": "Сумма",
+      "date": "Дата документа",
+      "uploadedBy": "Загрузил",
+      "size": "Размер",
+      "actions": "Действия",
+      "view": "Просмотр",
+      "download": "Скачать",
+      "share": "Поделиться",
+      "delete": "Удалить",
+      "deleteConfirmTitle": "Удалить документ",
+      "deleteConfirmContent": "Вы уверены, что хотите удалить этот документ?",
+      "yes": "Да",
+      "no": "Нет",
+      "loading": "Загрузка...",
+      "notFound": "Документы не найдены",
+      "back": "Назад",
+      "forward": "Вперед",
+      "page": "Страница"
+    },
+    "types": {
+      "contract": "Договор",
+      "invoice": "Счет-фактура",
+      "act": "Акт",
+      "report": "Отчет",
+      "letter": "Письмо",
+      "order": "Заказ",
+      "other": "Другое"
+    }
+  },
+  "NewDocumentPage": {
+    "back": "Назад",
+    "title": "Создать новый документ",
+    "subtitle": "Заполните форму ниже, чтобы добавить новый документ в систему",
+    "form": {
+      "companyName": "Название компании",
+      "companyPlaceholder": "Введите название компании",
+      "companyRequired": "Название компании обязательно",
+      "documentNumber": "Номер документа",
+      "documentNumberPlaceholder": "Введите номер документа",
+      "amount": "Сумма (AZN)",
+      "amountPlaceholder": "Введите сумму",
+      "date": "Дата документа",
+      "dateRequired": "Дата документа обязательна",
+      "datePlaceholder": "Выберите дату",
+      "type": "Тип документа",
+      "typeRequired": "Тип документа обязателен",
+      "typePlaceholder": "Выберите тип документа",
+      "file": "Файл документа (PDF, Word, Excel)",
+      "fileRequired": "* Файл должен быть выбран"
+    },
+    "buttons": {
+      "cancel": "Отмена",
+      "create": "Создать документ",
+      "loading": "Загрузка..."
+    },
+    "types": {
+      "contract": "Договор",
+      "invoice": "Счет-фактура",
+      "act": "Акт",
+      "report": "Отчет",
+      "letter": "Письмо",
+      "order": "Заказ",
+      "other": "Другое"
+    },
+    "info": {
+      "title": "Информация",
+      "content": "После загрузки документа текущий пользователь будет автоматически отмечен как загрузивший. Максимальный размер файла 10MB. Принимаются только форматы PDF, Word и Excel."
+    }
+  },
+  "DashboardPage": {
+    "welcome": {
+      "title": "Добро пожаловать, {name}",
+      "subtitle": "Здесь отображается общее состояние системы и последние действия",
+      "newDocument": "Новый документ"
+    },
+    "stats": {
+      "totalDocuments": "Всего документов",
+      "totalAmount": "Общая сумма",
+      "activeUsers": "Активные пользователи",
+      "otherDocuments": "Другие документы",
+      "trends": {
+        "general": "Общий",
+        "total": "Всего",
+        "last24h": "Последние 24 часа",
+        "formats": "Форматы"
+      }
+    },
+    "charts": {
+      "documentDistribution": "Распределение типов документов",
+      "pdf": "PDF Документы",
+      "word": "Word (DOCX)",
+      "excel": "Excel (XLSX)",
+      "other": "Другое",
+      "docsCount": "документов"
+    },
+    "activity": {
+      "title": "Последние действия",
+      "viewed": "просмотрел документ '{file}'",
+      "empty": "Пока нет действий"
+    },
+    "recentDocs": {
+      "title": "Недавно загруженные документы",
+      "viewAll": "Посмотреть все →",
+      "notFound": "Нет документов",
+      "table": {
+        "document": "Документ",
+        "uploader": "Загрузил",
+        "date": "Дата",
+        "amountStatus": "Сумма / Статус",
+        "noAmount": "Нет суммы",
+        "view": "Просмотр",
+        "viewDoc": "Посмотреть документ"
+      }
+    }
+  },
+  "DocumentDetailsPage": {
+    "back": "Назад",
+    "title": "Информация о документе",
+    "document": {
+      "number": "Документ №",
+      "status": "Активен",
+      "uploadDate": "Дата загрузки",
+      "amount": "Сумма",
+      "type": "Тип документа",
+      "format": "Формат документа",
+      "uploader": "Загрузил пользователь"
+    },
+    "file": {
+      "title": "Файл документа",
+      "size": "Размер",
+      "clickToDownload": "Нажмите, чтобы скачать",
+      "lastEdit": "Последнее редактирование",
+      "noEdit": "В этом документе еще не было правок",
+      "uploadNew": "Загрузить новую версию"
+    },
+    "history": {
+      "title": "История версий",
+      "version": "Версия"
+    },
+    "viewers": {
+      "title": "История просмотров",
+      "search": "Поиск пользователя...",
+      "empty": "Пока нет просмотров"
+    },
+    "error": {
+      "title": "Ошибка",
+      "description": "Документ не найден или произошла ошибка при загрузке."
+    }
+  },
+  "LoginPage": {
+    "title": "Войти",
+    "subtitle": "Вход в систему управления Xirman",
+    "email": "Email",
+    "emailPlaceholder": "Введите email",
+    "password": "Пароль",
+    "passwordPlaceholder": "Введите пароль",
+    "forgotPassword": "Забыли пароль?",
+    "createAccount": "Создать аккаунт",
+    "login": "Войти",
+    "loggingIn": "Вход...",
+    "help": "Помощь",
+    "privacy": "Конфиденциальность",
+    "terms": "Условия"
+  },
+  "RegisterPage": {
+    "title": "Регистрация",
+    "subtitle": "Создать новый аккаунт",
+    "firstName": "Имя",
+    "lastName": "Фамилия",
+    "email": "Email",
+    "position": "Должность",
+    "positionPlaceholder": "Выберите должность",
+    "password": "Пароль",
+    "confirmPassword": "Подтвердите пароль",
+    "alreadyHaveAccount": "Уже есть аккаунт?",
+    "register": "Зарегистрироваться",
+    "registering": "Подождите...",
+    "verifyTitle": "Подтверждение",
+    "verifySubtitle": "Введите 6-значный код, отправленный на {email}",
+    "verify": "Подтвердить",
+    "verifying": "Проверка...",
+    "backToEdit": "Вернуться и изменить данные",
+    "positions": {
+      "finance_manager": "Финансовый менеджер",
+      "accountant": "Бухгалтер",
+      "sales_specialist": "Специалист по продажам",
+      "warehouseman": "Кладовщик",
+      "director": "Директор",
+      "hr": "HR"
+    },
+    "errors": {
+      "firstNameMin": "Имя должно содержать минимум 2 символа",
+      "lastNameMin": "Фамилия должна содержать минимум 2 символа",
+      "emailInvalid": "Введите корректный email",
+      "positionRequired": "Должность должна быть выбрана",
+      "passwordMin": "Пароль должен содержать минимум 6 символов",
+      "passwordMismatch": "Пароли не совпадают"
+    }
+  },
+  "ForgotPasswordPage": {
+    "step1Title": "Забыли пароль?",
+    "step1Subtitle": "Введите ваш email адрес",
+    "step2Title": "Подтвердите OTP код",
+    "step2Subtitle": "Введите код, отправленный на ваш email",
+    "step3Title": "Установите новый пароль",
+    "step3Subtitle": "Введите ваш новый пароль",
+    "email": "Email",
+    "emailPlaceholder": "Введите email",
+    "otpCode": "OTP код",
+    "otpCodePlaceholder": "OTP код",
+    "newPassword": "Новый пароль",
+    "newPasswordPlaceholder": "Новый пароль",
+    "confirmPassword": "Повторите пароль",
+    "confirmPasswordPlaceholder": "Подтвердите пароль",
+    "sendCode": "Отправить код",
+    "sending": "Отправка...",
+    "verify": "Подтвердить",
+    "verifying": "Проверка...",
+    "reset": "Обновить",
+    "resetting": "Обновление...",
+    "back": "Вернуться",
+    "backShort": "Назад",
+    "info": "Мы отправим вам ссылку/код для сброса пароля.",
+    "passwordMismatch": "Пароли не совпадают"
   }
 }

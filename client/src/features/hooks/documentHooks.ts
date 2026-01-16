@@ -147,6 +147,20 @@ export const useDownloadVersion = () => {
   });
 };
 
+export const useMarkAsRead = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => documentService.markAsRead(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: documentKeys.all });
+    },
+    onError: (error: Error) => {
+      message.error(error.message);
+    },
+  });
+};
+
 export const useUpdateDocument = () => {
   const queryClient = useQueryClient();
 

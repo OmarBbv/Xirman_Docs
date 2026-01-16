@@ -10,6 +10,9 @@ import {
 import type { FilterDocumentDto, FileFormat } from "../types/document.types";
 import { Collapse, DatePicker, InputNumber, Button as AntButton, Row, Col, Form, Badge, Select, Input } from "antd";
 import { FilterOutlined, ClearOutlined, SearchOutlined } from "@ant-design/icons";
+import { useTranslations } from "use-intl";
+import { documentService } from "../services/documentServices";
+import { message } from "antd";
 
 
 const { RangePicker } = DatePicker;
@@ -17,28 +20,25 @@ const { RangePicker } = DatePicker;
 export default function DocumentPage() {
   const navigate = useNavigate();
   const [form] = Form.useForm();
+  const t = useTranslations('DocumentsPage');
 
-  // Filtr state-ləri
   const [filters, setFilters] = useState<FilterDocumentDto>({
     page: 1,
     limit: 10,
   });
 
-  // Aktiv filter sayı
   const activeFilterCount = Object.keys(filters).filter(k =>
     k !== 'page' && k !== 'limit' && filters[k as keyof FilterDocumentDto] !== undefined
   ).length;
 
-  // Hooks
   const { data: documentsData, isLoading, refetch } = useDocuments(filters);
   const { data: statsData } = useDocumentStats();
   const deleteDocument = useDeleteDocument();
   const downloadDocument = useDownloadDocument();
 
-  // Statistikalar
   const stats = [
     {
-      label: "Toplam Sənəd",
+      label: t('stats.total'),
       value: statsData?.total || 0,
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -83,7 +83,6 @@ export default function DocumentPage() {
     }
   ];
 
-  // Axtarış və filtrasiya
   const handleFilterSubmit = (values: any) => {
     const newFilters: FilterDocumentDto = {
       page: 1,
@@ -94,7 +93,7 @@ export default function DocumentPage() {
       maxAmount: values.maxAmount,
       startDate: values.dateRange?.[0]?.format('YYYY-MM-DD'),
       endDate: values.dateRange?.[1]?.format('YYYY-MM-DD'),
-      fileFormat: filters.fileFormat, // Tab-dan gələn dəyəri qoru
+      fileFormat: filters.fileFormat,
     };
     setFilters(newFilters);
   };
@@ -104,30 +103,42 @@ export default function DocumentPage() {
     setFilters({
       page: 1,
       limit: filters.limit,
-      fileFormat: filters.fileFormat, // Tab-dan gələn dəyəri qoru
+      fileFormat: filters.fileFormat,
     });
   };
 
-  // Pagination
   const handlePageChange = (page: number, pageSize: number) => {
     setFilters(prev => ({ ...prev, page, limit: pageSize }));
   };
 
-  // Sənədi sil
   const handleDelete = (id: number) => {
     deleteDocument.mutate(id, {
       onSuccess: () => refetch(),
     });
   };
 
-  // Sənədi yüklə
   const handleDownload = (id: number, fileName: string) => {
     downloadDocument.mutate({ id, fileName });
   };
 
-  // Fayl formatına görə filtr
   const handleFilterByFormat = (format: FileFormat | undefined) => {
     setFilters(prev => ({ ...prev, fileFormat: format, page: 1 }));
+  };
+
+  const handleShare = async (id: number) => {
+    try {
+      const response = await documentService.getShareLink(id);
+      const { downloadUrl, document: doc } = response;
+
+      const subject = encodeURIComponent(`Sənəd: ${doc.fileName}`);
+      const body = encodeURIComponent(
+        `Salam,\n\nSizinlə "${doc.fileName}" sənədini paylaşmaq istəyirəm.\n\nSənəd məlumatları:\n- Şirkət: ${doc.companyName}\n- Məbləğ: ${doc.amount ? doc.amount + ' AZN' : 'Göstərilməyib'}\n- Növ: ${doc.documentType}\n\nSənədi yükləmək üçün bu linkə klikləyin:\n${downloadUrl}\n\nXirman EAS`
+      );
+
+      window.open(`https://mail.google.com/mail/?view=cm&fs=1&su=${subject}&body=${body}`, '_blank');
+    } catch (error) {
+      message.error('Link yaradılarkən xəta baş verdi');
+    }
   };
 
   return (
@@ -136,8 +147,8 @@ export default function DocumentPage() {
       <div className="bg-linear-to-br from-[#2271b1] to-[#135e96] rounded-lg md:shadow-lg p-5 md:p-8 text-white">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex-1">
-            <h1 className="text-xl md:text-3xl font-bold mb-2">Sənəd İdarəetməsi</h1>
-            <p className="text-blue-100 text-xs md:text-sm">Bütün sənədlərinizi buradan idarə edə bilərsiniz</p>
+            <h1 className="text-xl md:text-3xl font-bold mb-2">{t('title')}</h1>
+            <p className="text-blue-100 text-xs md:text-sm">{t('subtitle')}</p>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -146,14 +157,14 @@ export default function DocumentPage() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
               </svg>
-              Yeni Sənəd
+              {t('newDocument')}
             </button>
           </div>
         </div>
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {stats.map((stat, i) => (
           <div key={i} className="bg-white rounded-lg border border-gray-200 md:shadow-sm p-4 md:p-5 transition-all duration-200 hover:shadow-md hover:border-gray-300">
             <div className="flex items-center justify-between">
@@ -178,7 +189,7 @@ export default function DocumentPage() {
             className={`px-4 py-2 text-sm font-semibold rounded-lg transition-all whitespace-nowrap ${!filters.fileFormat ? "text-white bg-[#2271b1]" : "text-gray-600 hover:text-[#2271b1] hover:bg-blue-50"
               }`}
           >
-            Hamısı ({documentsData?.total || 0})
+            {t('filters.all')} ({documentsData?.total || 0})
           </button>
           <button
             onClick={() => handleFilterByFormat("pdf" as FileFormat)}
@@ -203,7 +214,6 @@ export default function DocumentPage() {
           </button>
         </div>
 
-        {/* Detailed Filters */}
         <div className="mb-6">
           <Collapse
             ghost
@@ -213,7 +223,7 @@ export default function DocumentPage() {
                 label: (
                   <span className="text-gray-600 font-medium flex items-center gap-2">
                     <FilterOutlined />
-                    Ətraflı Axtarış
+                    {t('filters.detailedSearch')}
                     {activeFilterCount > 0 && (
                       <Badge count={activeFilterCount} style={{ backgroundColor: '#2271b1' }} />
                     )}
@@ -228,37 +238,37 @@ export default function DocumentPage() {
                   >
                     <Row gutter={[16, 16]}>
                       <Col xs={24} sm={12} lg={6}>
-                        <Form.Item name="companyName" label="Şirkət adı">
-                          <Input placeholder="Şirkət adı daxil edin" allowClear />
+                        <Form.Item name="companyName" label={t('filters.companyName')}>
+                          <Input placeholder={t('filters.companyPlaceholder')} allowClear />
                         </Form.Item>
                       </Col>
                       <Col xs={24} sm={12} lg={6}>
-                        <Form.Item name="documentType" label="Sənəd növü">
-                          <Select placeholder="Seçin" allowClear>
-                            <Select.Option value="contract">Müqavilə</Select.Option>
-                            <Select.Option value="invoice">Faktura</Select.Option>
-                            <Select.Option value="act">Akt</Select.Option>
-                            <Select.Option value="report">Hesabat</Select.Option>
-                            <Select.Option value="letter">Məktub</Select.Option>
-                            <Select.Option value="order">Sifariş</Select.Option>
-                            <Select.Option value="other">Digər</Select.Option>
+                        <Form.Item name="documentType" label={t('filters.documentType')}>
+                          <Select placeholder={t('filters.selectRequest')} allowClear>
+                            <Select.Option value="contract">{t('types.contract')}</Select.Option>
+                            <Select.Option value="invoice">{t('types.invoice')}</Select.Option>
+                            <Select.Option value="act">{t('types.act')}</Select.Option>
+                            <Select.Option value="report">{t('types.report')}</Select.Option>
+                            <Select.Option value="letter">{t('types.letter')}</Select.Option>
+                            <Select.Option value="order">{t('types.order')}</Select.Option>
+                            <Select.Option value="other">{t('types.other')}</Select.Option>
                           </Select>
                         </Form.Item>
                       </Col>
                       <Col xs={24} sm={12} lg={6}>
-                        <Form.Item name="dateRange" label="Tarix aralığı">
-                          <RangePicker className="w-full" placeholder={['Başlama', 'Bitmə']} />
+                        <Form.Item name="dateRange" label={t('filters.dateRange')}>
+                          <RangePicker className="w-full" placeholder={[t('filters.startDate'), t('filters.endDate')]} />
                         </Form.Item>
                       </Col>
                       <Col xs={24} sm={12} lg={6}>
-                        <Form.Item label="Məbləğ aralığı (AZN)">
+                        <Form.Item label={t('filters.amountRange')}>
                           <div className="flex gap-2">
                             <Form.Item name="minAmount" noStyle>
-                              <InputNumber placeholder="Min" className="w-full" min={0} />
+                              <InputNumber placeholder={t('filters.min')} className="w-full" min={0} />
                             </Form.Item>
                             <span className="text-gray-400 self-center">-</span>
                             <Form.Item name="maxAmount" noStyle>
-                              <InputNumber placeholder="Max" className="w-full" min={0} />
+                              <InputNumber placeholder={t('filters.max')} className="w-full" min={0} />
                             </Form.Item>
                           </div>
                         </Form.Item>
@@ -266,10 +276,10 @@ export default function DocumentPage() {
                     </Row>
                     <div className="flex gap-3">
                       <AntButton icon={<ClearOutlined />} onClick={clearFilters}>
-                        Təmizlə
+                        {t('filters.clear')}
                       </AntButton>
                       <AntButton type="primary" htmlType="submit" icon={<SearchOutlined />} className="bg-[#2271b1]">
-                        Axtar
+                        {t('filters.search')}
                       </AntButton>
                     </div>
                   </Form>
@@ -279,13 +289,13 @@ export default function DocumentPage() {
           />
         </div>
 
-        {/* Table */}
         <DocumentTable
           data={documentsData?.data || []}
           loading={isLoading}
           onView={(id: number) => navigate(`/dashboard/docs/${id}`)}
           onDownload={handleDownload}
           onDelete={handleDelete}
+          onShare={handleShare}
           pagination={{
             current: filters.page || 1,
             pageSize: filters.limit || 10,

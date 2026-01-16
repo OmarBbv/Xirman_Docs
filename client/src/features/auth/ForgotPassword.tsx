@@ -3,6 +3,7 @@ import { Button } from "../ui/button";
 import { Input } from "../ui/input";
 import { useForgotPassword, useVerifyResetOtp, useResetPassword } from "../hooks/authHooks";
 import { EyeIcon, EyeOffIcon } from "../ui/Icons";
+import { useTranslations } from "use-intl";
 
 type Props = {
   onNavigateToLogin: () => void;
@@ -20,6 +21,7 @@ export default function ForgotPassword({ onNavigateToLogin }: Props) {
   const forgotPasswordMutation = useForgotPassword();
   const verifyResetOtpMutation = useVerifyResetOtp();
   const resetPasswordMutation = useResetPassword();
+  const t = useTranslations('ForgotPasswordPage');
 
   const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,14 +61,14 @@ export default function ForgotPassword({ onNavigateToLogin }: Props) {
     <div className="w-full">
       <div className="text-center mb-8">
         <h2 className="text-2xl font-semibold text-[#202124] mb-2">
-          {step === 1 && "Şifrəni unutmusunuz?"}
-          {step === 2 && "OTP Kodu Təsdiqləyin"}
-          {step === 3 && "Yeni Şifrə Təyin Edin"}
+          {step === 1 && t('step1Title')}
+          {step === 2 && t('step2Title')}
+          {step === 3 && t('step3Title')}
         </h2>
         <p className="text-[16px] text-[#202124]">
-          {step === 1 && "Email ünvanınızı daxil edin"}
-          {step === 2 && "Emailinizə göndərilən kodu daxil edin"}
-          {step === 3 && "Yeni şifrənizi daxil edin"}
+          {step === 1 && t('step1Subtitle')}
+          {step === 2 && t('step2Subtitle')}
+          {step === 3 && t('step3Subtitle')}
         </p>
       </div>
 
@@ -74,8 +76,8 @@ export default function ForgotPassword({ onNavigateToLogin }: Props) {
         <form className="space-y-6" onSubmit={handleSendOtp}>
           <Input
             type="email"
-            placeholder="Email daxil edin"
-            label="Email"
+            placeholder={t('emailPlaceholder')}
+            label={t('email')}
             className="w-full"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -84,7 +86,7 @@ export default function ForgotPassword({ onNavigateToLogin }: Props) {
           />
 
           <div className="text-sm text-gray-500">
-            Biz sizə şifrəni yeniləmək üçün link/kod göndərəcəyik.
+            {t('info')}
           </div>
 
           <div className="flex items-center justify-between pt-4">
@@ -93,14 +95,14 @@ export default function ForgotPassword({ onNavigateToLogin }: Props) {
               onClick={onNavigateToLogin}
               className="text-[#1a73e8] font-medium text-sm py-2 rounded transition-colors hover:bg-blue-50 px-2"
             >
-              Geri qayıt
+              {t('back')}
             </button>
             <Button
               type="submit"
               className="py-1.5 px-6 w-fit"
               disabled={forgotPasswordMutation.isPending}
             >
-              {forgotPasswordMutation.isPending ? "Göndərilir..." : "Kodu göndər"}
+              {forgotPasswordMutation.isPending ? t('sending') : t('sendCode')}
             </Button>
           </div>
         </form>
@@ -110,8 +112,8 @@ export default function ForgotPassword({ onNavigateToLogin }: Props) {
         <form className="space-y-6" onSubmit={handleVerifyOtp}>
           <Input
             type="text"
-            placeholder="OTP Kodu"
-            label="OTP Kod"
+            placeholder={t('otpCodePlaceholder')}
+            label={t('otpCode')}
             className="w-full"
             value={otp}
             onChange={(e) => setOtp(e.target.value)}
@@ -125,14 +127,14 @@ export default function ForgotPassword({ onNavigateToLogin }: Props) {
               onClick={() => setStep(1)}
               className="text-[#1a73e8] font-medium text-sm py-2 rounded transition-colors hover:bg-blue-50 px-2"
             >
-              Geri
+              {t('backShort')}
             </button>
             <Button
               type="submit"
               className="py-1.5 px-6 w-fit"
               disabled={verifyResetOtpMutation.isPending}
             >
-              {verifyResetOtpMutation.isPending ? "Yoxlanılır..." : "Təsdiqlə"}
+              {verifyResetOtpMutation.isPending ? t('verifying') : t('verify')}
             </Button>
           </div>
         </form>
@@ -142,8 +144,8 @@ export default function ForgotPassword({ onNavigateToLogin }: Props) {
         <form className="space-y-6" onSubmit={handleResetPassword}>
           <Input
             type={showPassword ? "text" : "password"}
-            placeholder="Yeni şifrə"
-            label="Yeni Şifrə"
+            placeholder={t('newPasswordPlaceholder')}
+            label={t('newPassword')}
             className="w-full"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
@@ -161,8 +163,8 @@ export default function ForgotPassword({ onNavigateToLogin }: Props) {
           />
           <Input
             type={showConfirmPassword ? "text" : "password"}
-            placeholder="Şifrəni təsdiqləyin"
-            label="Təkrar Şifrə"
+            placeholder={t('confirmPasswordPlaceholder')}
+            label={t('confirmPassword')}
             className="w-full"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
@@ -179,7 +181,7 @@ export default function ForgotPassword({ onNavigateToLogin }: Props) {
           />
 
           {newPassword !== confirmPassword && confirmPassword && (
-            <p className="text-red-500 text-sm">Şifrələr eyni deyil</p>
+            <p className="text-red-500 text-sm">{t('passwordMismatch')}</p>
           )}
 
           <div className="flex items-center justify-between pt-4">
@@ -188,14 +190,14 @@ export default function ForgotPassword({ onNavigateToLogin }: Props) {
               onClick={() => setStep(2)}
               className="text-[#1a73e8] font-medium text-sm py-2 rounded transition-colors hover:bg-blue-50 px-2"
             >
-              Geri
+              {t('backShort')}
             </button>
             <Button
               type="submit"
               className="py-1.5 px-6 w-fit"
               disabled={resetPasswordMutation.isPending || (newPassword !== confirmPassword)}
             >
-              {resetPasswordMutation.isPending ? "Yenilənir..." : "Yenilə"}
+              {resetPasswordMutation.isPending ? t('resetting') : t('reset')}
             </Button>
           </div>
         </form>

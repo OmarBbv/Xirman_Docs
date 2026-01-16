@@ -32,13 +32,14 @@ export default function Layout() {
     page: 1,
     limit: 5,
     startDate: dateString,
+    excludeRead: true,
   });
 
   const notificationContent = (
     <div className="w-[300px]">
       <div className="flex justify-between items-center mb-2 px-2 pb-2 border-b border-gray-100">
-        <span className="font-bold text-sm">Yeni Sənədlər (Bu gün)</span>
-        <Link to="/dashboard/notifications" className="text-blue-600 text-xs hover:underline">Hamısına bax</Link>
+        <span className="font-bold text-sm">{t('newDocsToday')}</span>
+        <Link to="/dashboard/notifications" className="text-blue-600 text-xs hover:underline">{t('viewAll')}</Link>
       </div>
       {notificationsData?.data && notificationsData.data.length > 0 ? (
         <List
@@ -52,13 +53,13 @@ export default function Layout() {
               <div className="font-medium text-xs text-gray-800 truncate">{item.companyName}</div>
               <div className="text-[10px] text-gray-500 flex justify-between mt-0.5">
                 <span>{item.documentType}</span>
-                <span>{new Date(item.uploadedAt).toLocaleTimeString('az-AZ', { hour: '2-digit', minute: '2-digit' })}</span>
+                <span>{new Date(item.uploadedAt).toLocaleTimeString(locale === 'az' ? 'az-AZ' : 'ru-RU', { hour: '2-digit', minute: '2-digit' })}</span>
               </div>
             </div>
           )}
         />
       ) : (
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Yeni bildiriş yoxdur" />
+        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('noNotifications')} />
       )}
     </div>
   );
@@ -95,7 +96,7 @@ export default function Layout() {
         }}
         className="w-full text-left px-4 py-2 text-sm text-[#d63638] hover:bg-[#f0f0f1] transition-colors cursor-pointer"
       >
-        Çıxış et
+        {t('logout')}
       </button>
     </div>
   );
@@ -124,21 +125,27 @@ export default function Layout() {
       </div>
 
       <Drawer
-        title="Menyu"
+        title={null}
         placement="left"
+        closable={false}
         onClose={() => setMobileMenuOpen(false)}
         open={mobileMenuOpen}
-        styles={{ body: { padding: 0 } }}
-        width={250}
+        styles={{ body: { padding: 0 }, header: { display: 'none' } }}
+        size={250}
+        rootClassName="mobile-sidebar-drawer"
       >
         <div className="flex flex-col h-full bg-[#1d2327]">
-          <Sidebar isCollapsed={false} setIsCollapsed={() => { }} menuItems={filteredMenuItems} mobile={true} />
+          <Sidebar
+            isCollapsed={false}
+            setIsCollapsed={() => { }}
+            menuItems={filteredMenuItems}
+            mobile={true}
+            onClose={() => setMobileMenuOpen(false)}
+          />
         </div>
       </Drawer>
 
-      {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top bar (Admin Bar style) */}
         <header className="h-[46px] md:h-[32px] bg-[#1d2327] text-[#c3c4c7] flex items-center justify-between px-3 md:px-4 z-10 sticky top-0 md:relative">
           <div className="flex items-center gap-2 md:gap-4 h-full">
             <Button
@@ -148,7 +155,7 @@ export default function Layout() {
               className="lg:hidden! flex items-center justify-center -ml-2 text-white hover:text-white"
             />
             <div className="hover:bg-white/10 h-full px-2 md:px-3 flex items-center cursor-pointer transition-colors">
-              <span className="text-[14px] font-bold text-white md:text-[13px] md:font-normal md:text-[#c3c4c7] whitespace-nowrap">Xirman DMS</span>
+              <span className="text-[14px] font-bold text-white md:text-[13px] md:font-normal md:text-[#c3c4c7] whitespace-nowrap">{locale === 'ru' ? 'Хирман ЭАС' : 'Xirman EAS'}</span>
             </div>
 
             <Popover content={notificationContent} trigger={['hover', 'click']} placement="bottomLeft" overlayClassName="notification-popover">
@@ -181,11 +188,7 @@ export default function Layout() {
           </div>
         </header>
 
-        {/* Content Body */}
         <main className="flex-1 overflow-y-auto p-3 md:p-5 max-w-[1800px] no-scrollbar">
-          {/* <header className="mb-4 md:mb-6">
-            <h1 className="text-xl md:text-[23px] font-normal text-[#1d2327] hidden md:block">{t('admin_panel')}</h1>
-          </header> */}
           <div className="bg-transparent md:bg-white border-none md:border md:border-[#c3c4c7] shadow-none md:shadow-sm p-0 md:p-6">
             <Outlet />
           </div>

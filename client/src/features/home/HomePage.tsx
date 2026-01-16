@@ -2,11 +2,15 @@ import { useNavigate } from "react-router-dom";
 import { useDocuments, useDocumentStats, useRecentActivities } from "../hooks/documentHooks";
 import { Spin, Table, Tag, Button, Card, Dropdown } from "antd";
 import { MoreOutlined, EyeOutlined } from "@ant-design/icons";
+import { useTranslations, useLocale } from "use-intl";
+import { useAuth } from "../../context/AuthContext";
 
 export default function HomePage() {
   const navigate = useNavigate();
+  const t = useTranslations('DashboardPage');
+  const locale = useLocale();
+  const { user } = useAuth();
 
-  // Real data hooks
   const { data: statsData, isLoading: isStatsLoading } = useDocumentStats();
   const { data: recentDocsData, isLoading: isDocsLoading } = useDocuments({ page: 1, limit: 5 });
   const { data: activities, isLoading: isActivitiesLoading } = useRecentActivities();
@@ -19,51 +23,49 @@ export default function HomePage() {
     );
   }
 
-  // Format charts data
   const documentTypeData = [
-    { label: "PDF Sənədlər", value: statsData?.pdfCount || 0, color: "bg-[#2271b1]", lightColor: "bg-blue-100" },
-    { label: "Word (DOCX)", value: statsData?.wordCount || 0, color: "bg-[#34A853]", lightColor: "bg-green-100" },
-    { label: "Excel (XLSX)", value: statsData?.excelCount || 0, color: "bg-[#FBBC05]", lightColor: "bg-yellow-100" },
-    { label: "Digər", value: statsData?.otherCount || 0, color: "bg-[#EA4335]", lightColor: "bg-red-100" },
+    { label: t('charts.pdf'), value: statsData?.pdfCount || 0, color: "bg-[#2271b1]", lightColor: "bg-blue-100" },
+    { label: t('charts.word'), value: statsData?.wordCount || 0, color: "bg-[#34A853]", lightColor: "bg-green-100" },
+    { label: t('charts.excel'), value: statsData?.excelCount || 0, color: "bg-[#FBBC05]", lightColor: "bg-yellow-100" },
+    { label: t('charts.other'), value: statsData?.otherCount || 0, color: "bg-[#EA4335]", lightColor: "bg-red-100" },
   ].map(item => ({
     ...item,
     percentage: statsData?.total ? Math.round((item.value / statsData.total) * 100) : 0
   })).sort((a, b) => b.value - a.value);
 
-  // Recent Docs formatted for generic Table
   const formattedRecentDocs = recentDocsData?.data?.map(doc => ({
     id: doc.id,
     title: doc.fileName,
     author: `${doc.uploadedBy?.firstName} ${doc.uploadedBy?.lastName}`,
-    date: new Date(doc.uploadedAt).toLocaleString('az-AZ'),
+    date: new Date(doc.uploadedAt).toLocaleString(locale === 'az' ? 'az-AZ' : 'ru-RU'),
     amount: doc.amount
   })) || [];
 
   const columns = [
     {
-      title: 'Sənəd',
+      title: t('recentDocs.table.document'),
       dataIndex: 'title',
       key: 'title',
       render: (text: string) => <span className="font-medium text-gray-900">{text}</span>,
     },
     {
-      title: 'Yükləyən',
+      title: t('recentDocs.table.uploader'),
       dataIndex: 'author',
       key: 'author',
       render: (text: string) => <span className="text-gray-600">{text}</span>,
     },
     {
-      title: 'Tarix',
+      title: t('recentDocs.table.date'),
       dataIndex: 'date',
       key: 'date',
       render: (text: string) => <span className="text-gray-500 text-sm">{text}</span>,
     },
     {
-      title: 'Məbləğ / Status',
+      title: t('recentDocs.table.amountStatus'),
       key: 'amount',
       render: (_: any, record: any) => (
         <Tag color={record.amount ? 'green' : 'default'}>
-          {record.amount ? `${record.amount} AZN` : 'Məbləğ yoxdur'}
+          {record.amount ? `${record.amount} AZN` : t('recentDocs.table.noAmount')}
         </Tag>
       ),
     },
@@ -78,7 +80,7 @@ export default function HomePage() {
             items: [
               {
                 key: 'view',
-                label: 'Bax',
+                label: t('recentDocs.table.view'),
                 icon: <EyeOutlined />,
                 onClick: () => navigate(`/dashboard/docs/${record.id}`),
               },
@@ -98,12 +100,11 @@ export default function HomePage() {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
-      {/* Welcome Section - Modern Header */}
       <div className="bg-linear-to-br from-[#2271b1] to-[#135e96] rounded-lg md:shadow-lg p-5 md:p-8 text-white">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex-1">
-            <h1 className="text-xl md:text-3xl font-bold mb-2">Xoş gəldiniz, Admin</h1>
-            <p className="text-blue-100 text-xs md:text-sm">Sistemin ümumi vəziyyəti və son hərəkətlər burada görüntülənir</p>
+            <h1 className="text-xl md:text-3xl font-bold mb-2">{t('welcome.title', { name: user?.firstName || 'Admin' })}</h1>
+            <p className="text-blue-100 text-xs md:text-sm">{t('welcome.subtitle')}</p>
           </div>
           <div className="flex items-center gap-3">
             <button
@@ -113,19 +114,18 @@ export default function HomePage() {
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
               </svg>
-              Yeni Sənəd
+              {t('welcome.newDocument')}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Enhanced Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           {
-            label: "Toplam Sənəd",
+            label: t('stats.totalDocuments'),
             value: statsData?.total || 0,
-            trend: "Ümumi",
+            trend: t('stats.trends.general'),
             bgLight: "bg-blue-50",
             textColor: "text-blue-600",
             icon: (
@@ -135,9 +135,9 @@ export default function HomePage() {
             ),
           },
           {
-            label: "Toplam Məbləğ",
+            label: t('stats.totalAmount'),
             value: `${statsData?.totalAmount || 0} ₼`,
-            trend: "Cəmi",
+            trend: t('stats.trends.total'),
             bgLight: "bg-emerald-50",
             textColor: "text-emerald-600",
             icon: (
@@ -147,9 +147,9 @@ export default function HomePage() {
             ),
           },
           {
-            label: "Aktiv İstifadəçilər",
+            label: t('stats.activeUsers'),
             value: statsData?.activeUsers || 0,
-            trend: "Son 24 saat",
+            trend: t('stats.trends.last24h'),
             bgLight: "bg-purple-50",
             textColor: "text-purple-600",
             icon: (
@@ -159,9 +159,9 @@ export default function HomePage() {
             ),
           },
           {
-            label: "Digər Sənədlər",
+            label: t('stats.otherDocuments'),
             value: statsData?.otherCount || 0,
-            trend: "Formatlar",
+            trend: t('stats.trends.formats'),
             bgLight: "bg-amber-50",
             textColor: "text-amber-600",
             icon: (
@@ -171,7 +171,7 @@ export default function HomePage() {
             ),
           },
         ].map((stat, i) => (
-          <div key={i} className="bg-white rounded-lg border border-gray-200 md:shadow-sm p-4 md:p-6 transition-all duration-200 hover:shadow-md hover:border-gray-300">
+          <div key={i} className="flex flex-row items-center md:flex-col md:items-start bg-white rounded-lg border border-gray-200 md:shadow-sm p-4 md:p-6 transition-all duration-200 hover:shadow-md hover:border-gray-300">
             <div className="flex items-start justify-between mb-4">
               <div className={`${stat.bgLight} p-3 rounded-lg`}>
                 <div className={stat.textColor}>
@@ -188,12 +188,10 @@ export default function HomePage() {
         ))}
       </div>
 
-      {/* Charts Section - Enhanced Design */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Document Type Distribution */}
         <div className="bg-white rounded-lg border border-gray-200 md:shadow-sm p-4 md:p-6">
           <div className="flex items-center justify-between mb-6">
-            <h3 className="text-base md:text-lg font-bold text-gray-900">Sənəd Növü Dağılımı</h3>
+            <h3 className="text-base md:text-lg font-bold text-gray-900">{t('charts.documentDistribution')}</h3>
           </div>
           <div className="space-y-5">
             {documentTypeData.map((bar, i) => (
@@ -201,7 +199,7 @@ export default function HomePage() {
                 <div className="flex justify-between items-center text-sm">
                   <span className="font-medium text-gray-700 text-xs md:text-sm">{bar.label}</span>
                   <div className="flex items-center gap-3">
-                    <span className="text-[10px] md:text-xs text-gray-500">{bar.value} sənəd</span>
+                    <span className="text-[10px] md:text-xs text-gray-500">{bar.value} {t('charts.docsCount')}</span>
                     <span className="font-bold text-gray-900 text-xs md:text-sm">{bar.percentage}%</span>
                   </div>
                 </div>
@@ -216,9 +214,8 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Recent Activity */}
         <div className="bg-white rounded-lg border border-gray-200 md:shadow-sm p-4 md:p-6">
-          <h3 className="text-base md:text-lg font-bold text-gray-900 mb-4">Son Hərəkətlər</h3>
+          <h3 className="text-base md:text-lg font-bold text-gray-900 mb-4">{t('activity.title')}</h3>
           {activities && activities.length > 0 ? (
             <div className="relative">
               <div className="absolute left-[11px] top-2 bottom-2 w-px bg-gray-200"></div>
@@ -233,10 +230,10 @@ export default function HomePage() {
                         <span className="font-semibold">{act.viewedBy?.firstName} {act.viewedBy?.lastName}</span>
                       </p>
                       <p className="text-[10px] md:text-xs text-gray-600 mt-0.5">
-                        '{act.document?.fileName}' sənədinə baxdı
+                        {t('activity.viewed', { file: act.document?.fileName || 'Sənəd' })}
                       </p>
                       <span className="text-[10px] md:text-xs text-gray-400 mt-1 block">
-                        {new Date(act.viewedAt).toLocaleString('az-AZ')}
+                        {new Date(act.viewedAt || new Date()).toLocaleString(locale === 'az' ? 'az-AZ' : 'ru-RU')}
                       </span>
                     </div>
                   </div>
@@ -244,20 +241,19 @@ export default function HomePage() {
               </div>
             </div>
           ) : (
-            <p className="text-gray-500 text-sm text-center py-4">Hələ heç bir hərəkət yoxdur</p>
+            <p className="text-gray-500 text-sm text-center py-4">{t('activity.empty')}</p>
           )}
         </div>
       </div>
 
-      {/* Recent Documents Table */}
       <div className="bg-white rounded-lg border border-gray-200 md:shadow-sm p-4 md:p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-base md:text-lg font-bold text-gray-900">Son Yüklənən Sənədlər</h3>
+          <h3 className="text-base md:text-lg font-bold text-gray-900">{t('recentDocs.title')}</h3>
           <button
             onClick={() => navigate('/dashboard/docs')}
             className="text-xs md:text-sm text-[#2271b1] font-semibold hover:text-[#135e96] cursor-pointer"
           >
-            Hamısına bax →
+            {t('recentDocs.viewAll')}
           </button>
         </div>
         <div className="hidden md:block">
@@ -271,11 +267,10 @@ export default function HomePage() {
           />
         </div>
 
-        {/* Mobile Card View */}
-        <div className="md:hidden space-y-3">
+        <div className="flex flex-col gap-3 md:hidden">
           {formattedRecentDocs.length > 0 ? (
             formattedRecentDocs.map((doc) => (
-              <Card key={doc.id} className="shadow-none border border-gray-200" bodyStyle={{ padding: '16px' }}>
+              <Card key={doc.id} className="shadow-none border border-gray-200" styles={{ body: { padding: '16px' } }}>
                 <div className="flex justify-between items-start mb-2">
                   <div className="font-medium text-base text-gray-900 break-all">{doc.title}</div>
                   <Tag color={doc.amount ? 'green' : 'default'} className="mr-0">
@@ -285,11 +280,11 @@ export default function HomePage() {
 
                 <div className="space-y-2 text-sm text-gray-600">
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Yükləyən:</span>
+                    <span className="text-gray-500">{t('recentDocs.table.uploader')}:</span>
                     <span className="font-medium">{doc.author}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-gray-500">Tarix:</span>
+                    <span className="text-gray-500">{t('recentDocs.table.date')}:</span>
                     <span>{doc.date}</span>
                   </div>
                 </div>
@@ -301,7 +296,7 @@ export default function HomePage() {
                       items: [
                         {
                           key: 'view',
-                          label: 'Sənədə Bax',
+                          label: t('recentDocs.table.viewDoc'),
                           icon: <EyeOutlined />,
                           onClick: () => navigate(`/dashboard/docs/${doc.id}`),
                         },
@@ -319,7 +314,7 @@ export default function HomePage() {
               </Card>
             ))
           ) : (
-            <div className="text-center py-8 text-gray-500 text-sm">Heç bir sənəd yoxdur</div>
+            <div className="text-center py-8 text-gray-500 text-sm">{t('recentDocs.notFound')}</div>
           )}
         </div>
       </div>

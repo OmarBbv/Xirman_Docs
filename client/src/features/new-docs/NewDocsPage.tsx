@@ -9,9 +9,11 @@ import { useUploadDocument } from '../hooks/documentHooks';
 import { DocumentType } from '../types/document.types';
 import { Select, DatePicker } from 'antd';
 import dayjs from 'dayjs';
+import { useTranslations } from 'use-intl';
 
 interface NewDocumentForm {
   companyName: string;
+  documentNumber: string;
   amount: string;
   documentDate: string;
   documentType: string;
@@ -21,6 +23,7 @@ export default function NewDocsPage() {
   const navigate = useNavigate();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const uploadDocument = useUploadDocument();
+  const t = useTranslations('NewDocumentPage');
 
   const {
     register,
@@ -30,6 +33,7 @@ export default function NewDocsPage() {
   } = useForm<NewDocumentForm>({
     defaultValues: {
       companyName: '',
+      documentNumber: '',
       amount: '',
       documentDate: '',
       documentType: '',
@@ -45,6 +49,7 @@ export default function NewDocsPage() {
       {
         data: {
           companyName: data.companyName,
+          documentNumber: data.documentNumber,
           amount: data.amount ? parseFloat(data.amount) : undefined,
           documentDate: data.documentDate,
           documentType: data.documentType as DocumentType,
@@ -64,13 +69,13 @@ export default function NewDocsPage() {
   };
 
   const documentTypeOptions = [
-    { value: 'contract', label: 'Müqavilə' },
-    { value: 'invoice', label: 'Faktura' },
-    { value: 'act', label: 'Akt' },
-    { value: 'report', label: 'Hesabat' },
-    { value: 'letter', label: 'Məktub' },
-    { value: 'order', label: 'Sifariş' },
-    { value: 'other', label: 'Digər' },
+    { value: 'contract', label: t('types.contract') },
+    { value: 'invoice', label: t('types.invoice') },
+    { value: 'act', label: t('types.act') },
+    { value: 'report', label: t('types.report') },
+    { value: 'letter', label: t('types.letter') },
+    { value: 'order', label: t('types.order') },
+    { value: 'other', label: t('types.other') },
   ];
 
   return (
@@ -79,53 +84,59 @@ export default function NewDocsPage() {
         <button
           onClick={() => navigate('/dashboard/docs')}
           className="bg-white/10 hover:bg-white/20 p-2 rounded-lg transition-colors cursor-pointer"
-          title="Geri qayıt"
+          title={t('back')}
         >
           <ArrowLeftIcon className="w-5 h-5" />
         </button>
         <div>
           <h1 className="text-3xl font-bold text-white mb-2">
-            Yeni Sənəd Yarat
+            {t('title')}
           </h1>
           <p className="text-white/90 text-[15px]">
-            Sistemə yeni sənəd əlavə etmək üçün aşağıdakı formu doldurun
+            {t('subtitle')}
           </p>
         </div>
       </div>
 
-      <div className="bg-white p-6 md:px-8 md:py-6">
+      <div className="bg-white p-6 md:py-8 md:px-0">
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Input
               type="text"
-              label="Şirkət adı"
-              placeholder="Şirkət adını daxil edin"
-              {...register('companyName', { required: 'Şirkət adı mütləqdir' })}
+              label={t('form.companyName')}
+              placeholder={t('form.companyPlaceholder')}
+              {...register('companyName', { required: t('form.companyRequired') })}
               error={errors.companyName?.message}
             />
             <Input
+              type="text"
+              label={t('form.documentNumber')}
+              placeholder={t('form.documentNumberPlaceholder')}
+              {...register('documentNumber')}
+              error={errors.documentNumber?.message}
+            />
+            <Input
               type="number"
-              label="Məbləğ (AZN)"
-              placeholder="Məbləği daxil edin"
+              label={t('form.amount')}
+              placeholder={t('form.amountPlaceholder')}
               {...register('amount')}
               error={errors.amount?.message}
             />
           </div>
 
-          {/* Document Date & Type */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="relative">
               <label className="text-[12px] text-[#1a73e8] bg-white px-1 absolute -top-2.5 left-3 z-10">
-                Sənədin tarixi
+                {t('form.date')}
               </label>
               <Controller
                 name="documentDate"
                 control={control}
-                rules={{ required: 'Sənədin tarixi mütləqdir' }}
+                rules={{ required: t('form.dateRequired') }}
                 render={({ field }) => (
                   <DatePicker
                     className="w-full h-[54px]"
-                    placeholder="Tarix seçin"
+                    placeholder={t('form.datePlaceholder')}
                     status={errors.documentDate ? 'error' : ''}
                     value={field.value ? dayjs(field.value) : null}
                     onChange={(_, dateString) => field.onChange(dateString)}
@@ -142,16 +153,16 @@ export default function NewDocsPage() {
 
             <div className="relative">
               <label className="text-[12px] text-[#1a73e8] bg-white px-1 absolute -top-2.5 left-3 z-10">
-                Sənəd növü
+                {t('form.type')}
               </label>
               <Controller
                 name="documentType"
                 control={control}
-                rules={{ required: 'Sənəd növü seçilməlidir' }}
+                rules={{ required: t('form.typeRequired') }}
                 render={({ field }) => (
                   <Select
                     {...field}
-                    placeholder="Sənəd növünü seçin"
+                    placeholder={t('form.typePlaceholder')}
                     className="w-full h-[54px]"
                     options={documentTypeOptions}
                     status={errors.documentType ? 'error' : ''}
@@ -167,44 +178,40 @@ export default function NewDocsPage() {
             </div>
           </div>
 
-          {/* File Upload */}
           <div className="pt-2">
             <FileUpload
-              label="Sənəd faylı (PDF, Word, Excel)"
+              label={t('form.file')}
               onChange={handleFileChange}
               className="w-full"
             />
             {!selectedFile && (
               <p className="text-amber-600 text-[12px] mt-2">
-                * Fayl seçilməlidir
+                {t('form.fileRequired')}
               </p>
             )}
           </div>
 
-          {/* Divider */}
           <div className="border-t border-[#dadce0] my-8"></div>
 
-          {/* Action Buttons */}
           <div className="flex items-center justify-end gap-4">
             <button
               type="button"
               onClick={() => navigate('/dashboard/docs')}
               className="px-6 py-3 text-[#5f6368] hover:bg-[#f1f3f4] rounded-lg transition-colors font-medium cursor-pointer"
             >
-              Ləğv et
+              {t('buttons.cancel')}
             </button>
             <Button
               type="submit"
               className="px-8 py-3 font-medium text-[15px]"
               disabled={uploadDocument.isPending || !selectedFile}
             >
-              {uploadDocument.isPending ? 'Yüklənir...' : 'Sənəd Yarat'}
+              {uploadDocument.isPending ? t('buttons.loading') : t('buttons.create')}
             </Button>
           </div>
         </form>
       </div>
 
-      {/* Info Card */}
       <div className="bg-[#e8f0fe] border-t border-[#d2e3fc] p-6 md:px-12 lg:px-16">
         <div className="flex items-start gap-3">
           <div className="w-5 h-5 rounded-full bg-[#1a73e8] flex items-center justify-center shrink-0 mt-0.5">
@@ -214,11 +221,10 @@ export default function NewDocsPage() {
           </div>
           <div className="flex-1">
             <h3 className="text-[14px] font-semibold text-[#1a73e8] mb-1">
-              Məlumat
+              {t('info.title')}
             </h3>
             <p className="text-[13px] text-[#5f6368] leading-relaxed">
-              Sənəd yükləndikdən sonra yükləyən istifadəçi avtomatik olaraq sizin hesabınız kimi qeyd olunacaq.
-              Maksimum fayl ölçüsü 10MB-dır. Yalnız PDF, Word və Excel formatları qəbul edilir.
+              {t('info.content')}
             </p>
           </div>
         </div>

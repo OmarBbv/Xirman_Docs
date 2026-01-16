@@ -5,6 +5,10 @@ export class CreateDocumentDto {
   @IsString()
   companyName: string;
 
+  @IsString()
+  @IsOptional()
+  documentNumber?: string;
+
   @IsNumber()
   @IsOptional()
   amount?: number;

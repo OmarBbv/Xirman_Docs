@@ -7,11 +7,16 @@ import {
   FileExcelOutlined,
   FileWordOutlined,
   ClockCircleOutlined,
-  UserOutlined
+  UserOutlined,
+  CheckOutlined
 } from "@ant-design/icons";
+import { useMarkAsRead } from "../hooks/documentHooks";
+import { useTranslations, useLocale } from "use-intl";
 
 export default function NotificationsPage() {
   const navigate = useNavigate();
+  const t = useTranslations('NotificationsPage');
+  const locale = useLocale();
 
   const today = new Date();
   const year = today.getFullYear();
@@ -23,7 +28,20 @@ export default function NotificationsPage() {
     page: 1,
     limit: 50,
     startDate: dateString,
+    excludeRead: true,
   });
+
+  const markAsReadMutation = useMarkAsRead();
+
+  const handleCardClick = (id: number) => {
+    markAsReadMutation.mutate(id);
+    navigate(`/dashboard/docs/${id}`);
+  };
+
+  const handleMarkAsRead = (e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
+    markAsReadMutation.mutate(id);
+  };
 
   const getFileIcon = (format: string) => {
     switch (format?.toLowerCase()) {
@@ -39,14 +57,14 @@ export default function NotificationsPage() {
   };
 
   const formatTime = (dateStr: string) => {
-    return new Date(dateStr).toLocaleTimeString("az-AZ", { hour: '2-digit', minute: '2-digit' });
+    return new Date(dateStr).toLocaleTimeString(locale === 'az' ? 'az-AZ' : 'ru-RU', { hour: '2-digit', minute: '2-digit' });
   };
 
   return (
     <div className="space-y-4 md:space-y-6 animate-in fade-in duration-500">
       <div className="bg-linear-to-br from-[#2271b1] to-[#135e96] rounded-lg md:shadow-lg p-5 md:p-8 text-white">
-        <h1 className="text-xl md:text-3xl font-bold mb-2">Bildirişlər</h1>
-        <p className="text-blue-100 text-xs md:text-sm">Bu gün sistemə əlavə edilən yeni sənədlər</p>
+        <h1 className="text-xl md:text-3xl font-bold mb-2">{t('title')}</h1>
+        <p className="text-blue-100 text-xs md:text-sm">{t('subtitle')}</p>
       </div>
 
       {isLoading ? (
@@ -54,14 +72,14 @@ export default function NotificationsPage() {
           <Spin size="large" />
         </div>
       ) : (
-        <div className="bg-transparent md:bg-white rounded-lg md:shadow-sm md:border border-gray-200 p-0 md:p-6">
+        <>
           {data?.data && data.data.length > 0 ? (
             <div className="flex flex-col gap-3">
               {data.data.map((item: any) => (
                 <div
                   key={item.id}
-                  className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow group cursor-pointer"
-                  onClick={() => navigate(`/dashboard/docs/${item.id}`)}
+                  className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-md transition-shadow group cursor-pointer relative"
+                  onClick={() => handleCardClick(item.id)}
                 >
                   <div className="flex items-start md:items-center gap-4">
                     <div className="shrink-0 p-2 bg-gray-50 rounded-lg group-hover:bg-blue-50 transition-colors">
@@ -87,8 +105,17 @@ export default function NotificationsPage() {
                           </div>
                         </div>
 
-                        <div className="hidden md:flex items-center text-[#2271b1] text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                          Sənədə bax →
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="flex items-center justify-center w-8 h-8 rounded-full hover:bg-green-50 text-gray-400 hover:text-green-600 transition-colors z-10"
+                            title={t('markRead')}
+                            onClick={(e) => handleMarkAsRead(e, item.id)}
+                          >
+                            <CheckOutlined />
+                          </div>
+                          <div className="hidden md:flex items-center text-[#2271b1] text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity">
+                            {t('viewDoc')}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -97,9 +124,9 @@ export default function NotificationsPage() {
               ))}
             </div>
           ) : (
-            <Empty description="Bu gün heç bir sənəd əlavə edilməyib" />
+            <Empty description={t('empty')} />
           )}
-        </div>
+        </>
       )}
     </div>
   );
