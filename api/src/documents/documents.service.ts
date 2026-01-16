@@ -4,7 +4,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, Brackets } from 'typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -47,6 +47,10 @@ export class DocumentsService {
     }
 
     const fileExtension = file.originalname.split('.').pop() || '';
+
+    if (createDocumentDto.allowedPositions && typeof createDocumentDto.allowedPositions === 'string') {
+      createDocumentDto.allowedPositions = (createDocumentDto.allowedPositions as string).split(',');
+    }
     const fileFormat = this.getFileFormat(fileExtension);
     const fileName = Buffer.from(file.originalname, 'latin1').toString('utf8');
     const userId = user['userId'] || user.id;
@@ -110,6 +114,15 @@ export class DocumentsService {
       .leftJoinAndSelect('document.uploadedBy', 'uploadedBy')
       .leftJoinAndSelect('document.updatedBy', 'updatedBy')
       .orderBy('document.uploadedAt', 'DESC');
+
+    if (user && user.role !== 'admin') {
+      const userPosition = user.position || user['position'];
+      queryBuilder.andWhere(new Brackets(qb => {
+        qb.where("document.allowedPositions IS NULL")
+          .orWhere("document.allowedPositions = ''")
+          .orWhere("document.allowedPositions LIKE :pos", { pos: `%${userPosition}%` });
+      }));
+    }
 
     if (companyName) {
       queryBuilder.andWhere('document.companyName ILIKE :companyName', {

@@ -197,7 +197,9 @@
       "typeRequired": "Sənəd növü seçilməlidir",
       "typePlaceholder": "Sənəd növünü seçin",
       "file": "Sənəd faylı (PDF, Word, Excel)",
-      "fileRequired": "* Fayl seçilməlidir"
+      "fileRequired": "* Fayl seçilməlidir",
+      "allowedPositions": "Görə biləcək vəzifələr",
+      "allowedPositionsPlaceholder": "Vəzifə seçin"
     },
     "buttons": {
       "cancel": "Ləğv et",
@@ -212,6 +214,15 @@
       "letter": "Məktub",
       "order": "Sifariş",
       "other": "Digər"
+    },
+    "positions": {
+      "manager": "Menecer",
+      "accountant": "Mühasib",
+      "hr": "HR",
+      "finance_manager": "Maliyyə Meneceri",
+      "sales_specialist": "Satış Mütəxəssisi",
+      "warehouseman": "Anbardar",
+      "director": "Direktor"
     },
     "info": {
       "title": "Məlumat",

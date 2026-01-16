@@ -10,6 +10,7 @@ import { DocumentType } from '../types/document.types';
 import { Select, DatePicker } from 'antd';
 import dayjs from 'dayjs';
 import { useTranslations } from 'use-intl';
+import { MultiSelect } from '../ui/MultiSelect';
 
 interface NewDocumentForm {
   companyName: string;
@@ -17,6 +18,7 @@ interface NewDocumentForm {
   amount: string;
   documentDate: string;
   documentType: string;
+  allowedPositions: string[];
 }
 
 export default function NewDocsPage() {
@@ -37,6 +39,7 @@ export default function NewDocsPage() {
       amount: '',
       documentDate: '',
       documentType: '',
+      allowedPositions: [],
     },
   });
 
@@ -53,6 +56,7 @@ export default function NewDocsPage() {
           amount: data.amount ? parseFloat(data.amount) : undefined,
           documentDate: data.documentDate,
           documentType: data.documentType as DocumentType,
+          allowedPositions: data.allowedPositions,
         },
         file: selectedFile,
       },
@@ -76,6 +80,16 @@ export default function NewDocsPage() {
     { value: 'letter', label: t('types.letter') },
     { value: 'order', label: t('types.order') },
     { value: 'other', label: t('types.other') },
+  ];
+
+  const positionOptions = [
+    { value: 'manager', label: t('positions.manager') },
+    { value: 'accountant', label: t('positions.accountant') },
+    { value: 'hr', label: t('positions.hr') },
+    { value: 'finance_manager', label: t('positions.finance_manager') },
+    { value: 'sales_specialist', label: t('positions.sales_specialist') },
+    { value: 'warehouseman', label: t('positions.warehouseman') },
+    { value: 'director', label: t('positions.director') },
   ];
 
   return (
@@ -124,9 +138,9 @@ export default function NewDocsPage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="relative">
-              <label className="text-[12px] text-[#1a73e8] bg-white px-1 absolute -top-2.5 left-3 z-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t('form.date')}
               </label>
               <Controller
@@ -135,7 +149,7 @@ export default function NewDocsPage() {
                 rules={{ required: t('form.dateRequired') }}
                 render={({ field }) => (
                   <DatePicker
-                    className="w-full h-[54px]"
+                    className="w-full h-[50px]"
                     placeholder={t('form.datePlaceholder')}
                     status={errors.documentDate ? 'error' : ''}
                     value={field.value ? dayjs(field.value) : null}
@@ -151,8 +165,8 @@ export default function NewDocsPage() {
               )}
             </div>
 
-            <div className="relative">
-              <label className="text-[12px] text-[#1a73e8] bg-white px-1 absolute -top-2.5 left-3 z-10">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
                 {t('form.type')}
               </label>
               <Controller
@@ -163,7 +177,7 @@ export default function NewDocsPage() {
                   <Select
                     {...field}
                     placeholder={t('form.typePlaceholder')}
-                    className="w-full h-[54px]"
+                    className="w-full h-[50px] h-50-select"
                     options={documentTypeOptions}
                     status={errors.documentType ? 'error' : ''}
                     value={field.value || undefined}
@@ -175,6 +189,25 @@ export default function NewDocsPage() {
                   {errors.documentType.message}
                 </p>
               )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('form.allowedPositions')}
+              </label>
+              <Controller
+                name="allowedPositions"
+                control={control}
+                render={({ field }) => (
+                  <MultiSelect
+                    options={positionOptions}
+                    value={field.value || []}
+                    onChange={field.onChange}
+                    placeholder={t('form.allowedPositionsPlaceholder')}
+                    allowClear
+                  />
+                )}
+              />
             </div>
           </div>
 

@@ -63,6 +63,9 @@ export class Document {
   @Column({ name: 'updated_by_id', nullable: true })
   updatedById: number;
 
+  @Column({ type: 'simple-array', nullable: true })
+  allowedPositions: string[];
+
   // Versiya tarixçəsi
   @OneToMany(() => DocumentVersion, (version) => version.document)
   versions: DocumentVersion[];

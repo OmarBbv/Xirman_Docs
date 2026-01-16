@@ -19,4 +19,7 @@ export class CreateDocumentDto {
 
   @IsDateString()
   documentDate: string;
+
+  @IsOptional()
+  allowedPositions?: string[];
 }

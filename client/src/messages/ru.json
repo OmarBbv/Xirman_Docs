@@ -197,7 +197,9 @@
       "typeRequired": "Тип документа обязателен",
       "typePlaceholder": "Выберите тип документа",
       "file": "Файл документа (PDF, Word, Excel)",
-      "fileRequired": "* Файл должен быть выбран"
+      "fileRequired": "* Файл должен быть выбран",
+      "allowedPositions": "Кто может видеть",
+      "allowedPositionsPlaceholder": "Выберите должность"
     },
     "buttons": {
       "cancel": "Отмена",
@@ -212,6 +214,15 @@
       "letter": "Письмо",
       "order": "Заказ",
       "other": "Другое"
+    },
+    "positions": {
+      "manager": "Менеджер",
+      "accountant": "Бухгалтер",
+      "hr": "HR",
+      "finance_manager": "Финансовый менеджер",
+      "sales_specialist": "Специалист по продажам",
+      "warehouseman": "Кладовщик",
+      "director": "Директор"
     },
     "info": {
       "title": "Информация",

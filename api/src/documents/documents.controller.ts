@@ -13,6 +13,7 @@ import {
   Req,
   ParseIntPipe,
   Res,
+  ForbiddenException,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
@@ -128,7 +129,10 @@ export class DocumentsController {
   }
 
   @Delete(':id')
-  async remove(@Param('id', ParseIntPipe) id: number) {
+  async remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
+    if (req.user.role !== 'admin') {
+      throw new ForbiddenException('Bu əməliyyatı yerinə yetirmək üçün icazəniz yoxdur');
+    }
     return this.documentsService.remove(id);
   }
 

@@ -76,6 +76,7 @@ export interface CreateDocumentDto {
   amount?: number;
   documentType?: DocumentType;
   documentDate: string;
+  allowedPositions?: string[];
 }
 
 export interface UpdateDocumentDto {

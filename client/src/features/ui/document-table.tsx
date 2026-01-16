@@ -12,6 +12,7 @@ import {
   ShareAltOutlined
 } from '@ant-design/icons';
 import { useTranslations } from "use-intl";
+import { useAuth } from "../../context/AuthContext";
 import type { Document, FileFormat } from "../types/document.types";
 
 interface DocumentTableProps {
@@ -74,6 +75,7 @@ export const DocumentTable = ({
   pagination
 }: DocumentTableProps) => {
   const t = useTranslations('DocumentsPage');
+  const { user } = useAuth();
 
   const columns: ColumnsType<Document> = [
     {
@@ -153,7 +155,7 @@ export const DocumentTable = ({
                 key: 'download',
                 label: t('table.download'),
                 icon: <DownloadOutlined />,
-                onClick: (e) => {
+                onClick: (e: any) => {
                   e.domEvent.stopPropagation();
                   onDownload?.(record.id, record.fileName);
                 },
@@ -162,32 +164,34 @@ export const DocumentTable = ({
                 key: 'share',
                 label: t('table.share'),
                 icon: <ShareAltOutlined />,
-                onClick: (e) => {
+                onClick: (e: any) => {
                   e.domEvent.stopPropagation();
                   onShare?.(record.id);
                 },
               },
-              {
-                type: 'divider',
-              },
-              {
-                key: 'delete',
-                label: t('table.delete'),
-                icon: <DeleteOutlined />,
-                danger: true,
-                onClick: (e) => {
-                  e.domEvent.stopPropagation();
-                  Modal.confirm({
-                    title: t('table.deleteConfirmTitle'),
-                    content: t('table.deleteConfirmContent'),
-                    okText: t('table.yes'),
-                    cancelText: t('table.no'),
-                    okButtonProps: { danger: true },
-                    onOk: () => onDelete?.(record.id),
-                  });
+              ...(user?.role === 'admin' ? [
+                {
+                  type: 'divider',
                 },
-              },
-            ],
+                {
+                  key: 'delete',
+                  label: t('table.delete'),
+                  icon: <DeleteOutlined />,
+                  danger: true,
+                  onClick: (e: any) => {
+                    e.domEvent.stopPropagation();
+                    Modal.confirm({
+                      title: t('table.deleteConfirmTitle'),
+                      content: t('table.deleteConfirmContent'),
+                      okText: t('table.yes'),
+                      cancelText: t('table.no'),
+                      okType: 'danger',
+                      onOk: () => onDelete?.(record.id),
+                    });
+                  },
+                }
+              ] : []),
+            ] as any,
           }}
         >
           <Button
@@ -272,7 +276,7 @@ export const DocumentTable = ({
                           key: 'download',
                           label: t('table.download'),
                           icon: <DownloadOutlined />,
-                          onClick: (info) => {
+                          onClick: (info: any) => {
                             info.domEvent.stopPropagation();
                             onDownload?.(record.id, record.fileName);
                           },
@@ -281,29 +285,31 @@ export const DocumentTable = ({
                           key: 'share',
                           label: t('table.share'),
                           icon: <ShareAltOutlined />,
-                          onClick: (info) => {
+                          onClick: (info: any) => {
                             info.domEvent.stopPropagation();
                             onShare?.(record.id);
                           },
                         },
-                        {
-                          key: 'delete',
-                          label: t('table.delete'),
-                          icon: <DeleteOutlined />,
-                          danger: true,
-                          onClick: (info) => {
-                            info.domEvent.stopPropagation();
-                            Modal.confirm({
-                              title: t('table.deleteConfirmTitle'),
-                              content: t('table.deleteConfirmContent'),
-                              okText: t('table.yes'),
-                              cancelText: t('table.no'),
-                              okButtonProps: { danger: true },
-                              onOk: () => onDelete?.(record.id),
-                            });
-                          },
-                        },
-                      ],
+                        ...(user?.role === 'admin' ? [
+                          {
+                            key: 'delete',
+                            label: t('table.delete'),
+                            icon: <DeleteOutlined />,
+                            danger: true,
+                            onClick: (info: any) => {
+                              info.domEvent.stopPropagation();
+                              Modal.confirm({
+                                title: t('table.deleteConfirmTitle'),
+                                content: t('table.deleteConfirmContent'),
+                                okText: t('table.yes'),
+                                cancelText: t('table.no'),
+                                okType: 'danger',
+                                onOk: () => onDelete?.(record.id),
+                              });
+                            },
+                          }
+                        ] : []),
+                      ] as any,
                     }}
                   >
                     <Button

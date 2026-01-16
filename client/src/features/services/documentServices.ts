@@ -95,8 +95,13 @@ class DocumentService implements DocumentServiceTypes {
       formData.append("file", file);
       formData.append("companyName", data.companyName);
       formData.append("documentDate", data.documentDate);
+
       if (data.documentNumber) {
         formData.append("documentNumber", data.documentNumber);
+      }
+
+      if (data.allowedPositions && data.allowedPositions.length > 0) {
+        formData.append("allowedPositions", data.allowedPositions.join(','));
       }
 
       if (data.amount !== undefined) {
@@ -120,6 +125,7 @@ class DocumentService implements DocumentServiceTypes {
   async update(id: number, data: UpdateDocumentDto, file?: File): Promise<Document> {
     try {
       const formData = new FormData();
+
       if (file) {
         formData.append("file", file);
       }

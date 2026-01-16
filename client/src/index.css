@@ -31,3 +31,32 @@ body {
     /* Firefox */
   }
 }
+
+/* Custom Ant Design Inputs */
+.h-50-select .ant-select-selector {
+  height: 50px !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.h-50-select .ant-select-selection-search-input {
+  height: 48px !important;
+  /* Selector height minus borders */
+}
+
+.h-50-select .ant-select-selection-placeholder {
+  display: flex !important;
+  align-items: center !important;
+  inset-inline-start: 11px !important;
+}
+
+.h-50-select .ant-select-selection-item {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.h-50-datepicker {
+  height: 50px !important;
+}
