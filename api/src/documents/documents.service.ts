@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Brackets } from 'typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as archiver from 'archiver';
 
 import { Document } from './entities/document.entity';
 import { DocumentType, FileFormat } from './enums/document-enums';
@@ -478,5 +479,78 @@ export class DocumentsService {
         documentType: document.documentType,
       }
     };
+  }
+
+  async createBulkDownloadZip(ids: number[]): Promise<{ zipPath: string; zipFileName: string }> {
+    if (!ids || ids.length === 0) {
+      throw new BadRequestException('Ən azı bir sənəd seçilməlidir');
+    }
+
+    const documents = await Promise.all(
+      ids.map(async (id) => {
+        try {
+          const doc = await this.findOne(id);
+          const versions = await this.getVersions(id);
+          const latestVersion = versions[0];
+
+          return {
+            document: doc,
+            filePath: latestVersion ? latestVersion.filePath : doc.filePath,
+            fileName: latestVersion ? latestVersion.fileName : doc.fileName,
+          };
+        } catch {
+          return null;
+        }
+      })
+    );
+
+    const validDocs = documents.filter((d): d is NonNullable<typeof d> => d !== null && fs.existsSync(d.filePath));
+
+    if (validDocs.length === 0) {
+      throw new NotFoundException('Yüklənəcək fayl tapılmadı');
+    }
+
+    const tempDir = path.join(process.cwd(), 'uploads', 'temp');
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+    }
+
+    const timestamp = Date.now();
+    const zipFileName = `bulk_download_${timestamp}.zip`;
+    const zipPath = path.join(tempDir, zipFileName);
+
+    return new Promise((resolve, reject) => {
+      const output = fs.createWriteStream(zipPath);
+      const archive = archiver.default('zip', { zlib: { level: 9 } });
+
+      output.on('close', () => {
+        resolve({ zipPath, zipFileName });
+      });
+
+      archive.on('error', (err) => {
+        reject(err);
+      });
+
+      archive.pipe(output);
+
+      const fileNameCounts: Record<string, number> = {};
+
+      for (const doc of validDocs) {
+        let fileName = doc.fileName;
+
+        if (fileNameCounts[fileName]) {
+          const ext = path.extname(fileName);
+          const baseName = path.basename(fileName, ext);
+          fileName = `${baseName}_${fileNameCounts[fileName]}${ext}`;
+          fileNameCounts[doc.fileName]++;
+        } else {
+          fileNameCounts[fileName] = 1;
+        }
+
+        archive.file(doc.filePath, { name: fileName });
+      }
+
+      archive.finalize();
+    });
   }
 }

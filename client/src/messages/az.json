@@ -166,7 +166,11 @@
       "notFound": "Heç bir sənəd tapılmadı",
       "back": "Geri",
       "forward": "İrəli",
-      "page": "Səhifə"
+      "page": "Səhifə",
+      "selected": "seçildi",
+      "bulkDownload": "Toplu Yüklə",
+      "selectAll": "Hamısını seç",
+      "deselectAll": "Seçimi ləğv et"
     },
     "types": {
       "contract": "Müqavilə",

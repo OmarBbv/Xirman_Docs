@@ -1,4 +1,4 @@
-import { Table, Tag, Space, Button, Dropdown, Modal, Card } from 'antd';
+import { Table, Tag, Space, Button, Dropdown, Modal, Card, Checkbox } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
   EyeOutlined,
@@ -28,6 +28,10 @@ interface DocumentTableProps {
     total: number;
     onChange: (page: number, pageSize: number) => void;
   };
+  // Selection props
+  selectionMode?: boolean;
+  selectedIds?: number[];
+  onSelectionChange?: (ids: number[]) => void;
 }
 
 const getFileIcon = (format: FileFormat) => {
@@ -72,12 +76,48 @@ export const DocumentTable = ({
   onDownload,
   onDelete,
   onShare,
-  pagination
+  pagination,
+  selectionMode = false,
+  selectedIds = [],
+  onSelectionChange
 }: DocumentTableProps) => {
   const t = useTranslations('DocumentsPage');
   const { user } = useAuth();
 
+  const handleRowClick = (record: Document) => {
+    if (selectionMode) {
+      const isSelected = selectedIds.includes(record.id);
+      if (isSelected) {
+        onSelectionChange?.(selectedIds.filter(id => id !== record.id));
+      } else {
+        onSelectionChange?.([...selectedIds, record.id]);
+      }
+    } else {
+      onView?.(record.id);
+    }
+  };
+
+  const handleCheckboxChange = (id: number, checked: boolean, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (checked) {
+      onSelectionChange?.([...selectedIds, id]);
+    } else {
+      onSelectionChange?.(selectedIds.filter(selectedId => selectedId !== id));
+    }
+  };
+
   const columns: ColumnsType<Document> = [
+    ...(selectionMode ? [{
+      title: '',
+      key: 'select',
+      width: 50,
+      render: (_: unknown, record: Document) => (
+        <Checkbox
+          checked={selectedIds.includes(record.id)}
+          onClick={(e) => handleCheckboxChange(record.id, !selectedIds.includes(record.id), e)}
+        />
+      ),
+    }] : []),
     {
       title: t('table.file'),
       key: 'file',
@@ -214,8 +254,9 @@ export const DocumentTable = ({
           rowKey="id"
           loading={loading}
           onRow={(record) => ({
-            onClick: () => onView?.(record.id),
+            onClick: () => handleRowClick(record),
             style: { cursor: 'pointer' },
+            className: selectionMode && selectedIds.includes(record.id) ? 'bg-blue-50' : '',
           })}
           pagination={pagination ? {
             current: pagination.current,
@@ -237,9 +278,23 @@ export const DocumentTable = ({
           <div className="text-center py-8 bg-white rounded-lg">{t('table.loading')}</div>
         ) : data.length > 0 ? (
           data.map((record) => (
-            <Card key={record.id} className="shadow-none border border-gray-200" styles={{ body: { padding: '16px' } }} onClick={() => onView?.(record.id)}>
+            <Card
+              key={record.id}
+              className={`shadow-none border ${selectionMode && selectedIds.includes(record.id) ? 'border-blue-500 bg-blue-50' : 'border-gray-200'}`}
+              styles={{ body: { padding: '16px' } }}
+              onClick={() => handleRowClick(record)}
+            >
               <div className="flex justify-between items-start mb-3">
                 <div className="flex items-center gap-2 overflow-hidden">
+                  {selectionMode && (
+                    <Checkbox
+                      checked={selectedIds.includes(record.id)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCheckboxChange(record.id, !selectedIds.includes(record.id), e);
+                      }}
+                    />
+                  )}
                   {getFileIcon(record.fileFormat)}
                   <span className="font-medium text-base text-gray-900 truncate">{record.fileName}</span>
                 </div>

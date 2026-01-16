@@ -31,6 +31,8 @@
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/typeorm": "^11.0.0",
+    "@types/archiver": "^7.0.0",
+    "archiver": "^7.0.1",
     "bcrypt": "^6.0.0",
     "bullmq": "^5.66.5",
     "class-transformer": "^0.5.1",

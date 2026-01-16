@@ -217,6 +217,17 @@ class DocumentService implements DocumentServiceTypes {
     }
   }
 
+  async bulkDownload(ids: number[]): Promise<Blob> {
+    try {
+      const response = await PRIVATE_API.post("/documents/bulk-download", { ids }, {
+        responseType: "blob",
+      });
+      return response.data;
+    } catch (error) {
+      throw this.errorHandler(error);
+    }
+  }
+
   errorHandler(error: any): Error {
     const message = error.response?.data?.message || error.message || "Xəta baş verdi";
     console.error("Document Error:", message);

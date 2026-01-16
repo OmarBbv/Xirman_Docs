@@ -147,4 +147,24 @@ export class DocumentsController {
   ) {
     return this.documentsService.getPublicShareLink(id);
   }
+
+  @Post('bulk-download')
+  async bulkDownload(
+    @Body('ids') ids: number[],
+    @Res() res: Response,
+  ) {
+    const { zipPath, zipFileName } = await this.documentsService.createBulkDownloadZip(ids);
+
+    res.download(zipPath, zipFileName, (err) => {
+      if (err) {
+        console.error('Bulk download error:', err);
+        if (!res.headersSent) {
+          res.status(500).send('Fayllar yüklənərkən xəta baş verdi');
+        }
+      }
+      fs.unlink(zipPath, (unlinkErr) => {
+        if (unlinkErr) console.error('Failed to delete temp zip:', unlinkErr);
+      });
+    });
+  }
 }
