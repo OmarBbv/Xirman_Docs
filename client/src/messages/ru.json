@@ -166,7 +166,13 @@
       "notFound": "Документы не найдены",
       "back": "Назад",
       "forward": "Вперед",
-      "page": "Страница"
+      "page": "Страница",
+      "selected": "выбрано",
+      "bulkDownload": "Скачать выбранные",
+      "selectAll": "Выбрать все",
+      "deselectAll": "Снять выделение",
+      "closeSelection": "Закрыть выбор",
+      "selectMode": "Выбрать"
     },
     "types": {
       "contract": "Договор",

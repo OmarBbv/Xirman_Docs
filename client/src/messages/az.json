@@ -170,7 +170,9 @@
       "selected": "seçildi",
       "bulkDownload": "Toplu Yüklə",
       "selectAll": "Hamısını seç",
-      "deselectAll": "Seçimi ləğv et"
+      "deselectAll": "Seçimi ləğv et",
+      "closeSelection": "Seçimi bağla",
+      "selectMode": "Seç"
     },
     "types": {
       "contract": "Müqavilə",

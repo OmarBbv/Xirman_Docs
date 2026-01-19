@@ -11,6 +11,7 @@ import { Select, DatePicker } from 'antd';
 import dayjs from 'dayjs';
 import { useTranslations } from 'use-intl';
 import { MultiSelect } from '../ui/MultiSelect';
+import { useAuth } from '../../context/AuthContext';
 
 interface NewDocumentForm {
   companyName: string;
@@ -26,6 +27,9 @@ export default function NewDocsPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const uploadDocument = useUploadDocument();
   const t = useTranslations('NewDocumentPage');
+  const { user } = useAuth();
+
+  const userPosition = user?.position || '';
 
   const {
     register,
@@ -39,7 +43,7 @@ export default function NewDocsPage() {
       amount: '',
       documentDate: '',
       documentType: '',
-      allowedPositions: [],
+      allowedPositions: userPosition ? [userPosition] : [],
     },
   });
 
@@ -205,6 +209,7 @@ export default function NewDocsPage() {
                     onChange={field.onChange}
                     placeholder={t('form.allowedPositionsPlaceholder')}
                     allowClear
+                    lockedValues={userPosition ? [userPosition] : []}
                   />
                 )}
               />

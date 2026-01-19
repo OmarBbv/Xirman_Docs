@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Table, Tag, Space, Button, Dropdown, Modal, Card, Checkbox } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import {
@@ -14,6 +15,7 @@ import {
 import { useTranslations } from "use-intl";
 import { useAuth } from "../../context/AuthContext";
 import type { Document, FileFormat } from "../types/document.types";
+import { DocumentPreviewModal } from './DocumentPreviewModal';
 
 interface DocumentTableProps {
   data: Document[];
@@ -28,7 +30,6 @@ interface DocumentTableProps {
     total: number;
     onChange: (page: number, pageSize: number) => void;
   };
-  // Selection props
   selectionMode?: boolean;
   selectedIds?: number[];
   onSelectionChange?: (ids: number[]) => void;
@@ -83,6 +84,19 @@ export const DocumentTable = ({
 }: DocumentTableProps) => {
   const t = useTranslations('DocumentsPage');
   const { user } = useAuth();
+
+  const [previewDocument, setPreviewDocument] = useState<Document | null>(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+
+  const handlePreview = (record: Document) => {
+    setPreviewDocument(record);
+    setIsPreviewOpen(true);
+  };
+
+  const closePreview = () => {
+    setIsPreviewOpen(false);
+    setPreviewDocument(null);
+  };
 
   const handleRowClick = (record: Document) => {
     if (selectionMode) {
@@ -189,7 +203,10 @@ export const DocumentTable = ({
                 key: 'view',
                 label: t('table.view'),
                 icon: <EyeOutlined />,
-                onClick: () => onView?.(record.id),
+                onClick: (e: any) => {
+                  e.domEvent.stopPropagation();
+                  handlePreview(record);
+                },
               },
               {
                 key: 'download',
@@ -405,6 +422,12 @@ export const DocumentTable = ({
           </div>
         )}
       </div>
+
+      <DocumentPreviewModal
+        document={previewDocument}
+        isOpen={isPreviewOpen}
+        onClose={closePreview}
+      />
     </>
   );
 };

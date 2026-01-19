@@ -7,7 +7,6 @@ import type {
   FilterDocumentDto,
 } from "../types/document.types";
 
-// Query Keys
 export const documentKeys = {
   all: ["documents"] as const,
   lists: () => [...documentKeys.all, "list"] as const,
@@ -20,9 +19,9 @@ export const documentKeys = {
   versions: (id: number) => [...documentKeys.detail(id), 'versions'] as const,
   stats: ['stats'] as const,
   activities: ['activities'] as const,
+  years: ['years'] as const,
 };
 
-// Statistika Hook-u
 export const useDocumentStats = () => {
   return useQuery({
     queryKey: documentKeys.stats,
@@ -30,7 +29,6 @@ export const useDocumentStats = () => {
   });
 };
 
-// Bütün sənədləri gətir
 export const useDocuments = (filters?: FilterDocumentDto) => {
   return useQuery({
     queryKey: documentKeys.list(filters || {}),
@@ -38,7 +36,6 @@ export const useDocuments = (filters?: FilterDocumentDto) => {
   });
 };
 
-// Mənim sənədlərim
 export const useMyDocuments = (filters?: FilterDocumentDto) => {
   return useQuery({
     queryKey: documentKeys.myDocs(filters || {}),
@@ -46,7 +43,6 @@ export const useMyDocuments = (filters?: FilterDocumentDto) => {
   });
 };
 
-// Tək sənəd
 export const useDocument = (id: number) => {
   return useQuery({
     queryKey: documentKeys.detail(id),
@@ -55,7 +51,6 @@ export const useDocument = (id: number) => {
   });
 };
 
-// Baxış tarixçəsi
 export const useDocumentViews = (id: number, search?: string) => {
   return useQuery({
     queryKey: [...documentKeys.views(id), search],
@@ -64,7 +59,6 @@ export const useDocumentViews = (id: number, search?: string) => {
   });
 };
 
-// Versiyalar
 export const useDocumentVersions = (id: number) => {
   return useQuery({
     queryKey: documentKeys.versions(id),
@@ -73,7 +67,6 @@ export const useDocumentVersions = (id: number) => {
   });
 };
 
-// Sənəd yüklə
 export const useUploadDocument = () => {
   const queryClient = useQueryClient();
 
@@ -90,7 +83,6 @@ export const useUploadDocument = () => {
   });
 };
 
-// Sənədi sil
 export const useDeleteDocument = () => {
   const queryClient = useQueryClient();
 
@@ -106,7 +98,6 @@ export const useDeleteDocument = () => {
   });
 };
 
-// Sənədi yüklə (download)
 export const useDownloadDocument = () => {
   return useMutation({
     mutationFn: ({ id, fileName }: { id: number; fileName: string }) =>
@@ -179,11 +170,26 @@ export const useUpdateDocument = () => {
   });
 };
 
-// Son aktivliklər
 export const useRecentActivities = () => {
   return useQuery({
     queryKey: documentKeys.activities,
     queryFn: () => documentService.getRecentActivities(),
-    staleTime: 1000 * 60 * 1, // 1 dəqiqə
+    staleTime: 1000 * 60 * 1,
+  });
+};
+
+export const useDocumentYears = () => {
+  return useQuery({
+    queryKey: documentKeys.years,
+    queryFn: () => documentService.getYears(),
+  });
+};
+
+// Şirkət folderləri (il üzrə)
+export const useCompaniesForYear = (year: number | null) => {
+  return useQuery({
+    queryKey: ['companies', year],
+    queryFn: () => documentService.getCompaniesByYear(year!),
+    enabled: !!year,
   });
 };

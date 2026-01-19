@@ -61,6 +61,16 @@ export class DocumentsController {
     return this.documentsService.getRecentActivities();
   }
 
+  @Get('years')
+  async getYears(@Req() req: any) {
+    return this.documentsService.getDocumentYears(req.user);
+  }
+
+  @Get('years/:year/companies')
+  async getCompaniesByYear(@Param('year', ParseIntPipe) year: number, @Req() req: any) {
+    return this.documentsService.getCompaniesByYear(year, req.user);
+  }
+
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
     const document = await this.documentsService.findOne(id);

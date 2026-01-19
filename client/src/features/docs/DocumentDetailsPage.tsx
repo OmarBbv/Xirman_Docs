@@ -342,7 +342,13 @@ export default function DocumentDetailsPage() {
                       </div>
                     </div>
                     <span className="text-xs text-gray-500 font-mono bg-gray-100 px-2 py-1 rounded whitespace-nowrap ml-2 shrink-0">
-                      {new Date(view.viewedAt).toLocaleTimeString(locale === 'az' ? 'az-AZ' : 'ru-RU', { hour: '2-digit', minute: '2-digit' })}
+                      {new Date(view.viewedAt).toLocaleString(locale === 'az' ? 'az-AZ' : 'ru-RU', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
                     </span>
                   </div>
                 ))}

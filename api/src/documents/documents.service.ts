@@ -125,7 +125,8 @@ export class DocumentsService {
             .orWhere("document.allowedPositions = :emptyArray", { emptyArray: '' })
             .orWhere("document.allowedPositions LIKE :positionPattern", {
               positionPattern: `%${userPosition}%`
-            });
+            })
+            .orWhere("document.uploadedById = :uploaderId", { uploaderId: userId });
         }));
       }
     }
@@ -190,6 +191,8 @@ export class DocumentsService {
   }
 
   async getStats(user?: User) {
+    const userId = user ? (user['userId'] || user.id) : null;
+
     const baseQueryBuilder = () => {
       const qb = this.documentRepository.createQueryBuilder('document');
 
@@ -197,8 +200,8 @@ export class DocumentsService {
         const userPosition = user.position || user['position'];
         if (userPosition) {
           qb.andWhere(
-            "(document.allowedPositions IS NULL OR document.allowedPositions = '' OR document.allowedPositions LIKE :positionPattern)",
-            { positionPattern: `%${userPosition}%` }
+            "(document.allowedPositions IS NULL OR document.allowedPositions = '' OR document.allowedPositions LIKE :positionPattern OR document.uploadedById = :uploaderId)",
+            { positionPattern: `%${userPosition}%`, uploaderId: userId }
           );
         }
       }
@@ -251,6 +254,65 @@ export class DocumentsService {
       take: limit,
       relations: ['viewedBy', 'document'],
     });
+  }
+
+  async getDocumentYears(user?: User): Promise<{ year: number; count: number }[]> {
+    const userId = user ? (user['userId'] || user.id) : null;
+
+    const qb = this.documentRepository
+      .createQueryBuilder('document')
+      .select('EXTRACT(YEAR FROM document.documentDate)', 'year')
+      .addSelect('COUNT(*)', 'count');
+
+    if (user && user.role !== 'admin') {
+      const userPosition = user.position || user['position'];
+      if (userPosition) {
+        qb.where(
+          "(document.allowedPositions IS NULL OR document.allowedPositions = '' OR document.allowedPositions LIKE :positionPattern OR document.uploadedById = :uploaderId)",
+          { positionPattern: `%${userPosition}%`, uploaderId: userId }
+        );
+      }
+    }
+
+    const results = await qb
+      .groupBy('year')
+      .orderBy('year', 'DESC')
+      .getRawMany();
+
+    return results.map(r => ({
+      year: parseInt(r.year),
+      count: parseInt(r.count),
+    }));
+  }
+
+  async getCompaniesByYear(year: number, user?: User): Promise<{ companyName: string; count: number }[]> {
+    const userId = user ? (user['userId'] || user.id) : null;
+
+    const qb = this.documentRepository
+      .createQueryBuilder('document')
+      .select('document.companyName', 'companyName')
+      .addSelect('COUNT(*)', 'count')
+      .where('EXTRACT(YEAR FROM document.documentDate) = :year', { year });
+
+    if (user && user.role !== 'admin') {
+      const userPosition = user.position || user['position'];
+      if (userPosition) {
+        qb.andWhere(
+          "(document.allowedPositions IS NULL OR document.allowedPositions = '' OR document.allowedPositions LIKE :positionPattern OR document.uploadedById = :uploaderId)",
+          { positionPattern: `%${userPosition}%`, uploaderId: userId }
+        );
+      }
+    }
+
+    const results = await qb
+      .groupBy('document.companyName')
+      .orderBy('document.companyName', 'ASC')
+      .getRawMany();
+
+    return results.map(r => ({
+      companyName: r.companyName || 'Digər',
+      count: parseInt(r.count),
+    }));
   }
 
   async findOne(id: number): Promise<Document> {

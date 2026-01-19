@@ -217,6 +217,24 @@ class DocumentService implements DocumentServiceTypes {
     }
   }
 
+  async getYears(): Promise<{ year: number; count: number }[]> {
+    try {
+      const response = await PRIVATE_API.get("/documents/years");
+      return response.data;
+    } catch (error) {
+      throw this.errorHandler(error);
+    }
+  }
+
+  async getCompaniesByYear(year: number): Promise<{ companyName: string; count: number }[]> {
+    try {
+      const response = await PRIVATE_API.get(`/documents/years/${year}/companies`);
+      return response.data;
+    } catch (error) {
+      throw this.errorHandler(error);
+    }
+  }
+
   async bulkDownload(ids: number[]): Promise<Blob> {
     try {
       const response = await PRIVATE_API.post("/documents/bulk-download", { ids }, {
