@@ -81,3 +81,28 @@ export const ChevronDownIcon = ({ className = "w-5 h-5" }: { className?: string 
     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
   </svg>
 );
+
+export const PdfIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" fill="#E53935" />
+    <path d="M14 2v6h6" fill="#FFCDD2" />
+    <path d="M9.5 13.5c0-.55.45-1 1-1s1 .45 1 1-.45 1-1 1-1-.45-1-1zm4.5 0c0-.55.45-1 1-1s1 .45 1 1-.45 1-1 1-1-.45-1-1z" fill="white" />
+    <text x="6" y="18" fontSize="5" fill="white" fontWeight="bold">PDF</text>
+  </svg>
+);
+
+export const WordIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" fill="#1565C0" />
+    <path d="M14 2v6h6" fill="#90CAF9" />
+    <text x="5" y="18" fontSize="5" fill="white" fontWeight="bold">DOC</text>
+  </svg>
+);
+
+export const ExcelIcon = ({ className = "w-5 h-5" }: { className?: string }) => (
+  <svg className={className} viewBox="0 0 24 24" fill="currentColor">
+    <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8l-6-6z" fill="#2E7D32" />
+    <path d="M14 2v6h6" fill="#A5D6A7" />
+    <text x="5" y="18" fontSize="5" fill="white" fontWeight="bold">XLS</text>
+  </svg>
+);

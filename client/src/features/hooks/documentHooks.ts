@@ -71,8 +71,8 @@ export const useUploadDocument = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ data, file }: { data: CreateDocumentDto; file: File }) =>
-      documentService.upload(data, file),
+    mutationFn: ({ data, files }: { data: CreateDocumentDto; files: File[] }) =>
+      documentService.upload(data, files),
     onSuccess: () => {
       message.success("Sənəd uğurla yükləndi");
       queryClient.invalidateQueries({ queryKey: documentKeys.all });
@@ -132,6 +132,58 @@ export const useDownloadVersion = () => {
         window.URL.revokeObjectURL(url);
         return blob;
       }),
+    onError: (error: Error) => {
+      message.error(error.message);
+    },
+  });
+};
+
+export const useDownloadAttachment = () => {
+  return useMutation({
+    mutationFn: ({ id, fileName }: { id: number; fileName: string }) =>
+      documentService.downloadAttachment(id).then((blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", fileName);
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(url);
+        return blob;
+      }),
+    onError: (error: Error) => {
+      message.error(error.message);
+    },
+  });
+};
+
+export const useUpdateAttachment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, file }: { id: number; file: File }) =>
+      documentService.updateAttachment(id, file),
+    onSuccess: () => {
+      message.success("Əlavə fayl uğurla yeniləndi");
+      queryClient.invalidateQueries({ queryKey: documentKeys.all });
+    },
+    onError: (error: Error) => {
+      message.error(error.message);
+    },
+  });
+};
+
+export const useAddAttachment = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ documentId, file }: { documentId: number; file: File }) =>
+      documentService.addAttachment(documentId, file),
+    onSuccess: () => {
+      message.success("Yeni fayl əlavə edildi");
+      queryClient.invalidateQueries({ queryKey: documentKeys.all });
+    },
     onError: (error: Error) => {
       message.error(error.message);
     },

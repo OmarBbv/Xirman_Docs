@@ -14,6 +14,7 @@ import { DocumentType, FileFormat } from './enums/document-enums';
 import { DocumentView } from './entities/document-view.entity';
 import { DocumentVersion } from './entities/document-version.entity';
 import { DocumentRead } from './entities/document-read.entity';
+import { DocumentAttachment } from './entities/document-attachment.entity';
 import { CreateDocumentDto, UpdateDocumentDto, FilterDocumentDto } from './dto';
 import { User } from '../users/entities/user.entity';
 
@@ -28,6 +29,8 @@ export class DocumentsService {
     private documentVersionRepository: Repository<DocumentVersion>,
     @InjectRepository(DocumentRead)
     private documentReadRepository: Repository<DocumentRead>,
+    @InjectRepository(DocumentAttachment)
+    private documentAttachmentRepository: Repository<DocumentAttachment>,
   ) { }
 
   private getFileFormat(extension: string): FileFormat {
@@ -40,29 +43,33 @@ export class DocumentsService {
 
   async create(
     createDocumentDto: CreateDocumentDto,
-    file: Express.Multer.File,
+    files: Array<Express.Multer.File>,
     user: User,
   ): Promise<Document> {
-    if (!file) {
-      throw new BadRequestException('Fayl yüklənməlidir');
+    if (!files || files.length === 0) {
+      throw new BadRequestException('Ən azı bir fayl yüklənməlidir');
     }
 
-    const fileExtension = file.originalname.split('.').pop() || '';
+    const mainFile = files[0];
+    const attachmentFiles = files.slice(1);
+
+    const fileExtension = mainFile.originalname.split('.').pop() || '';
 
     if (createDocumentDto.allowedPositions && typeof createDocumentDto.allowedPositions === 'string') {
       createDocumentDto.allowedPositions = (createDocumentDto.allowedPositions as string).split(',');
     }
     const fileFormat = this.getFileFormat(fileExtension);
-    const fileName = Buffer.from(file.originalname, 'latin1').toString('utf8');
+    const fileName = Buffer.from(mainFile.originalname, 'latin1').toString('utf8');
     const userId = user['userId'] || user.id;
 
     const document = this.documentRepository.create({
       ...createDocumentDto,
+      companyName: createDocumentDto.companyName?.toUpperCase(),
       fileName,
-      filePath: file.path,
+      filePath: mainFile.path,
       fileExtension: fileExtension.toLowerCase(),
       fileFormat,
-      fileSize: file.size,
+      fileSize: mainFile.size,
       uploadedBy: { id: userId } as User,
       uploadedById: userId,
       documentDate: new Date(createDocumentDto.documentDate),
@@ -82,8 +89,23 @@ export class DocumentsService {
       version: 1,
       createdBy: { id: userId } as User,
     });
-
     await this.documentVersionRepository.save(version);
+
+    if (attachmentFiles.length > 0) {
+      for (const file of attachmentFiles) {
+        const ext = file.originalname.split('.').pop() || '';
+        const attachment = this.documentAttachmentRepository.create({
+          document: savedDocument,
+          documentId: savedDocument.id,
+          fileName: Buffer.from(file.originalname, 'latin1').toString('utf8'),
+          filePath: file.path,
+          fileExtension: ext.toLowerCase(),
+          fileFormat: this.getFileFormat(ext),
+          fileSize: file.size,
+        });
+        await this.documentAttachmentRepository.save(attachment);
+      }
+    }
 
     return savedDocument;
   }
@@ -106,6 +128,7 @@ export class DocumentsService {
       page = 1,
       limit = 10,
       excludeRead,
+      exactCompanyMatch,
     } = filterDto;
 
     const userId = user ? (user['userId'] || user.id) : null;
@@ -132,9 +155,15 @@ export class DocumentsService {
     }
 
     if (companyName) {
-      queryBuilder.andWhere('document.companyName ILIKE :companyName', {
-        companyName: `%${companyName}%`,
-      });
+      if (exactCompanyMatch) {
+        queryBuilder.andWhere('document.companyName = :companyName', {
+          companyName,
+        });
+      } else {
+        queryBuilder.andWhere('document.companyName ILIKE :companyName', {
+          companyName: `%${companyName}%`,
+        });
+      }
     }
 
     if (minAmount !== undefined) {
@@ -316,10 +345,14 @@ export class DocumentsService {
   }
 
   async findOne(id: number): Promise<Document> {
-    const document = await this.documentRepository.findOne({
-      where: { id },
-      relations: ['uploadedBy', 'updatedBy'],
-    });
+    const document = await this.documentRepository
+      .createQueryBuilder('document')
+      .leftJoinAndSelect('document.uploadedBy', 'uploadedBy')
+      .leftJoinAndSelect('document.updatedBy', 'updatedBy')
+      .leftJoinAndSelect('document.attachments', 'attachments')
+      .where('document.id = :id', { id })
+      .orderBy('attachments.id', 'ASC')
+      .getOne();
 
     if (!document) {
       throw new NotFoundException(`Sənəd tapılmadı: ${id}`);
@@ -415,7 +448,7 @@ export class DocumentsService {
       document.fileFormat = this.getFileFormat(newExtension);
     }
 
-    if (updateDocumentDto.companyName) document.companyName = updateDocumentDto.companyName;
+    if (updateDocumentDto.companyName) document.companyName = updateDocumentDto.companyName.toUpperCase();
     if (updateDocumentDto.documentNumber) document.documentNumber = updateDocumentDto.documentNumber;
     if (updateDocumentDto.amount) document.amount = updateDocumentDto.amount;
     if (updateDocumentDto.documentType) document.documentType = updateDocumentDto.documentType;
@@ -454,6 +487,18 @@ export class DocumentsService {
           fs.unlinkSync(version.filePath);
         } catch (e) {
           console.error(`Versiya faylını silərkən xəta (${version.version}): ${e.message}`);
+        }
+      }
+    }
+
+    if (document.attachments && document.attachments.length > 0) {
+      for (const attachment of document.attachments) {
+        if (attachment.filePath && fs.existsSync(attachment.filePath)) {
+          try {
+            fs.unlinkSync(attachment.filePath);
+          } catch (e) {
+            console.error(`Əlavə faylı silərkən xəta (${attachment.fileName}): ${e.message}`);
+          }
         }
       }
     }
@@ -529,18 +574,158 @@ export class DocumentsService {
     }
 
     const baseUrl = process.env.BACKEND_URL || 'http://localhost:3000';
-    const downloadUrl = `${baseUrl}/documents/${id}/download`;
+    const hasAttachments = document.attachments && document.attachments.length > 0;
+    const downloadUrl = hasAttachments
+      ? `${baseUrl}/documents/${id}/download-zip`
+      : `${baseUrl}/documents/${id}/download`;
 
     return {
       success: true,
       downloadUrl,
       document: {
-        fileName: document.fileName,
+        fileName: hasAttachments ? `${document.companyName}_sənədlər.zip` : document.fileName,
         companyName: document.companyName,
         amount: document.amount,
         documentType: document.documentType,
+        attachmentCount: document.attachments?.length || 0,
       }
     };
+  }
+
+  async getAttachmentFile(id: number): Promise<{ filePath: string; fileName: string }> {
+    const attachment = await this.documentAttachmentRepository.findOne({ where: { id } });
+
+    if (!attachment) {
+      throw new NotFoundException(`Əlavə fayl tapılmadı: ${id}`);
+    }
+
+    if (!fs.existsSync(attachment.filePath)) {
+      throw new NotFoundException('Fayl sistemdə tapılmadı');
+    }
+
+    return { filePath: attachment.filePath, fileName: attachment.fileName };
+  }
+
+  async updateAttachment(
+    id: number,
+    file: Express.Multer.File,
+    user: User,
+  ): Promise<DocumentAttachment> {
+    if (!file) {
+      throw new BadRequestException('Fayl yüklənməlidir');
+    }
+
+    const attachment = await this.documentAttachmentRepository.findOne({
+      where: { id },
+      relations: ['document'],
+    });
+
+    if (!attachment) {
+      throw new NotFoundException(`Əlavə fayl tapılmadı: ${id}`);
+    }
+
+    const ext = file.originalname.split('.').pop() || '';
+
+    // Update attachment with new file info
+    attachment.fileName = Buffer.from(file.originalname, 'latin1').toString('utf8');
+    attachment.filePath = file.path;
+    attachment.fileExtension = ext.toLowerCase();
+    attachment.fileFormat = this.getFileFormat(ext);
+    attachment.fileSize = file.size;
+
+    const userId = user['userId'] || user.id;
+    await this.documentRepository.update(attachment.documentId, {
+      updatedBy: { id: userId } as User,
+      updatedById: userId,
+    });
+
+    return await this.documentAttachmentRepository.save(attachment);
+  }
+
+  async addAttachment(
+    documentId: number,
+    file: Express.Multer.File,
+    user: User,
+  ): Promise<DocumentAttachment> {
+    if (!file) {
+      throw new BadRequestException('Fayl yüklənməlidir');
+    }
+
+    const document = await this.documentRepository.findOne({ where: { id: documentId } });
+    if (!document) {
+      throw new NotFoundException(`Sənəd tapılmadı: ${documentId}`);
+    }
+
+    const ext = file.originalname.split('.').pop() || '';
+    const userId = user['userId'] || user.id;
+
+    const attachment = this.documentAttachmentRepository.create({
+      document,
+      documentId,
+      fileName: Buffer.from(file.originalname, 'latin1').toString('utf8'),
+      filePath: file.path,
+      fileExtension: ext.toLowerCase(),
+      fileFormat: this.getFileFormat(ext),
+      fileSize: file.size,
+    });
+
+    await this.documentRepository.update(documentId, {
+      updatedBy: { id: userId } as User,
+      updatedById: userId,
+    });
+
+    return await this.documentAttachmentRepository.save(attachment);
+  }
+
+  async createSingleDocumentZip(id: number): Promise<{ zipPath: string; zipFileName: string }> {
+    const document = await this.findOne(id);
+    const versions = await this.getVersions(id);
+    const latestVersion = versions[0];
+
+    const mainFilePath = latestVersion ? latestVersion.filePath : document.filePath;
+    const mainFileName = latestVersion ? latestVersion.fileName : document.fileName;
+
+    if (!fs.existsSync(mainFilePath)) {
+      throw new NotFoundException('Ana fayl tapılmadı');
+    }
+
+    const tempDir = path.join(process.cwd(), 'uploads', 'temp');
+    if (!fs.existsSync(tempDir)) {
+      fs.mkdirSync(tempDir, { recursive: true });
+    }
+
+    const timestamp = Date.now();
+    const zipFileName = `${document.companyName}_${document.id}_sənədlər.zip`;
+    const zipPath = path.join(tempDir, `${timestamp}_${zipFileName}`);
+
+    return new Promise((resolve, reject) => {
+      const output = fs.createWriteStream(zipPath);
+      const archive = archiver.default('zip', { zlib: { level: 9 } });
+
+      output.on('close', () => {
+        resolve({ zipPath, zipFileName });
+      });
+
+      archive.on('error', (err) => {
+        reject(err);
+      });
+
+      archive.pipe(output);
+
+      archive.file(mainFilePath, { name: mainFileName });
+
+      if (document.attachments && document.attachments.length > 0) {
+        for (const attachment of document.attachments) {
+          if (fs.existsSync(attachment.filePath)) {
+            archive.file(attachment.filePath, {
+              name: `əlavələr/${attachment.fileName}`
+            });
+          }
+        }
+      }
+
+      archive.finalize();
+    });
   }
 
   async createBulkDownloadZip(ids: number[]): Promise<{ zipPath: string; zipFileName: string }> {
@@ -598,18 +783,28 @@ export class DocumentsService {
       const fileNameCounts: Record<string, number> = {};
 
       for (const doc of validDocs) {
-        let fileName = doc.fileName;
+        const folderName = `${doc.document.companyName}_${doc.document.id}`;
 
-        if (fileNameCounts[fileName]) {
-          const ext = path.extname(fileName);
-          const baseName = path.basename(fileName, ext);
-          fileName = `${baseName}_${fileNameCounts[fileName]}${ext}`;
+        let mainFileName = doc.fileName;
+        if (fileNameCounts[mainFileName]) {
+          const ext = path.extname(mainFileName);
+          const baseName = path.basename(mainFileName, ext);
+          mainFileName = `${baseName}_${fileNameCounts[mainFileName]}${ext}`;
           fileNameCounts[doc.fileName]++;
         } else {
-          fileNameCounts[fileName] = 1;
+          fileNameCounts[mainFileName] = 1;
         }
+        archive.file(doc.filePath, { name: `${folderName}/${mainFileName}` });
 
-        archive.file(doc.filePath, { name: fileName });
+        if (doc.document.attachments && doc.document.attachments.length > 0) {
+          for (const attachment of doc.document.attachments) {
+            if (fs.existsSync(attachment.filePath)) {
+              archive.file(attachment.filePath, {
+                name: `${folderName}/əlavələr/${attachment.fileName}`
+              });
+            }
+          }
+        }
       }
 
       archive.finalize();

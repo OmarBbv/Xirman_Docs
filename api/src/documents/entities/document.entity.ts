@@ -11,6 +11,7 @@ import {
 import { User } from '../../users/entities/user.entity';
 import { DocumentView } from './document-view.entity';
 import { DocumentVersion } from './document-version.entity';
+import { DocumentAttachment } from './document-attachment.entity';
 import { DocumentType, FileFormat } from '../enums/document-enums';
 
 @Entity('documents')
@@ -73,6 +74,9 @@ export class Document {
   // Baxış tarixçəsi
   @OneToMany(() => DocumentView, (view) => view.document)
   views: DocumentView[];
+
+  @OneToMany(() => DocumentAttachment, (attachment) => attachment.document, { cascade: true })
+  attachments: DocumentAttachment[];
 
   @CreateDateColumn({ name: 'uploaded_at' })
   uploadedAt: Date;

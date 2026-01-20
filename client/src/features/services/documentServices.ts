@@ -7,6 +7,7 @@ import type {
   PaginatedDocuments,
   DocumentView,
   DocumentVersion,
+  DocumentAttachment,
 } from "../types/document.types";
 
 interface DocumentServiceTypes {
@@ -14,7 +15,7 @@ interface DocumentServiceTypes {
   getMyDocuments(filters?: FilterDocumentDto): Promise<PaginatedDocuments>;
   getById(id: number): Promise<Document>;
   markAsRead(id: number): Promise<{ success: boolean }>;
-  upload(data: CreateDocumentDto, file: File): Promise<Document>;
+  upload(data: CreateDocumentDto, files: File[]): Promise<Document[]>;
   update(id: number, data: UpdateDocumentDto, file?: File): Promise<Document>;
   delete(id: number): Promise<{ message: string }>;
   download(id: number): Promise<Blob>;
@@ -89,10 +90,12 @@ class DocumentService implements DocumentServiceTypes {
     }
   }
 
-  async upload(data: CreateDocumentDto, file: File): Promise<Document> {
+  async upload(data: CreateDocumentDto, files: File[]): Promise<Document[]> {
     try {
       const formData = new FormData();
-      formData.append("file", file);
+      files.forEach((file) => {
+        formData.append("files", file);
+      });
       formData.append("companyName", data.companyName);
       formData.append("documentDate", data.documentDate);
 
@@ -211,6 +214,49 @@ class DocumentService implements DocumentServiceTypes {
   async getRecentActivities(): Promise<DocumentView[]> {
     try {
       const response = await PRIVATE_API.get("/documents/activities");
+      return response.data;
+    } catch (error) {
+      throw this.errorHandler(error);
+    }
+  }
+
+  async downloadAttachment(id: number): Promise<Blob> {
+    try {
+      const response = await PRIVATE_API.get(`/documents/attachments/${id}/download`, {
+        responseType: "blob",
+      });
+      return response.data;
+    } catch (error) {
+      throw this.errorHandler(error);
+    }
+  }
+
+  async updateAttachment(id: number, file: File): Promise<DocumentAttachment> {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await PRIVATE_API.patch(`/documents/attachments/${id}`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw this.errorHandler(error);
+    }
+  }
+
+  async addAttachment(documentId: number, file: File): Promise<DocumentAttachment> {
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const response = await PRIVATE_API.post(`/documents/${documentId}/attachments`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
       return response.data;
     } catch (error) {
       throw this.errorHandler(error);

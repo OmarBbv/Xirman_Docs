@@ -49,6 +49,17 @@ export interface DocumentVersion {
   createdAt: string;
 }
 
+export interface DocumentAttachment {
+  id: number;
+  documentId: number;
+  fileName: string;
+  filePath: string;
+  fileFormat: FileFormat;
+  fileExtension: string;
+  fileSize: number;
+  uploadedAt: string;
+}
+
 export interface Document {
   id: number;
   companyName: string;
@@ -68,6 +79,7 @@ export interface Document {
   updatedBy?: User;
   updatedById?: number;
   views?: DocumentView[];
+  attachments?: DocumentAttachment[];
 }
 
 export interface CreateDocumentDto {
@@ -98,6 +110,7 @@ export interface FilterDocumentDto {
   page?: number;
   limit?: number;
   excludeRead?: boolean;
+  exactCompanyMatch?: boolean;
 }
 
 export interface PaginatedDocuments {

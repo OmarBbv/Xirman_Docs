@@ -1,13 +1,15 @@
 import { useState, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { ArrowLeftIcon, DetailIcon, ExternalLinkIcon, EyeIcon } from "../ui/Icons";
-import { useDocument, useDocumentViews, useDownloadDocument, useUpdateDocument, useDocumentVersions, useDownloadVersion } from "../hooks/documentHooks";
+import { ArrowLeftIcon, DetailIcon, EyeIcon, PdfIcon, WordIcon, ExcelIcon, FileIcon } from "../ui/Icons";
+import { useDocument, useDocumentViews, useDownloadDocument, useUpdateDocument, useDocumentVersions, useDownloadVersion, useDownloadAttachment, useUpdateAttachment, useAddAttachment } from "../hooks/documentHooks";
 import { Spin, Alert, Tag, Avatar, Button as AntButton } from "antd";
 import { useDebounce } from "../hooks/useDebounce";
 import { UploadOutlined, HistoryOutlined, FileTextOutlined, DownOutlined, RightOutlined, DownloadOutlined, ShareAltOutlined } from "@ant-design/icons";
 import { useTranslations, useLocale } from "use-intl";
 import { documentService } from "../services/documentServices";
 import { message } from "antd";
+import { DocumentPreviewModal } from "../ui/DocumentPreviewModal";
+import type { DocumentAttachment } from "../types/document.types";
 
 export default function DocumentDetailsPage() {
   const { id } = useParams<{ id: string }>();
@@ -27,12 +29,56 @@ export default function DocumentDetailsPage() {
   const downloadDocument = useDownloadDocument();
   const updateDocument = useUpdateDocument();
   const downloadVersion = useDownloadVersion();
+  const downloadAttachment = useDownloadAttachment();
+  const updateAttachment = useUpdateAttachment();
+  const addAttachment = useAddAttachment();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const addAttachmentInputRef = useRef<HTMLInputElement>(null);
+  const [selectedFileType, setSelectedFileType] = useState<'main' | 'attachment' | null>(null);
+  const [selectedAttachmentId, setSelectedAttachmentId] = useState<number | null>(null);
+
+  const [previewOpen, setPreviewOpen] = useState(false);
+  const [previewType, setPreviewType] = useState<'document' | 'attachment'>('document');
+  const [previewAttachment, setPreviewAttachment] = useState<DocumentAttachment | null>(null);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      updateDocument.mutate({ id: documentId, data: {}, file });
+      if (selectedFileType === 'main') {
+        updateDocument.mutate({ id: documentId, data: {}, file });
+      } else if (selectedFileType === 'attachment' && selectedAttachmentId) {
+        updateAttachment.mutate({ id: selectedAttachmentId, file });
+      }
+      setSelectedFileType(null);
+      setSelectedAttachmentId(null);
+    }
+    // Reset input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleMainFileClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedFileType('main');
+    setSelectedAttachmentId(null);
+    fileInputRef.current?.click();
+  };
+
+  const handleAttachmentClick = (attachmentId: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedFileType('attachment');
+    setSelectedAttachmentId(attachmentId);
+    fileInputRef.current?.click();
+  };
+
+  const handleAddAttachmentUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      addAttachment.mutate({ documentId, file });
+    }
+    if (addAttachmentInputRef.current) {
+      addAttachmentInputRef.current.value = '';
     }
   };
 
@@ -103,6 +149,22 @@ export default function DocumentDetailsPage() {
     return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
   };
 
+  const getFileIcon = (fileName: string, size: string = "w-5 h-5") => {
+    const ext = fileName?.split('.').pop()?.toLowerCase();
+    switch (ext) {
+      case 'pdf':
+        return <PdfIcon className={size} />;
+      case 'doc':
+      case 'docx':
+        return <WordIcon className={size} />;
+      case 'xls':
+      case 'xlsx':
+        return <ExcelIcon className={size} />;
+      default:
+        return <FileIcon className={size} />;
+    }
+  };
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
       <div className="bg-linear-to-br from-[#2271b1] to-[#135e96] rounded-lg shadow-lg p-8 text-white">
@@ -110,7 +172,10 @@ export default function DocumentDetailsPage() {
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-2">
               <button
-                onClick={() => navigate('/dashboard/docs')}
+                onClick={() => {
+                  const docYear = new Date(document.documentDate).getFullYear();
+                  navigate(`/dashboard/docs/year/${docYear}/company/${encodeURIComponent(document.companyName)}`);
+                }}
                 className="bg-white/10 hover:bg-white/20 p-2 rounded-lg transition-colors cursor-pointer"
                 title={t('back')}
               >
@@ -182,23 +247,121 @@ export default function DocumentDetailsPage() {
 
             <div className="mt-6 pt-6 border-t border-gray-100">
               <h3 className="text-sm font-semibold text-gray-900 mb-3">{t('file.title')}</h3>
-              <div
-                onClick={handleDownload}
-                className="flex items-center justify-between p-4 bg-blue-50 border border-blue-100 rounded-lg hover:bg-blue-100 transition-colors group cursor-pointer"
-              >
-                <div className="flex items-center gap-3">
-                  <DetailIcon className="w-8 h-8 text-[#2271b1]" />
-                  <div>
-                    <p className="font-medium text-[#2271b1] group-hover:text-[#135e96] break-all">
-                      {document.fileName}
-                    </p>
-                    <p className="text-xs text-blue-600">
-                      {t('file.size')}: {formatFileSize(document.fileSize)} • {t('file.clickToDownload')}
-                    </p>
+              <div className="p-4 bg-blue-50 border border-blue-100 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div
+                    className="flex items-center gap-3 cursor-pointer hover:opacity-80"
+                    onClick={() => {
+                      setPreviewType('document');
+                      setPreviewAttachment(null);
+                      setPreviewOpen(true);
+                    }}
+                    title="Önizləmə üçün klikləyin"
+                  >
+                    {getFileIcon(document.fileName, "w-8 h-8")}
+                    <div>
+                      <p className="font-medium text-[#2271b1] break-all">
+                        {document.fileName}
+                      </p>
+                      <p className="text-xs text-blue-600">
+                        {t('file.size')}: {formatFileSize(document.fileSize)}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => {
+                        setPreviewType('document');
+                        setPreviewAttachment(null);
+                        setPreviewOpen(true);
+                      }}
+                      className="w-9 h-9 flex items-center justify-center rounded-lg bg-white border border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer"
+                      title="Önizləmə"
+                    >
+                      <EyeIcon className="w-5 h-5 text-[#2271b1]" />
+                    </button>
+                    <button
+                      onClick={handleDownload}
+                      className="w-9 h-9 flex items-center justify-center rounded-lg bg-white border border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer"
+                      title="Yüklə"
+                    >
+                      <DownloadOutlined className="text-lg text-[#2271b1]" />
+                    </button>
+                    <button
+                      onClick={handleMainFileClick}
+                      className="w-9 h-9 flex items-center justify-center rounded-lg bg-white border border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer"
+                      title="Yeni versiya yüklə"
+                    >
+                      <UploadOutlined className="text-lg text-[#2271b1]" />
+                    </button>
                   </div>
                 </div>
-                <ExternalLinkIcon className="w-5 h-5 text-blue-400 group-hover:text-blue-600 shrink-0" />
               </div>
+
+              {/* Attachments / Ek Dosyalar */}
+              {document.attachments && document.attachments.length > 0 && (
+                <div className="mt-4">
+                  <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                    <FileTextOutlined />
+                    Əlavə Fayllar ({document.attachments.length})
+                  </h4>
+                  <div className="space-y-2">
+                    {document.attachments.map((attachment) => (
+                      <div
+                        key={attachment.id}
+                        className="flex items-center justify-between p-3 bg-gray-50 border border-gray-200 rounded-lg"
+                      >
+                        <div
+                          className="flex items-center gap-3 cursor-pointer hover:opacity-80"
+                          onClick={() => {
+                            setPreviewType('attachment');
+                            setPreviewAttachment(attachment);
+                            setPreviewOpen(true);
+                          }}
+                          title="Önizləmə üçün klikləyin"
+                        >
+                          {getFileIcon(attachment.fileName, "w-6 h-6")}
+                          <div>
+                            <p className="font-medium text-gray-700 text-sm break-all">
+                              {attachment.fileName}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              {formatFileSize(attachment.fileSize)} • {attachment.fileFormat.toUpperCase()}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => {
+                              setPreviewType('attachment');
+                              setPreviewAttachment(attachment);
+                              setPreviewOpen(true);
+                            }}
+                            className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors cursor-pointer"
+                            title="Önizləmə"
+                          >
+                            <EyeIcon className="w-4 h-4 text-gray-500 hover:text-[#2271b1]" />
+                          </button>
+                          <button
+                            onClick={() => downloadAttachment.mutate({ id: attachment.id, fileName: attachment.fileName })}
+                            className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors cursor-pointer"
+                            title="Yüklə"
+                          >
+                            <DownloadOutlined className="text-gray-500 hover:text-[#2271b1]" />
+                          </button>
+                          <button
+                            onClick={(e) => handleAttachmentClick(attachment.id, e)}
+                            className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors cursor-pointer"
+                            title="Yeni versiya yüklə"
+                          >
+                            <UploadOutlined className="text-gray-500 hover:text-[#2271b1]" />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               <div className="mt-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-gray-50 p-3 rounded-lg border border-gray-100">
                 <div className="text-xs text-gray-500">
@@ -226,11 +389,17 @@ export default function DocumentDetailsPage() {
                     className="hidden"
                     onChange={handleFileUpload}
                   />
+                  <input
+                    type="file"
+                    ref={addAttachmentInputRef}
+                    className="hidden"
+                    onChange={handleAddAttachmentUpload}
+                  />
                   <AntButton
                     icon={<UploadOutlined />}
                     size="small"
-                    loading={updateDocument.isPending}
-                    onClick={() => fileInputRef.current?.click()}
+                    loading={addAttachment.isPending}
+                    onClick={() => addAttachmentInputRef.current?.click()}
                     type="default"
                     className="text-xs"
                   >
@@ -269,8 +438,8 @@ export default function DocumentDetailsPage() {
                         title="Yükləmək üçün klikləyin"
                       >
                         <div className="flex items-center gap-3 min-w-0">
-                          <div className="bg-blue-100 p-2 rounded text-[#2271b1] shrink-0">
-                            <FileTextOutlined />
+                          <div className="bg-blue-100 p-2 rounded shrink-0">
+                            {getFileIcon(ver.fileName)}
                           </div>
                           <div className="min-w-0">
                             <p className="font-medium text-gray-700 truncate" title={ver.fileName}>{t('history.version')} {ver.version} - {ver.fileName}</p>
@@ -361,6 +530,15 @@ export default function DocumentDetailsPage() {
           </div>
         </div>
       </div>
+
+      {/* Preview Modal */}
+      <DocumentPreviewModal
+        isOpen={previewOpen}
+        onClose={() => setPreviewOpen(false)}
+        document={previewType === 'document' ? document : undefined}
+        attachmentId={previewType === 'attachment' ? previewAttachment?.id : undefined}
+        fileName={previewType === 'attachment' ? previewAttachment?.fileName : undefined}
+      />
     </div>
   );
 }

@@ -47,4 +47,9 @@ export class FilterDocumentDto {
   @IsOptional()
   @Transform(({ value }) => value === 'true' || value === true)
   excludeRead?: boolean;
+
+  @IsBoolean()
+  @IsOptional()
+  @Transform(({ value }) => value === 'true' || value === true)
+  exactCompanyMatch?: boolean;
 }

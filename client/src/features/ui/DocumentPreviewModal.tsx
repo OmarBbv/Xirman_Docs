@@ -1,13 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
 import { Modal, Spin, Tabs } from 'antd';
-import { FileIcon } from './Icons';
+import { FileIcon, PdfIcon, WordIcon, ExcelIcon } from './Icons';
 import { renderAsync } from 'docx-preview';
 import * as XLSX from 'xlsx';
 import { documentService } from '../services/documentServices';
-import type { Document, FileFormat } from '../types/document.types';
+import type { Document } from '../types/document.types';
 
 interface DocumentPreviewModalProps {
-  document: Document | null;
+  document?: Document | null;
+  attachmentId?: number | null;
+  fileName?: string;
   isOpen: boolean;
   onClose: () => void;
 }
@@ -18,15 +20,17 @@ type PreviewContent = {
   sheets?: { name: string; data: string[][] }[];
 };
 
-export function DocumentPreviewModal({ document, isOpen, onClose }: DocumentPreviewModalProps) {
+export function DocumentPreviewModal({ document, attachmentId, fileName, isOpen, onClose }: DocumentPreviewModalProps) {
   const [preview, setPreview] = useState<PreviewContent | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [activeSheet, setActiveSheet] = useState('0');
   const docxContainerRef = useRef<HTMLDivElement>(null);
   const [fileBlob, setFileBlob] = useState<Blob | null>(null);
 
+  const displayFileName = document?.fileName || fileName || 'Fayl';
+
   useEffect(() => {
-    if (!document || !isOpen) {
+    if (!isOpen || (!document && !attachmentId)) {
       setPreview(null);
       setFileBlob(null);
       return;
@@ -36,10 +40,21 @@ export function DocumentPreviewModal({ document, isOpen, onClose }: DocumentPrev
       setIsLoading(true);
 
       try {
-        const blob = await documentService.download(document.id);
+        let blob: Blob;
+        let fileNameToUse = displayFileName;
+
+        if (document) {
+          blob = await documentService.download(document.id);
+          fileNameToUse = document.fileName;
+        } else if (attachmentId) {
+          blob = await documentService.downloadAttachment(attachmentId);
+        } else {
+          throw new Error('No file to preview');
+        }
+
         setFileBlob(blob);
 
-        const extension = document.fileName.split('.').pop()?.toLowerCase();
+        const extension = fileNameToUse.split('.').pop()?.toLowerCase();
 
         if (extension === 'pdf') {
           const url = URL.createObjectURL(blob);
@@ -84,9 +99,8 @@ export function DocumentPreviewModal({ document, isOpen, onClose }: DocumentPrev
         URL.revokeObjectURL(preview.content);
       }
     };
-  }, [document, isOpen]);
+  }, [document, attachmentId, isOpen, displayFileName]);
 
-  // Render docx when container is ready
   useEffect(() => {
     if (preview?.type === 'word' && preview.content === 'docx-preview' && docxContainerRef.current && fileBlob) {
       const renderDocx = async () => {
@@ -124,29 +138,31 @@ export function DocumentPreviewModal({ document, isOpen, onClose }: DocumentPrev
     }
   }, [preview, fileBlob]);
 
-  const getFileTypeLabel = (format: FileFormat) => {
-    switch (format) {
+  const getFileTypeLabel = (fileNameOrFormat: string) => {
+    const ext = fileNameOrFormat.includes('.')
+      ? fileNameOrFormat.split('.').pop()?.toLowerCase()
+      : fileNameOrFormat;
+    switch (ext) {
       case 'pdf': return 'PDF Sənəd';
+      case 'doc':
+      case 'docx':
       case 'word': return 'Word Sənəd';
+      case 'xls':
+      case 'xlsx':
       case 'excel': return 'Excel Cədvəl';
       default: return 'Fayl';
     }
   };
 
-  const formatFileSize = (bytes: number): string => {
-    if (bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
-  };
-
-  const getFileTypeColor = (format: FileFormat) => {
-    switch (format) {
-      case 'pdf': return '#ea4335';
-      case 'word': return '#4285f4';
-      case 'excel': return '#34a853';
-      default: return '#5f6368';
+  const getFileIcon = (fileNameStr: string) => {
+    const ext = fileNameStr.split('.').pop()?.toLowerCase();
+    switch (ext) {
+      case 'pdf': return <PdfIcon className="w-6 h-6" />;
+      case 'doc':
+      case 'docx': return <WordIcon className="w-6 h-6" />;
+      case 'xls':
+      case 'xlsx': return <ExcelIcon className="w-6 h-6" />;
+      default: return <FileIcon className="w-6 h-6" />;
     }
   };
 
@@ -244,16 +260,14 @@ export function DocumentPreviewModal({ document, isOpen, onClose }: DocumentPrev
       title={
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg bg-[#e8f0fe] flex items-center justify-center">
-            <svg className="w-5 h-5" viewBox="0 0 24 24" fill={getFileTypeColor(document?.fileFormat || 'pdf')}>
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2l5 5h-5V4z" />
-            </svg>
+            {getFileIcon(displayFileName)}
           </div>
           <div>
             <div className="text-base font-semibold text-gray-900 truncate max-w-[400px]">
-              {document?.fileName || 'Fayl önizləməsi'}
+              {displayFileName}
             </div>
             <div className="text-xs text-gray-500">
-              {document && `${formatFileSize(document.fileSize)} • ${getFileTypeLabel(document.fileFormat)}`}
+              {getFileTypeLabel(displayFileName)}
             </div>
           </div>
         </div>

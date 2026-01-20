@@ -50,7 +50,7 @@ export function YearFolderView({ years, isLoading, onFolderOpen }: YearFolderVie
         <div
           key={folder.year}
           onDoubleClick={() => onFolderOpen(folder.year)}
-          className="flex flex-col items-center p-4 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors group"
+          className="flex flex-col items-center p-4 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors group select-none"
         >
           <div className="relative">
             <FolderOutlined
@@ -96,7 +96,7 @@ export function CompanyFolderView({ companies, isLoading, onFolderOpen }: Compan
         <div
           key={folder.companyName}
           onDoubleClick={() => onFolderOpen(folder.companyName)}
-          className="flex flex-col items-center p-4 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors group"
+          className="flex flex-col items-center p-4 rounded-lg cursor-pointer hover:bg-blue-50 transition-colors group select-none"
         >
           <div className="relative">
             <FolderOutlined
@@ -142,8 +142,8 @@ export function FolderBreadcrumb({ currentYear, currentCompany, onBackToRoot, on
         onClick={handleBack}
         disabled={!canGoBack}
         className={`flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors ${canGoBack
-            ? 'text-blue-600 hover:bg-blue-100 cursor-pointer'
-            : 'text-gray-400 cursor-not-allowed'
+          ? 'text-blue-600 hover:bg-blue-100 cursor-pointer'
+          : 'text-gray-400 cursor-not-allowed'
           }`}
       >
         <ArrowLeftOutlined />
@@ -167,8 +167,8 @@ export function FolderBreadcrumb({ currentYear, currentCompany, onBackToRoot, on
             <span
               onClick={currentCompany ? onBackToYear : undefined}
               className={`flex items-center gap-1 ${currentCompany
-                  ? 'text-blue-600 hover:underline cursor-pointer'
-                  : 'text-gray-700 font-medium'
+                ? 'text-blue-600 hover:underline cursor-pointer'
+                : 'text-gray-700 font-medium'
                 }`}
             >
               <FolderOutlined style={{ color: '#f59e0b' }} />

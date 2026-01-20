@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { DocumentTable } from "../ui/document-table";
 import {
   useDocuments,
@@ -22,11 +22,13 @@ const { RangePicker } = DatePicker;
 
 export default function DocumentPage() {
   const navigate = useNavigate();
+  const { year: yearParam, company: companyParam } = useParams<{ year?: string; company?: string }>();
   const [form] = Form.useForm();
   const t = useTranslations('DocumentsPage');
 
-  const [currentYear, setCurrentYear] = useState<number | null>(null);
-  const [currentCompany, setCurrentCompany] = useState<string | null>(null);
+  // Use URL params for current year and company
+  const currentYear = yearParam ? parseInt(yearParam) : null;
+  const currentCompany = companyParam ? decodeURIComponent(companyParam) : null;
 
   const [filters, setFilters] = useState<FilterDocumentDto>({
     page: 1,
@@ -42,7 +44,6 @@ export default function DocumentPage() {
   ).length;
 
   const { data: yearsData, isLoading: yearsLoading } = useDocumentYears();
-
   const { data: companiesData, isLoading: companiesLoading } = useCompaniesForYear(currentYear);
 
   const documentFilters: FilterDocumentDto = {
@@ -50,6 +51,7 @@ export default function DocumentPage() {
     startDate: filters.startDate || (currentYear ? `${currentYear}-01-01` : undefined),
     endDate: filters.endDate || (currentYear ? `${currentYear}-12-31` : undefined),
     companyName: currentCompany || undefined,
+    exactCompanyMatch: !!currentCompany,
   };
 
   const { data: documentsData, isLoading, refetch } = useDocuments(
@@ -164,49 +166,40 @@ export default function DocumentPage() {
     }
   };
 
-  // Folder navigation - Year
   const handleYearFolderOpen = (year: number) => {
-    setCurrentYear(year);
-    setCurrentCompany(null);
+    navigate(`/dashboard/docs/year/${year}`);
     setFilters(prev => ({ ...prev, page: 1 }));
   };
 
-  // Folder navigation - Company
   const handleCompanyFolderOpen = (companyName: string) => {
-    setCurrentCompany(companyName);
+    navigate(`/dashboard/docs/year/${currentYear}/company/${encodeURIComponent(companyName)}`);
     setFilters(prev => ({ ...prev, page: 1 }));
   };
 
-  // Back to root (all years)
   const handleBackToRoot = () => {
-    setCurrentYear(null);
-    setCurrentCompany(null);
+    navigate('/dashboard/docs');
     setSelectionMode(false);
     setSelectedIds([]);
   };
 
-  // Back to year (companies list)
   const handleBackToYear = () => {
-    setCurrentCompany(null);
+    navigate(`/dashboard/docs/year/${currentYear}`);
     setSelectionMode(false);
     setSelectedIds([]);
   };
 
-  // Toggle selection mode
   const toggleSelectionMode = () => {
     setSelectionMode(!selectionMode);
     if (selectionMode) {
-      setSelectedIds([]); // Clear selection when exiting selection mode
+      setSelectedIds([]);
     }
   };
 
-  // Select all visible documents
   const selectAll = () => {
     const allIds = documentsData?.data?.map(doc => doc.id) || [];
     setSelectedIds(allIds);
   };
 
-  // Deselect all
   const deselectAll = () => {
     setSelectedIds([]);
   };

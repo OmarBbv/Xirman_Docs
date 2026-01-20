@@ -9,13 +9,14 @@ import {
   Query,
   UseGuards,
   UseInterceptors,
+  UploadedFiles,
   UploadedFile,
   Req,
   ParseIntPipe,
   Res,
   ForbiddenException,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
@@ -32,13 +33,13 @@ export class DocumentsController {
   constructor(private readonly documentsService: DocumentsService) { }
 
   @Post('upload')
-  @UseInterceptors(FileInterceptor('file', documentUploadOptions))
+  @UseInterceptors(FilesInterceptor('files', 10, documentUploadOptions))
   async create(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Array<Express.Multer.File>,
     @Body() createDocumentDto: CreateDocumentDto,
     @Req() req: any,
   ) {
-    return this.documentsService.create(createDocumentDto, file, req.user);
+    return this.documentsService.create(createDocumentDto, files, req.user);
   }
 
   @Get()
@@ -71,6 +72,35 @@ export class DocumentsController {
     return this.documentsService.getCompaniesByYear(year, req.user);
   }
 
+  @Get('attachments/:id/download')
+  async downloadAttachment(
+    @Param('id', ParseIntPipe) id: number,
+    @Res() res: Response,
+  ) {
+    const { filePath, fileName } = await this.documentsService.getAttachmentFile(id);
+    res.download(filePath, fileName);
+  }
+
+  @Patch('attachments/:id')
+  @UseInterceptors(FileInterceptor('file', documentUploadOptions))
+  async updateAttachment(
+    @Param('id', ParseIntPipe) id: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: any,
+  ) {
+    return this.documentsService.updateAttachment(id, file, req.user);
+  }
+
+  @Post(':id/attachments')
+  @UseInterceptors(FileInterceptor('file', documentUploadOptions))
+  async addAttachment(
+    @Param('id', ParseIntPipe) documentId: number,
+    @UploadedFile() file: Express.Multer.File,
+    @Req() req: any,
+  ) {
+    return this.documentsService.addAttachment(documentId, file, req.user);
+  }
+
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
     const document = await this.documentsService.findOne(id);
@@ -98,6 +128,27 @@ export class DocumentsController {
     }
 
     res.download(filePath, document.fileName);
+  }
+
+  @Public()
+  @Get(':id/download-zip')
+  async downloadZip(
+    @Param('id', ParseIntPipe) id: number,
+    @Res() res: Response,
+  ) {
+    const { zipPath, zipFileName } = await this.documentsService.createSingleDocumentZip(id);
+
+    res.download(zipPath, zipFileName, (err) => {
+      if (!err) {
+        setTimeout(() => {
+          try {
+            fs.unlinkSync(zipPath);
+          } catch (e) {
+            console.error('Error deleting temp zip:', e);
+          }
+        }, 5000);
+      }
+    });
   }
 
   @Get(':id/views')

@@ -24,7 +24,7 @@ interface NewDocumentForm {
 
 export default function NewDocsPage() {
   const navigate = useNavigate();
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const uploadDocument = useUploadDocument();
   const t = useTranslations('NewDocumentPage');
   const { user } = useAuth();
@@ -48,7 +48,7 @@ export default function NewDocsPage() {
   });
 
   const onSubmit = (data: NewDocumentForm) => {
-    if (!selectedFile) {
+    if (selectedFiles.length === 0) {
       return;
     }
 
@@ -62,7 +62,7 @@ export default function NewDocsPage() {
           documentType: data.documentType as DocumentType,
           allowedPositions: data.allowedPositions,
         },
-        file: selectedFile,
+        files: selectedFiles,
       },
       {
         onSuccess: () => {
@@ -72,8 +72,8 @@ export default function NewDocsPage() {
     );
   };
 
-  const handleFileChange = (file: File | null) => {
-    setSelectedFile(file);
+  const handleFileChange = (files: File[]) => {
+    setSelectedFiles(files);
   };
 
   const documentTypeOptions = [
@@ -219,12 +219,18 @@ export default function NewDocsPage() {
           <div className="pt-2">
             <FileUpload
               label={t('form.file')}
-              onChange={handleFileChange}
+              onChange={handleFileChange} // Now accepts File[]
               className="w-full"
+              multiple={true} // Enable multiple files
             />
-            {!selectedFile && (
+            {selectedFiles.length === 0 && (
               <p className="text-amber-600 text-[12px] mt-2">
                 {t('form.fileRequired')}
+              </p>
+            )}
+            {selectedFiles.length > 0 && (
+              <p className="text-green-600 text-[12px] mt-2">
+                {selectedFiles.length} fayl seçilib
               </p>
             )}
           </div>
@@ -242,7 +248,7 @@ export default function NewDocsPage() {
             <Button
               type="submit"
               className="px-8 py-3 font-medium text-[15px]"
-              disabled={uploadDocument.isPending || !selectedFile}
+              disabled={uploadDocument.isPending || selectedFiles.length === 0}
             >
               {uploadDocument.isPending ? t('buttons.loading') : t('buttons.create')}
             </Button>
