@@ -40,7 +40,6 @@ export class DocumentVersion {
   @Column({ default: 1 })
   version: number;
 
-  // Versiyanı yükləyən istifadəçi
   @ManyToOne(() => User, { eager: true })
   @JoinColumn({ name: 'created_by_id' })
   createdBy: User;

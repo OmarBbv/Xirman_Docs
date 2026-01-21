@@ -1,5 +1,3 @@
-// Document Types
-
 export const DocumentType = {
   CONTRACT: 'contract',
   INVOICE: 'invoice',

@@ -152,12 +152,6 @@ export default function SettingsPage() {
                 <div className="flex-1">
                   <h3 className="text-lg font-bold text-gray-900 mb-1">{user?.firstName} {user?.lastName}</h3>
                   <p className="text-sm text-gray-600 mb-3">{user?.email}</p>
-                  {/* <div className="flex items-center gap-3">
-                    <button className="px-4 py-2 text-sm font-medium bg-white text-[#2271b1] border border-[#2271b1] rounded-lg hover:bg-blue-50 transition-all cursor-pointer">
-                      Şəkli dəyiş
-                    </button>
-                    <span className="text-xs text-gray-500">Maks. 2MB (JPG, PNG)</span>
-                  </div> */}
                 </div>
               </div>
 
@@ -190,7 +184,7 @@ export default function SettingsPage() {
                   label={t("profile.position")}
                   value={
                     {
-                      manager: "Menecer", // Ideally these come from translations too if needed dynamic, but assuming key map is fine or use t()
+                      manager: "Menecer",
                       accountant: "Mühasib",
                       hr: "İnsan Resursları",
                       finance_manager: "Maliyyə Meneceri",
@@ -282,48 +276,6 @@ export default function SettingsPage() {
                   {updateUser.isPending ? t("security.pdating") : t("security.updatePassword")}
                 </Button>
               </div>
-
-              {/* Session Logs - Static for now */}
-              {/* <div className="pt-8 border-t border-gray-200">
-                <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <svg className="w-5 h-5 text-[#2271b1]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  Son Giriş Hərəkətləri
-                </h3>
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
-                  <table className="w-full text-left text-sm">
-                    <thead>
-                      <tr className="bg-gray-50 border-b border-gray-200">
-                        <th className="p-4 font-semibold text-gray-700">IP Ünvanı</th>
-                        <th className="p-4 font-semibold text-gray-700">Cihaz</th>
-                        <th className="p-4 font-semibold text-gray-700">Tarix</th>
-                        <th className="p-4 font-semibold text-gray-700">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {sessionLogs.map((log) => (
-                        <tr key={log.id} className="border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors">
-                          <td className="p-4 font-medium text-[#2271b1]">{log.ip}</td>
-                          <td className="p-4 text-gray-600">{log.device}</td>
-                          <td className="p-4 text-gray-600">{log.date}</td>
-                          <td className="p-4">
-                            <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold ${log.status === "Aktiv"
-                              ? "bg-green-100 text-green-700"
-                              : "bg-gray-100 text-gray-600"
-                              }`}>
-                              {log.status === "Aktiv" && (
-                                <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-                              )}
-                              {log.status}
-                            </span>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div> */}
             </div>
           )}
 

@@ -26,7 +26,6 @@ export class AllExceptionsFilter implements ExceptionFilter {
         ? exception.getResponse()
         : 'Internal server error';
 
-    // Xətanı terminalda loglayırıq
     this.logger.error(
       `Http Status: ${status} | Method: ${request.method} | Path: ${request.url}`,
     );

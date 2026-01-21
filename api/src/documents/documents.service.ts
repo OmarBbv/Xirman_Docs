@@ -365,7 +365,6 @@ export class DocumentsService {
     const document = await this.findOne(documentId);
     const userId = user['userId'] || user.id;
 
-    // Bildiriş kimi oxunmuş işarələ
     await this.markAsRead(documentId, user);
 
     const view = this.documentViewRepository.create({
@@ -626,7 +625,6 @@ export class DocumentsService {
 
     const ext = file.originalname.split('.').pop() || '';
 
-    // Update attachment with new file info
     attachment.fileName = Buffer.from(file.originalname, 'latin1').toString('utf8');
     attachment.filePath = file.path;
     attachment.fileExtension = ext.toLowerCase();

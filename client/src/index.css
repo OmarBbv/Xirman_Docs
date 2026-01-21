@@ -16,7 +16,6 @@ body {
   padding: 0;
 }
 
-/* Hide scrollbar for mobile devices */
 @media (max-width: 768px) {
   *::-webkit-scrollbar {
     display: none !important;
@@ -26,13 +25,10 @@ body {
 
   * {
     -ms-overflow-style: none !important;
-    /* IE and Edge */
     scrollbar-width: none !important;
-    /* Firefox */
   }
 }
 
-/* Custom Ant Design Inputs */
 .h-50-select .ant-select-selector {
   height: 50px !important;
   padding-top: 0 !important;
@@ -43,7 +39,6 @@ body {
 
 .h-50-select .ant-select-selection-search-input {
   height: 48px !important;
-  /* Selector height minus borders */
 }
 
 .h-50-select .ant-select-selection-placeholder {
@@ -61,7 +56,6 @@ body {
   height: 50px !important;
 }
 
-/* DOCX Preview Styles */
 .docx-preview-container {
   background: #f5f5f5;
 }

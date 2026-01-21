@@ -26,7 +26,6 @@ export default function DocumentPage() {
   const [form] = Form.useForm();
   const t = useTranslations('DocumentsPage');
 
-  // Use URL params for current year and company
   const currentYear = yearParam ? parseInt(yearParam) : null;
   const currentCompany = companyParam ? decodeURIComponent(companyParam) : null;
 
@@ -232,7 +231,6 @@ export default function DocumentPage() {
     }
   };
 
-  // Determine current view
   const isAtRoot = !currentYear && !currentCompany;
   const isAtYearLevel = currentYear && !currentCompany;
   const isAtCompanyLevel = currentYear && currentCompany;
@@ -277,7 +275,6 @@ export default function DocumentPage() {
       </div>
 
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
-        {/* Breadcrumb Navigation */}
         <FolderBreadcrumb
           currentYear={currentYear}
           currentCompany={currentCompany}
@@ -285,9 +282,7 @@ export default function DocumentPage() {
           onBackToYear={handleBackToYear}
         />
 
-        {/* View based on navigation level */}
         {isAtRoot && (
-          // Year Folders View
           <YearFolderView
             years={yearsData || []}
             isLoading={yearsLoading}
@@ -296,7 +291,6 @@ export default function DocumentPage() {
         )}
 
         {isAtYearLevel && (
-          // Company Folders View (inside a year)
           <CompanyFolderView
             companies={companiesData || []}
             isLoading={companiesLoading}
@@ -305,7 +299,6 @@ export default function DocumentPage() {
         )}
 
         {isAtCompanyLevel && (
-          // Document List View (inside a company folder)
           <div className="p-4 md:p-0">
             <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6 pb-4 border-b border-gray-200 px-4 pt-4">
               <div className="flex items-center gap-1 overflow-x-auto flex-1">

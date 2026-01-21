@@ -37,10 +37,8 @@ export function FilePreviewModal({ file, isOpen, onClose }: FilePreviewModalProp
           const url = URL.createObjectURL(file);
           setPreview({ type: 'pdf', content: url });
         } else if (extension === 'docx') {
-          // docx-preview will render directly to container
           setPreview({ type: 'word', content: 'docx-preview' });
         } else if (extension === 'doc') {
-          // .doc format is not supported
           setPreview({
             type: 'unsupported',
             content: null
@@ -80,7 +78,6 @@ export function FilePreviewModal({ file, isOpen, onClose }: FilePreviewModalProp
     };
   }, [file, isOpen]);
 
-  // Render docx when container is ready
   useEffect(() => {
     if (preview?.type === 'word' && preview.content === 'docx-preview' && docxContainerRef.current && file) {
       const renderDocx = async () => {

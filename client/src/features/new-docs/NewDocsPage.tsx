@@ -219,9 +219,9 @@ export default function NewDocsPage() {
           <div className="pt-2">
             <FileUpload
               label={t('form.file')}
-              onChange={handleFileChange} // Now accepts File[]
+              onChange={handleFileChange}
               className="w-full"
-              multiple={true} // Enable multiple files
+              multiple={true}
             />
             {selectedFiles.length === 0 && (
               <p className="text-amber-600 text-[12px] mt-2">

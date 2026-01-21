@@ -56,7 +56,6 @@ export class Document {
   @Column({ name: 'uploaded_by_id' })
   uploadedById: number;
 
-  // Yeniləyən istifadəçi
   @ManyToOne(() => User, { eager: true, nullable: true })
   @JoinColumn({ name: 'updated_by_id' })
   updatedBy: User;
@@ -67,11 +66,9 @@ export class Document {
   @Column({ type: 'simple-array', nullable: true })
   allowedPositions: string[];
 
-  // Versiya tarixçəsi
   @OneToMany(() => DocumentVersion, (version) => version.document)
   versions: DocumentVersion[];
 
-  // Baxış tarixçəsi
   @OneToMany(() => DocumentView, (view) => view.document)
   views: DocumentView[];
 

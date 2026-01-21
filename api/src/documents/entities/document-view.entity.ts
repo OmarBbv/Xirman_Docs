@@ -14,7 +14,6 @@ export class DocumentView {
   @PrimaryGeneratedColumn()
   id: number;
 
-  // Baxılan sənəd
   @ManyToOne(() => Document, (document) => document.views, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'document_id' })
   document: Document;
@@ -22,7 +21,6 @@ export class DocumentView {
   @Column({ name: 'document_id' })
   documentId: number;
 
-  // Baxan istifadəçi
   @ManyToOne(() => User, { eager: true })
   @JoinColumn({ name: 'viewed_by_id' })
   viewedBy: User;
@@ -30,7 +28,6 @@ export class DocumentView {
   @Column({ name: 'viewed_by_id' })
   viewedById: number;
 
-  // Baxış tarixi və saatı
   @CreateDateColumn({ name: 'viewed_at' })
   viewedAt: Date;
 }

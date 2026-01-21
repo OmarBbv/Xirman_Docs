@@ -52,7 +52,6 @@ export default function DocumentDetailsPage() {
       setSelectedFileType(null);
       setSelectedAttachmentId(null);
     }
-    // Reset input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
@@ -298,7 +297,6 @@ export default function DocumentDetailsPage() {
                 </div>
               </div>
 
-              {/* Attachments / Ek Dosyalar */}
               {document.attachments && document.attachments.length > 0 && (
                 <div className="mt-4">
                   <h4 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">

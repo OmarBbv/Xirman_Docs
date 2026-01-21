@@ -28,7 +28,6 @@ export function MultiSelect({
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
@@ -95,8 +94,8 @@ export function MultiSelect({
                   <span
                     key={opt.value}
                     className={`inline-flex items-center gap-1 px-2 py-0.5 text-xs rounded border ${optionIsLocked
-                        ? 'bg-gray-100 text-gray-600 border-gray-300'
-                        : 'bg-[#f0f5ff] text-[#1a73e8] border-[#d6e4ff]'
+                      ? 'bg-gray-100 text-gray-600 border-gray-300'
+                      : 'bg-[#f0f5ff] text-[#1a73e8] border-[#d6e4ff]'
                       }`}
                   >
                     {opt.label}
@@ -183,10 +182,10 @@ export function MultiSelect({
                   )}
                 </div>
                 <span className={`text-sm ${optionIsLocked && isSelected
-                    ? 'text-gray-500 font-medium'
-                    : isSelected
-                      ? 'text-[#1a73e8] font-medium'
-                      : 'text-gray-700'
+                  ? 'text-gray-500 font-medium'
+                  : isSelected
+                    ? 'text-[#1a73e8] font-medium'
+                    : 'text-gray-700'
                   }`}>
                   {option.label}
                   {optionIsLocked && isSelected && (

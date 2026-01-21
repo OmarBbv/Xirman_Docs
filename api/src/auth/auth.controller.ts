@@ -24,7 +24,6 @@ export class AuthController {
     return {
       message: 'OTP kodu email ünvanınıza göndərildi',
       email: user.email,
-      // otpCode: user.otpCode,
     };
   }
 

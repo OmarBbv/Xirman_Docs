@@ -21,8 +21,7 @@ import { EmailProcessor } from './mail.processor';
           };
         }
 
-        // Local Redis (Commented out)
-        /*
+        /* local redis
         return {
           connection: {
             host: configService.get<string>('REDIS_HOST') || 'localhost',
@@ -32,7 +31,6 @@ import { EmailProcessor } from './mail.processor';
         };
         */
 
-        // Fallback for local dev if REDIS_URL missing
         return {
           connection: {
             host: 'localhost',

@@ -139,7 +139,6 @@ export class EmailProcessor extends WorkerHost {
     } catch (error) {
       this.logger.error(`❌ Email failed | Job #${job.id} | ${email} - ${error.message}`);
 
-      // BullMQ avtomatik retry edəcək
       throw error;
     }
   }

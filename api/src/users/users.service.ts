@@ -90,12 +90,9 @@ export class UsersService {
     }
 
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
-    console.log(`[ForgotPassword] New OTP generated for ${email}: ${otpCode}`);
 
-    // Update only the OTP code directly
     await this.usersRepository.update(user.id, { otpCode });
 
-    // Send email (after DB update)
     await this.mailService.sendOtpEmail(user.email, otpCode);
   }
 
@@ -105,7 +102,6 @@ export class UsersService {
       throw new BadRequestException('İstifadəçi tapılmadı');
     }
 
-    console.log(`[VerifyReset] Checking OTP for ${email}. Expected: ${user.otpCode}, Received: ${code}`);
 
     if (user.otpCode !== code) {
       throw new BadRequestException('Yanlış OTP kodu');

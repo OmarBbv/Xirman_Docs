@@ -192,5 +192,4 @@ export function FolderBreadcrumb({ currentYear, currentCompany, onBackToRoot, on
   );
 }
 
-// Backward compatibility - export old names as aliases
 export const FolderView = YearFolderView;

@@ -237,7 +237,6 @@ export const useDocumentYears = () => {
   });
 };
 
-// Şirkət folderləri (il üzrə)
 export const useCompaniesForYear = (year: number | null) => {
   return useQuery({
     queryKey: ['companies', year],

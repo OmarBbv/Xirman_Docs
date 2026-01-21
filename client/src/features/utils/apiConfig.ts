@@ -1,7 +1,8 @@
 import axios from "axios";
 
-// const API_BASE_URL = "http://localhost:3000";
-const API_BASE_URL = "https://xirman-docs.onrender.com";
+
+const API_BASE_URL = "http://192.168.100.194:3000";
+// const API_BASE_URL = "https://xirman-docs.onrender.com";
 
 export const PUBLIC_API = axios.create({
   baseURL: API_BASE_URL,
