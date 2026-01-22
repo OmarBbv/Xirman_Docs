@@ -34,3 +34,7 @@ api/uploads/
 
 # Redis docs (optional - local docs)
 api/README-REDIS.md
+
+# Server setup guides (contains sensitive info)
+SERVER_SETUP_GUIDE.md
+SERVER_SETUP_GUIDE_WINDOWS.md
