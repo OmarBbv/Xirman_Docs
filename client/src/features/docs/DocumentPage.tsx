@@ -18,7 +18,6 @@ import { documentService } from "../services/documentServices";
 import { message } from "antd";
 import { FolderBreadcrumb, GenericFolderView } from "../ui/FolderView";
 
-
 const { RangePicker } = DatePicker;
 
 type DocumentPageParams = {
@@ -69,6 +68,7 @@ export default function DocumentPage() {
   const { data: documentsData, isLoading, refetch } = useDocuments(
     shouldFetchDocuments ? documentFilters : { page: 1, limit: 1 }
   );
+
   const { data: statsData } = useDocumentStats();
   const deleteDocument = useDeleteDocument();
   const downloadDocument = useDownloadDocument();

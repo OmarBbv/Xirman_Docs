@@ -56,6 +56,8 @@ const getDocumentTypeColor = (type: string) => {
     act: "purple",
     report: "cyan",
     letter: "magenta",
+    incoming_letter: "green",
+    outgoing_letter: "volcano",
     order: "orange",
     other: "default",
   };

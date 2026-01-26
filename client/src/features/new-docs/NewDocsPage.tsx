@@ -114,6 +114,8 @@ export default function NewDocsPage() {
     { value: 'timesheet', label: t('types.timesheet') },
     { value: 'waybill_requisition', label: t('types.waybill_requisition') },
     { value: 'financial_reports', label: t('types.financial_reports') },
+    { value: 'incoming_letter', label: t('types.incoming_letter') },
+    { value: 'outgoing_letter', label: t('types.outgoing_letter') },
   ];
 
   const positionOptions = [

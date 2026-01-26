@@ -22,6 +22,8 @@ export const DocumentType = {
   TIMESHEET: 'timesheet',
   WAYBILL_REQUISITION: 'waybill_requisition',
   FINANCIAL_REPORTS: 'financial_reports',
+  INCOMING_LETTER: 'incoming_letter',
+  OUTGOING_LETTER: 'outgoing_letter',
   OTHER: 'other',
 } as const;
 

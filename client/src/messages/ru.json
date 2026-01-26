@@ -198,7 +198,9 @@
       "protocol": "Протокол",
       "timesheet": "Табель",
       "waybill_requisition": "Накладная-требование",
-      "financial_reports": "Финансовые отчеты"
+      "financial_reports": "Финансовые отчеты",
+      "incoming_letter": "Входящие письма",
+      "outgoing_letter": "Исходящие письма"
     }
   },
   "NewDocumentPage": {
@@ -255,7 +257,9 @@
       "protocol": "Протокол",
       "timesheet": "Табель",
       "waybill_requisition": "Накладная-требование",
-      "financial_reports": "Финансовые отчеты"
+      "financial_reports": "Финансовые отчеты",
+      "incoming_letter": "Входящие письма",
+      "outgoing_letter": "Исходящие письма"
     },
     "positions": {
       "manager": "Менеджер",

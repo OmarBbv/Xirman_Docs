@@ -198,7 +198,9 @@
       "protocol": "Protokol",
       "timesheet": "Tabel",
       "waybill_requisition": "Qaimə-tələbnamə",
-      "financial_reports": "Maliyyə hesabatları"
+      "financial_reports": "Maliyyə hesabatları",
+      "incoming_letter": "Məktublar (daxil olan)",
+      "outgoing_letter": "Məktublar (xaric olan)"
     }
   },
   "NewDocumentPage": {
@@ -255,7 +257,9 @@
       "protocol": "Protokol",
       "timesheet": "Tabel",
       "waybill_requisition": "Qaimə-tələbnamə",
-      "financial_reports": "Maliyyə hesabatları"
+      "financial_reports": "Maliyyə hesabatları",
+      "incoming_letter": "Məktublar (daxil olan)",
+      "outgoing_letter": "Məktublar (xaric olan)"
     },
     "positions": {
       "manager": "Menecer",
