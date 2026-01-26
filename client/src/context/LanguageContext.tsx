@@ -1,4 +1,4 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useEffect } from "react";
 import type { ReactNode } from "react";
 import { IntlProvider } from "use-intl";
 import azMessages from "../messages/az.json";
@@ -19,7 +19,14 @@ const messages = {
 };
 
 export const LanguageProvider = ({ children }: { children: ReactNode }) => {
-  const [locale, setLocale] = useState<Locale>("az");
+  const [locale, setLocale] = useState<Locale>(() => {
+    const saved = localStorage.getItem("app-lang");
+    return (saved === "az" || saved === "ru") ? saved : "az";
+  });
+
+  useEffect(() => {
+    localStorage.setItem("app-lang", locale);
+  }, [locale]);
 
   return (
     <LanguageContext.Provider value={{ locale, setLocale }}>

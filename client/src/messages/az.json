@@ -201,6 +201,12 @@
       "financial_reports": "Maliyyə hesabatları",
       "incoming_letter": "Məktublar (daxil olan)",
       "outgoing_letter": "Məktublar (xaric olan)"
+    },
+    "departments": {
+      "mill": "Dəyirman",
+      "dairy": "Süd məhsulları",
+      "sausage": "Kolbasa və Sosilər",
+      "other_service": "Digər xidmət"
     }
   },
   "NewDocumentPage": {

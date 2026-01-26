@@ -324,26 +324,6 @@ export default function SettingsPage() {
                   ))}
                 </div>
               </div>
-
-              <div className="pt-8 border-t border-gray-200">
-                <h3 className="text-lg font-bold text-gray-900 mb-6">{t("app.otherSettings")}</h3>
-                <div className="space-y-4">
-                  <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer">
-                    <div>
-                      <p className="font-medium text-gray-900">{t("app.emailNotifications")}</p>
-                      <p className="text-sm text-gray-600">{t("app.emailHint")}</p>
-                    </div>
-                    <input type="checkbox" defaultChecked className="w-5 h-5 text-[#2271b1] rounded focus:ring-2 focus:ring-[#2271b1] cursor-pointer" />
-                  </label>
-                  <label className="flex items-center justify-between p-4 bg-gray-50 rounded-lg cursor-pointer">
-                    <div>
-                      <p className="font-medium text-gray-900">{t("app.twoFactor")}</p>
-                      <p className="text-sm text-gray-600">{t("app.twoFactorHint")}</p>
-                    </div>
-                    <input type="checkbox" className="w-5 h-5 text-[#2271b1] rounded focus:ring-2 focus:ring-[#2271b1] cursor-pointer" />
-                  </label>
-                </div>
-              </div>
             </div>
           )}
         </div>

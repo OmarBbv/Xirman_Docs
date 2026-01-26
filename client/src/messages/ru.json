@@ -201,6 +201,12 @@
       "financial_reports": "Финансовые отчеты",
       "incoming_letter": "Входящие письма",
       "outgoing_letter": "Исходящие письма"
+    },
+    "departments": {
+      "mill": "Мельница",
+      "dairy": "Молочные продукты",
+      "sausage": "Колбаса и Сосиски",
+      "other_service": "Другие услуги"
     }
   },
   "NewDocumentPage": {
