@@ -93,9 +93,6 @@ class DocumentService implements DocumentServiceTypes {
   async upload(data: CreateDocumentDto, files: File[]): Promise<Document[]> {
     try {
       const formData = new FormData();
-      files.forEach((file) => {
-        formData.append("files", file);
-      });
       formData.append("companyName", data.companyName);
       formData.append("documentDate", data.documentDate);
 
@@ -113,6 +110,13 @@ class DocumentService implements DocumentServiceTypes {
       if (data.documentType) {
         formData.append("documentType", data.documentType);
       }
+      if (data.department) {
+        formData.append("department", data.department);
+      }
+
+      files.forEach((file) => {
+        formData.append("files", file);
+      });
 
       const response = await PRIVATE_API.post("/documents/upload", formData, {
         headers: {
@@ -275,6 +279,24 @@ class DocumentService implements DocumentServiceTypes {
   async getCompaniesByYear(year: number): Promise<{ companyName: string; count: number }[]> {
     try {
       const response = await PRIVATE_API.get(`/documents/years/${year}/companies`);
+      return response.data;
+    } catch (error) {
+      throw this.errorHandler(error);
+    }
+  }
+
+  async getDepartmentsByYear(year: number): Promise<{ department: string; count: number }[]> {
+    try {
+      const response = await PRIVATE_API.get(`/documents/years/${year}/departments`);
+      return response.data;
+    } catch (error) {
+      throw this.errorHandler(error);
+    }
+  }
+
+  async getDocumentTypesInDepartment(year: number, department: string): Promise<{ documentType: string; count: number }[]> {
+    try {
+      const response = await PRIVATE_API.get(`/documents/years/${year}/departments/${department}/types`);
       return response.data;
     } catch (error) {
       throw this.errorHandler(error);

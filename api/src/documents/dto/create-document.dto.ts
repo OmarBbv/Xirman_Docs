@@ -1,5 +1,5 @@
 import { IsString, IsNumber, IsOptional, IsEnum, IsDateString } from 'class-validator';
-import { DocumentType } from '../enums/document-enums';
+import { DocumentType, Department } from '../enums/document-enums';
 
 export class CreateDocumentDto {
   @IsString()
@@ -16,6 +16,10 @@ export class CreateDocumentDto {
   @IsEnum(DocumentType)
   @IsOptional()
   documentType?: DocumentType;
+
+  @IsEnum(Department)
+  @IsOptional()
+  department?: Department;
 
   @IsDateString()
   documentDate: string;

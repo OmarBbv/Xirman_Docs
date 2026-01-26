@@ -244,3 +244,19 @@ export const useCompaniesForYear = (year: number | null) => {
     enabled: !!year,
   });
 };
+
+export const useDepartmentsForYear = (year: number | null) => {
+  return useQuery({
+    queryKey: ['departments', year],
+    queryFn: () => documentService.getDepartmentsByYear(year!),
+    enabled: !!year,
+  });
+};
+
+export const useDocumentTypesInDepartment = (year: number | null, department: string | null) => {
+  return useQuery({
+    queryKey: ['documentTypes', year, department],
+    queryFn: () => documentService.getDocumentTypesInDepartment(year!, department!),
+    enabled: !!year && !!department,
+  });
+};

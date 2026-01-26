@@ -17,10 +17,25 @@ export const MAX_FILE_SIZE = 10 * 1024 * 1024;
 
 export const documentStorage = diskStorage({
   destination: (req, file, cb) => {
-    if (!fs.existsSync(UPLOAD_PATH)) {
-      fs.mkdirSync(UPLOAD_PATH, { recursive: true });
+    const body = req.body;
+    let year = new Date().getFullYear().toString();
+
+    if (body.documentDate) {
+      const date = new Date(body.documentDate);
+      if (!isNaN(date.getTime())) {
+        year = date.getFullYear().toString();
+      }
     }
-    cb(null, UPLOAD_PATH);
+
+    const department = body.department || 'general';
+    const documentType = body.documentType || 'other';
+
+    const uploadPath = path.join(UPLOAD_PATH, year, department, documentType);
+
+    if (!fs.existsSync(uploadPath)) {
+      fs.mkdirSync(uploadPath, { recursive: true });
+    }
+    cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);

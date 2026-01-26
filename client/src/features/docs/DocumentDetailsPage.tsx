@@ -173,7 +173,7 @@ export default function DocumentDetailsPage() {
               <button
                 onClick={() => {
                   const docYear = new Date(document.documentDate).getFullYear();
-                  navigate(`/dashboard/docs/year/${docYear}/company/${encodeURIComponent(document.companyName)}`);
+                  navigate(`/dashboard/docs/year/${docYear}/department/${encodeURIComponent(document.department || 'other_service')}/type/${encodeURIComponent((document.documentType || 'other').toString())}`);
                 }}
                 className="bg-white/10 hover:bg-white/20 p-2 rounded-lg transition-colors cursor-pointer"
                 title={t('back')}

@@ -7,27 +7,37 @@ import {
   useDownloadDocument,
   useDocumentStats,
   useDocumentYears,
-  useCompaniesForYear,
+  useDepartmentsForYear,
+  useDocumentTypesInDepartment
 } from "../hooks/documentHooks";
 import type { FilterDocumentDto, FileFormat } from "../types/document.types";
-import { Collapse, DatePicker, InputNumber, Button as AntButton, Row, Col, Form, Badge, Select } from "antd";
+import { Collapse, DatePicker, InputNumber, Button as AntButton, Row, Col, Form, Badge, Select, Input } from "antd";
 import { FilterOutlined, ClearOutlined, SearchOutlined, DownloadOutlined, CheckSquareOutlined, CloseSquareOutlined } from "@ant-design/icons";
 import { useTranslations } from "use-intl";
 import { documentService } from "../services/documentServices";
 import { message } from "antd";
-import { YearFolderView, CompanyFolderView, FolderBreadcrumb } from "../ui/FolderView";
+import { FolderBreadcrumb, GenericFolderView } from "../ui/FolderView";
 
 
 const { RangePicker } = DatePicker;
 
+type DocumentPageParams = {
+  year?: string;
+  department?: string;
+  type?: string;
+};
+
 export default function DocumentPage() {
   const navigate = useNavigate();
-  const { year: yearParam, company: companyParam } = useParams<{ year?: string; company?: string }>();
+  const { year: yearParam, department: departmentParam, type: typeParam } = useParams<DocumentPageParams>();
   const [form] = Form.useForm();
   const t = useTranslations('DocumentsPage');
+  const tTypes = useTranslations('NewDocumentPage.types');
+  const tDepartments = useTranslations('NewDocumentPage.departments');
 
   const currentYear = yearParam ? parseInt(yearParam) : null;
-  const currentCompany = companyParam ? decodeURIComponent(companyParam) : null;
+  const currentDepartment = departmentParam ? decodeURIComponent(departmentParam) : null;
+  const currentType = typeParam ? decodeURIComponent(typeParam) : null;
 
   const [filters, setFilters] = useState<FilterDocumentDto>({
     page: 1,
@@ -43,18 +53,21 @@ export default function DocumentPage() {
   ).length;
 
   const { data: yearsData, isLoading: yearsLoading } = useDocumentYears();
-  const { data: companiesData, isLoading: companiesLoading } = useCompaniesForYear(currentYear);
+  const { data: departmentsData, isLoading: departmentsLoading } = useDepartmentsForYear(currentYear);
+  const { data: typesData, isLoading: typesLoading } = useDocumentTypesInDepartment(currentYear, currentDepartment);
 
   const documentFilters: FilterDocumentDto = {
     ...filters,
     startDate: filters.startDate || (currentYear ? `${currentYear}-01-01` : undefined),
     endDate: filters.endDate || (currentYear ? `${currentYear}-12-31` : undefined),
-    companyName: currentCompany || undefined,
-    exactCompanyMatch: !!currentCompany,
+    department: currentDepartment as any || undefined,
+    documentType: currentType as any || undefined,
   };
 
+  const shouldFetchDocuments = !!(currentYear && currentDepartment && currentType);
+
   const { data: documentsData, isLoading, refetch } = useDocuments(
-    currentCompany ? documentFilters : { page: 1, limit: 1 }
+    shouldFetchDocuments ? documentFilters : { page: 1, limit: 1 }
   );
   const { data: statsData } = useDocumentStats();
   const deleteDocument = useDeleteDocument();
@@ -111,8 +124,9 @@ export default function DocumentPage() {
     const newFilters: FilterDocumentDto = {
       page: 1,
       limit: filters.limit,
-      companyName: currentCompany || values.companyName,
-      documentType: values.documentType,
+      companyName: values.companyName,
+      fileName: values.fileName,
+      documentType: currentType as any || values.documentType,
       minAmount: values.minAmount,
       maxAmount: values.maxAmount,
       startDate: values.dateRange?.[0]?.format('YYYY-MM-DD') || (currentYear ? `${currentYear}-01-01` : undefined),
@@ -170,8 +184,13 @@ export default function DocumentPage() {
     setFilters(prev => ({ ...prev, page: 1 }));
   };
 
-  const handleCompanyFolderOpen = (companyName: string) => {
-    navigate(`/dashboard/docs/year/${currentYear}/company/${encodeURIComponent(companyName)}`);
+  const handleDepartmentFolderOpen = (departmentName: string) => {
+    navigate(`/dashboard/docs/year/${currentYear}/department/${encodeURIComponent(departmentName)}`);
+    setFilters(prev => ({ ...prev, page: 1 }));
+  };
+
+  const handleTypeFolderOpen = (typeName: string) => {
+    navigate(`/dashboard/docs/year/${currentYear}/department/${encodeURIComponent(currentDepartment!)}/type/${encodeURIComponent(typeName)}`);
     setFilters(prev => ({ ...prev, page: 1 }));
   };
 
@@ -186,6 +205,12 @@ export default function DocumentPage() {
     setSelectionMode(false);
     setSelectedIds([]);
   };
+
+  const handleBackToDepartment = () => {
+    navigate(`/dashboard/docs/year/${currentYear}/department/${encodeURIComponent(currentDepartment!)}`);
+    setSelectionMode(false);
+    setSelectedIds([]);
+  }
 
   const toggleSelectionMode = () => {
     setSelectionMode(!selectionMode);
@@ -231,9 +256,10 @@ export default function DocumentPage() {
     }
   };
 
-  const isAtRoot = !currentYear && !currentCompany;
-  const isAtYearLevel = currentYear && !currentCompany;
-  const isAtCompanyLevel = currentYear && currentCompany;
+  const isAtRoot = !currentYear;
+  const isAtYearLevel = currentYear && !currentDepartment;
+  const isAtDepartmentLevel = currentYear && currentDepartment && !currentType;
+  const isAtTypeLevel = currentYear && currentDepartment && currentType;
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
@@ -277,28 +303,53 @@ export default function DocumentPage() {
       <div className="bg-white rounded-lg border border-gray-200 overflow-hidden">
         <FolderBreadcrumb
           currentYear={currentYear}
-          currentCompany={currentCompany}
+          currentDepartment={currentDepartment}
+          currentType={currentType}
           onBackToRoot={handleBackToRoot}
           onBackToYear={handleBackToYear}
+          onBackToDepartment={handleBackToDepartment}
+          t={t}
         />
 
         {isAtRoot && (
-          <YearFolderView
-            years={yearsData || []}
+          <GenericFolderView
+            items={(yearsData || []).map(y => ({ name: y.year.toString(), count: y.count, type: 'year' }))}
             isLoading={yearsLoading}
-            onFolderOpen={handleYearFolderOpen}
+            onFolderOpen={(name: string) => handleYearFolderOpen(parseInt(name))}
+            color="#f59e0b"
           />
         )}
 
         {isAtYearLevel && (
-          <CompanyFolderView
-            companies={companiesData || []}
-            isLoading={companiesLoading}
-            onFolderOpen={handleCompanyFolderOpen}
+          <GenericFolderView
+            items={(departmentsData || []).map(d => ({
+              name: d.department,
+              count: d.count,
+              type: 'department',
+              label: tDepartments(d.department) || d.department
+            }))}
+            isLoading={departmentsLoading}
+            onFolderOpen={handleDepartmentFolderOpen}
+            color="#3b82f6"
           />
         )}
 
-        {isAtCompanyLevel && (
+        {isAtDepartmentLevel && (
+          <GenericFolderView
+            items={(typesData || []).map(t => ({
+              name: t.documentType,
+              count: t.count,
+              type: 'documentType',
+              label: tTypes(t.documentType) || t.documentType
+            }))}
+            isLoading={typesLoading}
+            onFolderOpen={handleTypeFolderOpen}
+            color="#10b981"
+          />
+        )}
+
+
+        {isAtTypeLevel && (
           <div className="p-4 md:p-0">
             <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6 pb-4 border-b border-gray-200 px-4 pt-4">
               <div className="flex items-center gap-1 overflow-x-auto flex-1">
@@ -332,7 +383,6 @@ export default function DocumentPage() {
                 </button>
               </div>
 
-              {/* Selection mode controls */}
               <div className="flex items-center gap-2">
                 {!selectionMode ? (
                   <AntButton
@@ -402,16 +452,8 @@ export default function DocumentPage() {
                       >
                         <Row gutter={[16, 16]}>
                           <Col xs={24} sm={12} lg={8}>
-                            <Form.Item name="documentType" label={t('filters.documentType')}>
-                              <Select placeholder={t('filters.selectRequest')} allowClear>
-                                <Select.Option value="contract">{t('types.contract')}</Select.Option>
-                                <Select.Option value="invoice">{t('types.invoice')}</Select.Option>
-                                <Select.Option value="act">{t('types.act')}</Select.Option>
-                                <Select.Option value="report">{t('types.report')}</Select.Option>
-                                <Select.Option value="letter">{t('types.letter')}</Select.Option>
-                                <Select.Option value="order">{t('types.order')}</Select.Option>
-                                <Select.Option value="other">{t('types.other')}</Select.Option>
-                              </Select>
+                            <Form.Item name="fileName" label="Sənəd adı">
+                              <Input placeholder="Fayl adını daxil edin" allowClear />
                             </Form.Item>
                           </Col>
                           <Col xs={24} sm={12} lg={8}>
@@ -468,6 +510,6 @@ export default function DocumentPage() {
           </div>
         )}
       </div>
-    </div >
+    </div>
   );
 }

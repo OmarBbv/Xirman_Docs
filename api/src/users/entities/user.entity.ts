@@ -6,6 +6,7 @@ export enum UserPosition {
   HR = 'hr',
   FINANCE_MANAGER = 'finance_manager',
   SALES_SPECIALIST = 'sales_specialist',
+  SALES_MANAGER = 'sales_manager',
   WAREHOUSEMAN = 'warehouseman',
   DIRECTOR = 'director',
 }

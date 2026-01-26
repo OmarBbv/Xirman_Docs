@@ -73,6 +73,7 @@
       "finance_manager": "Финансовый менеджер",
       "accountant": "Бухгалтер",
       "sales_specialist": "Специалист по продажам",
+      "sales_manager": "Менеджер по продажам",
       "warehouseman": "Кладовщик",
       "hr": "HR",
       "manager": "Менеджер",
@@ -176,12 +177,28 @@
     },
     "types": {
       "contract": "Договор",
+      "contract_addendum": "Дополнительное соглашение",
       "invoice": "Счет-фактура",
-      "act": "Акт",
-      "report": "Отчет",
-      "letter": "Письмо",
-      "order": "Заказ",
-      "other": "Другое"
+      "reconciliation_act": "Акт сверки",
+      "handover_act": "Акт приема-передачи",
+      "cash_receipt_order": "Приходный кассовый ордер",
+      "cash_expenditure_order": "Расходный кассовый ордер",
+      "cash_z_report": "Z-отчет",
+      "legal_documents": "Юридические документы",
+      "production_form": "Производственный бланк",
+      "defect_installation_act": "Акт дефектовки/установки",
+      "write_off_act": "Акт списания",
+      "warehouse_transfer": "Складское перемещение",
+      "sales_invoice": "Накладная на продажу",
+      "employment_order": "Приказ о приеме на работу",
+      "termination_order": "Приказ об увольнении",
+      "vacation_order": "Приказ об отпуске",
+      "business_trip_order": "Приказ о командировке",
+      "sick_leave": "Больничный лист",
+      "protocol": "Протокол",
+      "timesheet": "Табель",
+      "waybill_requisition": "Накладная-требование",
+      "financial_reports": "Финансовые отчеты"
     }
   },
   "NewDocumentPage": {
@@ -205,7 +222,10 @@
       "file": "Файл документа (PDF, Word, Excel)",
       "fileRequired": "* Файл должен быть выбран",
       "allowedPositions": "Кто может видеть",
-      "allowedPositionsPlaceholder": "Выберите должность"
+      "allowedPositionsPlaceholder": "Выберите должность",
+      "department": "Отдел",
+      "departmentPlaceholder": "Выберите отдел",
+      "departmentRequired": "Отдел должен быть выбран"
     },
     "buttons": {
       "cancel": "Отмена",
@@ -214,12 +234,28 @@
     },
     "types": {
       "contract": "Договор",
+      "contract_addendum": "Дополнительное соглашение",
       "invoice": "Счет-фактура",
-      "act": "Акт",
-      "report": "Отчет",
-      "letter": "Письмо",
-      "order": "Заказ",
-      "other": "Другое"
+      "reconciliation_act": "Акт сверки",
+      "handover_act": "Акт приема-передачи",
+      "cash_receipt_order": "Приходный кассовый ордер",
+      "cash_expenditure_order": "Расходный кассовый ордер",
+      "cash_z_report": "Z-отчет",
+      "legal_documents": "Юридические документы",
+      "production_form": "Производственный бланк",
+      "defect_installation_act": "Акт дефектовки/установки",
+      "write_off_act": "Акт списания",
+      "warehouse_transfer": "Складское перемещение",
+      "sales_invoice": "Накладная на продажу",
+      "employment_order": "Приказ о приеме на работу",
+      "termination_order": "Приказ об увольнении",
+      "vacation_order": "Приказ об отпуске",
+      "business_trip_order": "Приказ о командировке",
+      "sick_leave": "Больничный лист",
+      "protocol": "Протокол",
+      "timesheet": "Табель",
+      "waybill_requisition": "Накладная-требование",
+      "financial_reports": "Финансовые отчеты"
     },
     "positions": {
       "manager": "Менеджер",
@@ -227,12 +263,19 @@
       "hr": "HR",
       "finance_manager": "Финансовый менеджер",
       "sales_specialist": "Специалист по продажам",
+      "sales_manager": "Менеджер по продажам",
       "warehouseman": "Кладовщик",
       "director": "Директор"
     },
     "info": {
       "title": "Информация",
       "content": "После загрузки документа текущий пользователь будет автоматически отмечен как загрузивший. Максимальный размер файла 10MB. Принимаются только форматы PDF, Word и Excel."
+    },
+    "departments": {
+      "mill": "Мельница",
+      "dairy": "Молочные продукты",
+      "sausage": "Колбаса и Сосиски",
+      "other_service": "Другие услуги"
     }
   },
   "DashboardPage": {
@@ -350,6 +393,7 @@
       "finance_manager": "Финансовый менеджер",
       "accountant": "Бухгалтер",
       "sales_specialist": "Специалист по продажам",
+      "sales_manager": "Менеджер по продажам",
       "warehouseman": "Кладовщик",
       "director": "Директор",
       "hr": "HR"

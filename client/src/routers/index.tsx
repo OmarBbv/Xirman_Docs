@@ -47,7 +47,11 @@ export const router = createBrowserRouter([
         element: <DocumentPage />,
       },
       {
-        path: "docs/year/:year/company/:company",
+        path: "docs/year/:year/department/:department",
+        element: <DocumentPage />,
+      },
+      {
+        path: "docs/year/:year/department/:department/type/:type",
         element: <DocumentPage />,
       },
       {

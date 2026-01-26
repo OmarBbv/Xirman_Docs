@@ -72,6 +72,20 @@ export class DocumentsController {
     return this.documentsService.getCompaniesByYear(year, req.user);
   }
 
+  @Get('years/:year/departments')
+  async getDepartmentsByYear(@Param('year', ParseIntPipe) year: number, @Req() req: any) {
+    return this.documentsService.getDepartmentsByYear(year, req.user);
+  }
+
+  @Get('years/:year/departments/:department/types')
+  async getDocumentTypesInDepartment(
+    @Param('year', ParseIntPipe) year: number,
+    @Param('department') department: string,
+    @Req() req: any
+  ) {
+    return this.documentsService.getDocumentTypesInDepartment(year, department, req.user);
+  }
+
   @Get('attachments/:id/download')
   async downloadAttachment(
     @Param('id', ParseIntPipe) id: number,

@@ -12,7 +12,7 @@ import { User } from '../../users/entities/user.entity';
 import { DocumentView } from './document-view.entity';
 import { DocumentVersion } from './document-version.entity';
 import { DocumentAttachment } from './document-attachment.entity';
-import { DocumentType, FileFormat } from '../enums/document-enums';
+import { DocumentType, FileFormat, Department } from '../enums/document-enums';
 
 @Entity('documents')
 export class Document {
@@ -28,7 +28,7 @@ export class Document {
   @Column({ type: 'decimal', precision: 12, scale: 2, nullable: true })
   amount: number;
 
-  @Column({ type: 'enum', enum: DocumentType, default: DocumentType.OTHER })
+  @Column({ type: 'enum', enum: DocumentType })
   documentType: DocumentType;
 
   @Column({ type: 'date' })
@@ -62,6 +62,9 @@ export class Document {
 
   @Column({ name: 'updated_by_id', nullable: true })
   updatedById: number;
+
+  @Column({ type: 'enum', enum: Department, nullable: true })
+  department: Department;
 
   @Column({ type: 'simple-array', nullable: true })
   allowedPositions: string[];

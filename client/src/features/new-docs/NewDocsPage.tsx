@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, Controller } from 'react-hook-form';
 import { Input } from '../ui/input';
@@ -19,6 +19,7 @@ interface NewDocumentForm {
   amount: string;
   documentDate: string;
   documentType: string;
+  department: string;
   allowedPositions: string[];
 }
 
@@ -35,6 +36,8 @@ export default function NewDocsPage() {
     register,
     handleSubmit,
     control,
+    setValue,
+    getValues,
     formState: { errors },
   } = useForm<NewDocumentForm>({
     defaultValues: {
@@ -43,9 +46,19 @@ export default function NewDocsPage() {
       amount: '',
       documentDate: '',
       documentType: '',
+      department: '',
       allowedPositions: userPosition ? [userPosition] : [],
     },
   });
+
+  useEffect(() => {
+    if (userPosition) {
+      const current = getValues('allowedPositions') || [];
+      if (!current.includes(userPosition)) {
+        setValue('allowedPositions', [...current, userPosition]);
+      }
+    }
+  }, [userPosition, setValue, getValues]);
 
   const onSubmit = (data: NewDocumentForm) => {
     if (selectedFiles.length === 0) {
@@ -60,6 +73,7 @@ export default function NewDocsPage() {
           amount: data.amount ? parseFloat(data.amount) : undefined,
           documentDate: data.documentDate,
           documentType: data.documentType as DocumentType,
+          department: data.department,
           allowedPositions: data.allowedPositions,
         },
         files: selectedFiles,
@@ -78,12 +92,28 @@ export default function NewDocsPage() {
 
   const documentTypeOptions = [
     { value: 'contract', label: t('types.contract') },
+    { value: 'contract_addendum', label: t('types.contract_addendum') },
     { value: 'invoice', label: t('types.invoice') },
-    { value: 'act', label: t('types.act') },
-    { value: 'report', label: t('types.report') },
-    { value: 'letter', label: t('types.letter') },
-    { value: 'order', label: t('types.order') },
-    { value: 'other', label: t('types.other') },
+    { value: 'reconciliation_act', label: t('types.reconciliation_act') },
+    { value: 'handover_act', label: t('types.handover_act') },
+    { value: 'cash_receipt_order', label: t('types.cash_receipt_order') },
+    { value: 'cash_expenditure_order', label: t('types.cash_expenditure_order') },
+    { value: 'cash_z_report', label: t('types.cash_z_report') },
+    { value: 'legal_documents', label: t('types.legal_documents') },
+    { value: 'production_form', label: t('types.production_form') },
+    { value: 'defect_installation_act', label: t('types.defect_installation_act') },
+    { value: 'write_off_act', label: t('types.write_off_act') },
+    { value: 'warehouse_transfer', label: t('types.warehouse_transfer') },
+    { value: 'sales_invoice', label: t('types.sales_invoice') },
+    { value: 'employment_order', label: t('types.employment_order') },
+    { value: 'termination_order', label: t('types.termination_order') },
+    { value: 'vacation_order', label: t('types.vacation_order') },
+    { value: 'business_trip_order', label: t('types.business_trip_order') },
+    { value: 'sick_leave', label: t('types.sick_leave') },
+    { value: 'protocol', label: t('types.protocol') },
+    { value: 'timesheet', label: t('types.timesheet') },
+    { value: 'waybill_requisition', label: t('types.waybill_requisition') },
+    { value: 'financial_reports', label: t('types.financial_reports') },
   ];
 
   const positionOptions = [
@@ -92,8 +122,16 @@ export default function NewDocsPage() {
     { value: 'hr', label: t('positions.hr') },
     { value: 'finance_manager', label: t('positions.finance_manager') },
     { value: 'sales_specialist', label: t('positions.sales_specialist') },
+    { value: 'sales_manager', label: t('positions.sales_manager') },
     { value: 'warehouseman', label: t('positions.warehouseman') },
     { value: 'director', label: t('positions.director') },
+  ];
+
+  const departmentOptions = [
+    { value: 'mill', label: t('departments.mill') },
+    { value: 'dairy', label: t('departments.dairy') },
+    { value: 'sausage', label: t('departments.sausage') },
+    { value: 'other_service', label: t('departments.other_service') },
   ];
 
   return (
@@ -191,6 +229,32 @@ export default function NewDocsPage() {
               {errors.documentType && (
                 <p className="text-red-500 text-[12px] mt-1 ml-1">
                   {errors.documentType.message}
+                </p>
+              )}
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('form.department')}
+              </label>
+              <Controller
+                name="department"
+                control={control}
+                rules={{ required: t('form.departmentRequired') }}
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    placeholder={t('form.departmentPlaceholder')}
+                    className="w-full h-[50px] h-50-select"
+                    options={departmentOptions}
+                    status={errors.department ? 'error' : ''}
+                    value={field.value || undefined}
+                  />
+                )}
+              />
+              {errors.department && (
+                <p className="text-red-500 text-[12px] mt-1 ml-1">
+                  {errors.department.message}
                 </p>
               )}
             </div>

@@ -7,6 +7,10 @@ export class FilterDocumentDto {
   @IsOptional()
   companyName?: string;
 
+  @IsString()
+  @IsOptional()
+  fileName?: string;
+
   @IsNumber()
   @IsOptional()
   @Type(() => Number)

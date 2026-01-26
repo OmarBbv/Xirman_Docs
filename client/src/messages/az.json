@@ -73,6 +73,7 @@
       "finance_manager": "Maliyyə müdiri",
       "accountant": "Mühasib",
       "sales_specialist": "Satış mütəxəssisi",
+      "sales_manager": "Satış meneceri",
       "warehouseman": "Anbardar",
       "hr": "HR",
       "manager": "Menecer",
@@ -176,12 +177,28 @@
     },
     "types": {
       "contract": "Müqavilə",
-      "invoice": "Faktura",
-      "act": "Akt",
-      "report": "Hesabat",
-      "letter": "Məktub",
-      "order": "Sifariş",
-      "other": "Digər"
+      "contract_addendum": "Müqaviləyə əlavə",
+      "invoice": "Hesab-Faktura",
+      "reconciliation_act": "Üzləşmə aktı",
+      "handover_act": "Təhvil-təslim aktı",
+      "cash_receipt_order": "Kassa mədaxil orderi",
+      "cash_expenditure_order": "Kassa məxaric orderi",
+      "cash_z_report": "Kassa z hesabat",
+      "legal_documents": "Hüquqi sənədlər",
+      "production_form": "İstehsal blankı",
+      "defect_installation_act": "Qüsur-quraşdırma aktı",
+      "write_off_act": "Silinmə aktı",
+      "warehouse_transfer": "Anbar yerdəyişməsi",
+      "sales_invoice": "Satış faktura",
+      "employment_order": "İşə qəbul əmri",
+      "termination_order": "İşə xitam əmri",
+      "vacation_order": "Məzuniyyət əmri",
+      "business_trip_order": "Ezamiyyə əmri",
+      "sick_leave": "Xəstəlik vərəqəsi",
+      "protocol": "Protokol",
+      "timesheet": "Tabel",
+      "waybill_requisition": "Qaimə-tələbnamə",
+      "financial_reports": "Maliyyə hesabatları"
     }
   },
   "NewDocumentPage": {
@@ -205,7 +222,10 @@
       "file": "Sənəd faylı (PDF, Word, Excel)",
       "fileRequired": "* Fayl seçilməlidir",
       "allowedPositions": "Görə biləcək vəzifələr",
-      "allowedPositionsPlaceholder": "Vəzifə seçin"
+      "allowedPositionsPlaceholder": "Vəzifə seçin",
+      "department": "Şöbə",
+      "departmentPlaceholder": "Şöbə seçin",
+      "departmentRequired": "Şöbə seçilməlidir"
     },
     "buttons": {
       "cancel": "Ləğv et",
@@ -214,12 +234,28 @@
     },
     "types": {
       "contract": "Müqavilə",
-      "invoice": "Faktura",
-      "act": "Akt",
-      "report": "Hesabat",
-      "letter": "Məktub",
-      "order": "Sifariş",
-      "other": "Digər"
+      "contract_addendum": "Müqaviləyə əlavə",
+      "invoice": "Hesab-Faktura",
+      "reconciliation_act": "Üzləşmə aktı",
+      "handover_act": "Təhvil-təslim aktı",
+      "cash_receipt_order": "Kassa mədaxil orderi",
+      "cash_expenditure_order": "Kassa məxaric orderi",
+      "cash_z_report": "Kassa z hesabat",
+      "legal_documents": "Hüquqi sənədlər",
+      "production_form": "İstehsal blankı",
+      "defect_installation_act": "Qüsur-quraşdırma aktı",
+      "write_off_act": "Silinmə aktı",
+      "warehouse_transfer": "Anbar yerdəyişməsi",
+      "sales_invoice": "Satış faktura",
+      "employment_order": "İşə qəbul əmri",
+      "termination_order": "İşə xitam əmri",
+      "vacation_order": "Məzuniyyət əmri",
+      "business_trip_order": "Ezamiyyə əmri",
+      "sick_leave": "Xəstəlik vərəqəsi",
+      "protocol": "Protokol",
+      "timesheet": "Tabel",
+      "waybill_requisition": "Qaimə-tələbnamə",
+      "financial_reports": "Maliyyə hesabatları"
     },
     "positions": {
       "manager": "Menecer",
@@ -227,12 +263,19 @@
       "hr": "HR",
       "finance_manager": "Maliyyə Meneceri",
       "sales_specialist": "Satış Mütəxəssisi",
+      "sales_manager": "Satış Meneceri",
       "warehouseman": "Anbardar",
       "director": "Direktor"
     },
     "info": {
       "title": "Məlumat",
       "content": "Sənəd yükləndikdən sonra yükləyən istifadəçi avtomatik olaraq sizin hesabınız kimi qeyd olunacaq. Maksimum fayl ölçüsü 10MB-dır. Yalnız PDF, Word və Excel formatları qəbul edilir."
+    },
+    "departments": {
+      "mill": "Dəyirman",
+      "dairy": "Süd məhsulları",
+      "sausage": "Kolbasa və Sosilər",
+      "other_service": "Digər xidmət"
     }
   },
   "DashboardPage": {
@@ -350,6 +393,7 @@
       "finance_manager": "Maliyyə müdiri",
       "accountant": "Mühasib",
       "sales_specialist": "Satış mütəxəssisi",
+      "sales_manager": "Satış meneceri",
       "warehouseman": "Anbardar",
       "director": "Direktor",
       "hr": "HR"

@@ -162,6 +162,7 @@ export default function Register({ onNavigateToLogin }: RegisterProps) {
                   { value: 'finance_manager', label: tPositions('finance_manager') },
                   { value: 'accountant', label: tPositions('accountant') },
                   { value: 'sales_specialist', label: tPositions('sales_specialist') },
+                  { value: 'sales_manager', label: tPositions('sales_manager') },
                   { value: 'warehouseman', label: tPositions('warehouseman') },
                   { value: 'director', label: tPositions('director') },
                   { value: 'hr', label: tPositions('hr') },
