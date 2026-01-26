@@ -11,7 +11,7 @@ import {
   useDocumentTypesInDepartment
 } from "../hooks/documentHooks";
 import type { FilterDocumentDto, FileFormat } from "../types/document.types";
-import { Collapse, DatePicker, InputNumber, Button as AntButton, Row, Col, Form, Badge, Select, Input } from "antd";
+import { Collapse, DatePicker, InputNumber, Button as AntButton, Row, Col, Form, Badge, Input } from "antd";
 import { FilterOutlined, ClearOutlined, SearchOutlined, DownloadOutlined, CheckSquareOutlined, CloseSquareOutlined } from "@ant-design/icons";
 import { useTranslations } from "use-intl";
 import { documentService } from "../services/documentServices";
