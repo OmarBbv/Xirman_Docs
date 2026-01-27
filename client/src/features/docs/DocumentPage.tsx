@@ -451,12 +451,17 @@ export default function DocumentPage() {
                         className="p-4 bg-gray-50 rounded-lg border border-gray-100"
                       >
                         <Row gutter={[16, 16]}>
-                          <Col xs={24} sm={12} lg={8}>
+                          <Col xs={24} sm={12} lg={6}>
                             <Form.Item name="fileName" label="Sənəd adı">
                               <Input placeholder="Fayl adını daxil edin" allowClear />
                             </Form.Item>
                           </Col>
-                          <Col xs={24} sm={12} lg={8}>
+                          <Col xs={24} sm={12} lg={6}>
+                            <Form.Item name="companyName" label="Şirkət adı">
+                              <Input placeholder="Şirkət adını daxil edin" allowClear />
+                            </Form.Item>
+                          </Col>
+                          <Col xs={24} sm={12} lg={6}>
                             <Form.Item label={t('filters.amountRange')}>
                               <div className="flex gap-2">
                                 <Form.Item name="minAmount" noStyle>
@@ -469,7 +474,7 @@ export default function DocumentPage() {
                               </div>
                             </Form.Item>
                           </Col>
-                          <Col xs={24} sm={12} lg={8}>
+                          <Col xs={24} sm={12} lg={6}>
                             <Form.Item name="dateRange" label={t('filters.dateRange')}>
                               <RangePicker className="w-full" placeholder={[t('filters.startDate'), t('filters.endDate')]} />
                             </Form.Item>
