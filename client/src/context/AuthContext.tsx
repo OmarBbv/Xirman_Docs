@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { queryClient } from "../features/utils/queryClient";
 
 interface User {
   id: number;
@@ -48,9 +49,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
-
     localStorage.clear();
     sessionStorage.clear();
+    queryClient.clear();
     setUser(null);
   };
 
