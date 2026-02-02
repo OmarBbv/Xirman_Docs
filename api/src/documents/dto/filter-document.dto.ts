@@ -1,6 +1,6 @@
 import { IsString, IsNumber, IsOptional, IsEnum, IsDateString, IsBoolean } from 'class-validator';
 import { Type, Transform } from 'class-transformer';
-import { DocumentType, FileFormat } from '../enums/document-enums';
+import { DocumentType, FileFormat, Department } from '../enums/document-enums';
 
 export class FilterDocumentDto {
   @IsString()
@@ -28,6 +28,10 @@ export class FilterDocumentDto {
   @IsEnum(FileFormat)
   @IsOptional()
   fileFormat?: FileFormat;
+
+  @IsString()
+  @IsOptional()
+  department?: string;
 
   @IsDateString()
   @IsOptional()

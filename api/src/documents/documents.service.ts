@@ -124,6 +124,7 @@ export class DocumentsService {
       maxAmount,
       documentType,
       fileFormat,
+      department,
       startDate,
       endDate,
       page = 1,
@@ -187,6 +188,14 @@ export class DocumentsService {
 
     if (fileFormat) {
       queryBuilder.andWhere('document.fileFormat = :fileFormat', { fileFormat });
+    }
+
+    if (department) {
+      if (department === 'other_service') {
+        queryBuilder.andWhere("(document.department = :department OR document.department IS NULL)", { department });
+      } else {
+        queryBuilder.andWhere('document.department = :department', { department });
+      }
     }
 
     if (startDate) {
@@ -388,8 +397,15 @@ export class DocumentsService {
       .createQueryBuilder('document')
       .select('document.documentType', 'documentType')
       .addSelect('COUNT(*)', 'count')
-      .where('EXTRACT(YEAR FROM document.documentDate) = :year', { year })
-      .andWhere('document.department = :department', { department });
+      .where('EXTRACT(YEAR FROM document.documentDate) = :year', { year });
+
+    // Handle 'other_service' to match documents with null department
+    // Note: department is a PostgreSQL enum, so we cannot compare to empty string
+    if (department === 'other_service') {
+      qb.andWhere("(document.department = :department OR document.department IS NULL)", { department });
+    } else {
+      qb.andWhere('document.department = :department', { department });
+    }
 
     if (user && user.role !== 'admin') {
       const userPosition = user.position || user['position'];
