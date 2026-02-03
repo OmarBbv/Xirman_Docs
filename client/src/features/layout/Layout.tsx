@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { Outlet, useNavigate, Link, useLocation } from "react-router-dom";
+import { Outlet, useNavigate, Link, useLocation, Navigate } from "react-router-dom";
 import { useTranslations } from "use-intl";
 import { HomeIcon, PostsIcon, UsersIcon, SettingsIcon } from "../ui/Icons";
 import { useLanguage } from "../../context/LanguageContext";
 import { Sidebar } from "./Sidebar";
 import { useAuth } from "../../context/AuthContext";
-import { Badge, Popover, List, Empty, Drawer, Button } from "antd";
+import { Badge, Popover, List, Empty, Drawer, Button, Spin } from "antd";
 import { MenuOutlined } from "@ant-design/icons";
 import { useDocuments } from "../hooks/documentHooks";
 import { useQueryClient } from "@tanstack/react-query";
@@ -15,14 +15,10 @@ export default function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const t = useTranslations('Layout');
   const { locale, setLocale } = useLanguage();
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
-
-  useEffect(() => {
-    setMobileMenuOpen(false);
-  }, [location.pathname]);
 
   const today = new Date();
   const year = today.getFullYear();
@@ -36,6 +32,22 @@ export default function Layout() {
     startDate: dateString,
     excludeRead: true,
   });
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-[#f0f0f1]">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   const notificationContent = (
     <div className="w-[300px]">
