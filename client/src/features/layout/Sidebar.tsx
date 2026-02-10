@@ -36,7 +36,7 @@ export const Sidebar = ({ isCollapsed, setIsCollapsed, menuItems, mobile = false
           <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/20">
             <span className="text-white text-xs font-bold leading-none">X</span>
           </div>
-          {!isCollapsed && <span className="ml-2 font-bold text-[14px] text-white tracking-wide">{locale === 'ru' ? 'ХирманЭАС' : 'XirmanEAS'}</span>}
+          {!isCollapsed && <Link to="/dashboard/docs" className="ml-2 font-bold text-[14px] text-white tracking-wide">{locale === 'ru' ? 'ХирманЭАС' : 'XirmanEAS'}</Link>}
         </div>
 
         {mobile && onClose && (

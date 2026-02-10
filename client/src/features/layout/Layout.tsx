@@ -170,7 +170,7 @@ export default function Layout() {
               className="lg:hidden! flex items-center justify-center -ml-2 text-white hover:text-white"
             />
             <div className="hover:bg-white/10 h-full px-2 md:px-3 flex items-center cursor-pointer transition-colors">
-              <span className="text-[14px] font-bold text-white md:text-[13px] md:font-normal md:text-[#c3c4c7] whitespace-nowrap">{locale === 'ru' ? 'Хирман ЭАС' : 'Xirman EAS'}</span>
+              <Link to="/dashboard/docs" className="text-[14px] font-bold text-white md:text-[13px] md:font-normal md:text-[#c3c4c7] whitespace-nowrap">{locale === 'ru' ? 'Хирман ЭАС' : 'Xirman EAS'}</Link>
             </div>
 
             <Popover content={notificationContent} trigger={['hover', 'click']} placement="bottomLeft" overlayClassName="notification-popover">
