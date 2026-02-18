@@ -1,4 +1,3 @@
-
 import { Test, TestingModule } from '@nestjs/testing';
 import { DocumentsService } from './documents.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
@@ -90,7 +89,9 @@ describe('DocumentsService', () => {
 
       // Mock repository behavior
       mockRepository.create.mockImplementation((dto) => dto);
-      mockRepository.save.mockImplementation((doc) => Promise.resolve({ id: 1, ...doc }));
+      mockRepository.save.mockImplementation((doc) =>
+        Promise.resolve({ id: 1, ...doc }),
+      );
 
       const result = await service.create(createDto, [mockFile], mockUser);
 

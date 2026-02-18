@@ -38,7 +38,7 @@ interface DocumentServiceTypes {
     document: {
       fileName: string;
       companyName: string;
-      amount: number;
+      amount: string;
       documentType: string;
     };
   }>;

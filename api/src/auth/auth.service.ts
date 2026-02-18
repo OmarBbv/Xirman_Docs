@@ -9,13 +9,15 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
-  ) { }
+  ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.usersService.findByEmail(email);
     if (user && (await bcrypt.compare(pass, user.password))) {
       if (!user.isVerified) {
-        throw new UnauthorizedException('Zəhmət olmasa email ünvanınızı təsdiqləyin');
+        throw new UnauthorizedException(
+          'Zəhmət olmasa email ünvanınızı təsdiqləyin',
+        );
       }
       const { password, ...result } = user;
       return result;
@@ -24,7 +26,12 @@ export class AuthService {
   }
 
   async login(user: any) {
-    const payload = { email: user.email, sub: user.id, role: user.role, position: user.position };
+    const payload = {
+      email: user.email,
+      sub: user.id,
+      role: user.role,
+      position: user.position,
+    };
     return {
       access_token: this.jwtService.sign(payload),
       user: {

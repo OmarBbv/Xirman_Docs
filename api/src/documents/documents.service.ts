@@ -31,7 +31,7 @@ export class DocumentsService {
     private documentReadRepository: Repository<DocumentRead>,
     @InjectRepository(DocumentAttachment)
     private documentAttachmentRepository: Repository<DocumentAttachment>,
-  ) { }
+  ) {}
 
   private getFileFormat(extension: string): FileFormat {
     const ext = extension.toLowerCase();
@@ -55,11 +55,18 @@ export class DocumentsService {
 
     const fileExtension = mainFile.originalname.split('.').pop() || '';
 
-    if (createDocumentDto.allowedPositions && typeof createDocumentDto.allowedPositions === 'string') {
-      createDocumentDto.allowedPositions = (createDocumentDto.allowedPositions as string).split(',');
+    if (
+      createDocumentDto.allowedPositions &&
+      typeof createDocumentDto.allowedPositions === 'string'
+    ) {
+      createDocumentDto.allowedPositions = (
+        createDocumentDto.allowedPositions as string
+      ).split(',');
     }
     const fileFormat = this.getFileFormat(fileExtension);
-    const fileName = Buffer.from(mainFile.originalname, 'latin1').toString('utf8');
+    const fileName = Buffer.from(mainFile.originalname, 'latin1').toString(
+      'utf8',
+    );
     const userId = user['userId'] || user.id;
 
     const document = this.documentRepository.create({
@@ -110,7 +117,10 @@ export class DocumentsService {
     return savedDocument;
   }
 
-  async findAll(filterDto: FilterDocumentDto, user?: User): Promise<{
+  async findAll(
+    filterDto: FilterDocumentDto,
+    user?: User,
+  ): Promise<{
     data: Document[];
     total: number;
     page: number;
@@ -133,7 +143,7 @@ export class DocumentsService {
       exactCompanyMatch,
     } = filterDto;
 
-    const userId = user ? (user['userId'] || user.id) : null;
+    const userId = user ? user['userId'] || user.id : null;
 
     const queryBuilder = this.documentRepository
       .createQueryBuilder('document')
@@ -144,15 +154,21 @@ export class DocumentsService {
     if (user && user.role !== 'admin') {
       const userPosition = user.position || user['position'];
       if (userPosition) {
-        queryBuilder.andWhere(new Brackets(qb => {
-          qb.where("document.allowedPositions IS NULL")
-            .orWhere("document.allowedPositions = ''")
-            .orWhere("document.allowedPositions = :emptyArray", { emptyArray: '' })
-            .orWhere("document.allowedPositions LIKE :positionPattern", {
-              positionPattern: `%${userPosition}%`
-            })
-            .orWhere("document.uploadedById = :uploaderId", { uploaderId: userId });
-        }));
+        queryBuilder.andWhere(
+          new Brackets((qb) => {
+            qb.where('document.allowedPositions IS NULL')
+              .orWhere("document.allowedPositions = ''")
+              .orWhere('document.allowedPositions = :emptyArray', {
+                emptyArray: '',
+              })
+              .orWhere('document.allowedPositions LIKE :positionPattern', {
+                positionPattern: `%${userPosition}%`,
+              })
+              .orWhere('document.uploadedById = :uploaderId', {
+                uploaderId: userId,
+              });
+          }),
+        );
       }
     }
 
@@ -183,18 +199,27 @@ export class DocumentsService {
     }
 
     if (documentType) {
-      queryBuilder.andWhere('document.documentType = :documentType', { documentType });
+      queryBuilder.andWhere('document.documentType = :documentType', {
+        documentType,
+      });
     }
 
     if (fileFormat) {
-      queryBuilder.andWhere('document.fileFormat = :fileFormat', { fileFormat });
+      queryBuilder.andWhere('document.fileFormat = :fileFormat', {
+        fileFormat,
+      });
     }
 
     if (department) {
       if (department === 'other_service') {
-        queryBuilder.andWhere("(document.department = :department OR document.department IS NULL)", { department });
+        queryBuilder.andWhere(
+          '(document.department = :department OR document.department IS NULL)',
+          { department },
+        );
       } else {
-        queryBuilder.andWhere('document.department = :department', { department });
+        queryBuilder.andWhere('document.department = :department', {
+          department,
+        });
       }
     }
 
@@ -210,15 +235,19 @@ export class DocumentsService {
     }
 
     if (excludeRead && userId) {
-      queryBuilder.andWhere(qb => {
-        const subQuery = qb.subQuery()
-          .select('1')
-          .from(DocumentRead, 'read')
-          .where('read.documentId = document.id')
-          .andWhere('read.userId = :userId')
-          .getQuery();
-        return 'NOT EXISTS ' + subQuery;
-      }, { userId });
+      queryBuilder.andWhere(
+        (qb) => {
+          const subQuery = qb
+            .subQuery()
+            .select('1')
+            .from(DocumentRead, 'read')
+            .where('read.documentId = document.id')
+            .andWhere('read.userId = :userId')
+            .getQuery();
+          return 'NOT EXISTS ' + subQuery;
+        },
+        { userId },
+      );
     }
 
     const skip = (page - 1) * limit;
@@ -236,7 +265,7 @@ export class DocumentsService {
   }
 
   async getStats(user?: User) {
-    const userId = user ? (user['userId'] || user.id) : null;
+    const userId = user ? user['userId'] || user.id : null;
 
     const baseQueryBuilder = () => {
       const qb = this.documentRepository.createQueryBuilder('document');
@@ -246,7 +275,7 @@ export class DocumentsService {
         if (userPosition) {
           qb.andWhere(
             "(document.allowedPositions IS NULL OR document.allowedPositions = '' OR document.allowedPositions LIKE :positionPattern OR document.uploadedById = :uploaderId)",
-            { positionPattern: `%${userPosition}%`, uploaderId: userId }
+            { positionPattern: `%${userPosition}%`, uploaderId: userId },
           );
         }
       }
@@ -301,8 +330,10 @@ export class DocumentsService {
     });
   }
 
-  async getDocumentYears(user?: User): Promise<{ year: number; count: number }[]> {
-    const userId = user ? (user['userId'] || user.id) : null;
+  async getDocumentYears(
+    user?: User,
+  ): Promise<{ year: number; count: number }[]> {
+    const userId = user ? user['userId'] || user.id : null;
 
     const qb = this.documentRepository
       .createQueryBuilder('document')
@@ -314,7 +345,7 @@ export class DocumentsService {
       if (userPosition) {
         qb.where(
           "(document.allowedPositions IS NULL OR document.allowedPositions = '' OR document.allowedPositions LIKE :positionPattern OR document.uploadedById = :uploaderId)",
-          { positionPattern: `%${userPosition}%`, uploaderId: userId }
+          { positionPattern: `%${userPosition}%`, uploaderId: userId },
         );
       }
     }
@@ -324,14 +355,17 @@ export class DocumentsService {
       .orderBy('year', 'DESC')
       .getRawMany();
 
-    return results.map(r => ({
+    return results.map((r) => ({
       year: parseInt(r.year),
       count: parseInt(r.count),
     }));
   }
 
-  async getCompaniesByYear(year: number, user?: User): Promise<{ companyName: string; count: number }[]> {
-    const userId = user ? (user['userId'] || user.id) : null;
+  async getCompaniesByYear(
+    year: number,
+    user?: User,
+  ): Promise<{ companyName: string; count: number }[]> {
+    const userId = user ? user['userId'] || user.id : null;
 
     const qb = this.documentRepository
       .createQueryBuilder('document')
@@ -344,7 +378,7 @@ export class DocumentsService {
       if (userPosition) {
         qb.andWhere(
           "(document.allowedPositions IS NULL OR document.allowedPositions = '' OR document.allowedPositions LIKE :positionPattern OR document.uploadedById = :uploaderId)",
-          { positionPattern: `%${userPosition}%`, uploaderId: userId }
+          { positionPattern: `%${userPosition}%`, uploaderId: userId },
         );
       }
     }
@@ -354,14 +388,17 @@ export class DocumentsService {
       .orderBy('document.companyName', 'ASC')
       .getRawMany();
 
-    return results.map(r => ({
+    return results.map((r) => ({
       companyName: r.companyName || 'Digər',
       count: parseInt(r.count),
     }));
   }
 
-  async getDepartmentsByYear(year: number, user?: User): Promise<{ department: string; count: number }[]> {
-    const userId = user ? (user['userId'] || user.id) : null;
+  async getDepartmentsByYear(
+    year: number,
+    user?: User,
+  ): Promise<{ department: string; count: number }[]> {
+    const userId = user ? user['userId'] || user.id : null;
 
     const qb = this.documentRepository
       .createQueryBuilder('document')
@@ -374,7 +411,7 @@ export class DocumentsService {
       if (userPosition) {
         qb.andWhere(
           "(document.allowedPositions IS NULL OR document.allowedPositions = '' OR document.allowedPositions LIKE :positionPattern OR document.uploadedById = :uploaderId)",
-          { positionPattern: `%${userPosition}%`, uploaderId: userId }
+          { positionPattern: `%${userPosition}%`, uploaderId: userId },
         );
       }
     }
@@ -384,14 +421,18 @@ export class DocumentsService {
       .orderBy('document.department', 'ASC')
       .getRawMany();
 
-    return results.map(r => ({
+    return results.map((r) => ({
       department: r.department || 'other_service',
       count: parseInt(r.count),
     }));
   }
 
-  async getDocumentTypesInDepartment(year: number, department: string, user?: User): Promise<{ documentType: string; count: number }[]> {
-    const userId = user ? (user['userId'] || user.id) : null;
+  async getDocumentTypesInDepartment(
+    year: number,
+    department: string,
+    user?: User,
+  ): Promise<{ documentType: string; count: number }[]> {
+    const userId = user ? user['userId'] || user.id : null;
 
     const qb = this.documentRepository
       .createQueryBuilder('document')
@@ -402,7 +443,10 @@ export class DocumentsService {
     // Handle 'other_service' to match documents with null department
     // Note: department is a PostgreSQL enum, so we cannot compare to empty string
     if (department === 'other_service') {
-      qb.andWhere("(document.department = :department OR document.department IS NULL)", { department });
+      qb.andWhere(
+        '(document.department = :department OR document.department IS NULL)',
+        { department },
+      );
     } else {
       qb.andWhere('document.department = :department', { department });
     }
@@ -412,7 +456,7 @@ export class DocumentsService {
       if (userPosition) {
         qb.andWhere(
           "(document.allowedPositions IS NULL OR document.allowedPositions = '' OR document.allowedPositions LIKE :positionPattern OR document.uploadedById = :uploaderId)",
-          { positionPattern: `%${userPosition}%`, uploaderId: userId }
+          { positionPattern: `%${userPosition}%`, uploaderId: userId },
         );
       }
     }
@@ -422,7 +466,7 @@ export class DocumentsService {
       .orderBy('document.documentType', 'ASC')
       .getRawMany();
 
-    return results.map(r => ({
+    return results.map((r) => ({
       documentType: r.documentType,
       count: parseInt(r.count),
     }));
@@ -461,7 +505,10 @@ export class DocumentsService {
     return this.documentViewRepository.save(view);
   }
 
-  async getViewHistory(documentId: number, search?: string): Promise<DocumentView[]> {
+  async getViewHistory(
+    documentId: number,
+    search?: string,
+  ): Promise<DocumentView[]> {
     await this.findOne(documentId);
 
     const query = this.documentViewRepository
@@ -484,13 +531,15 @@ export class DocumentsService {
     id: number,
     updateDocumentDto: UpdateDocumentDto,
     user: User,
-    file?: Express.Multer.File
+    file?: Express.Multer.File,
   ): Promise<Document> {
     const document = await this.findOne(id);
     const userId = user['userId'] || user.id;
 
     if (file) {
-      const count = await this.documentVersionRepository.count({ where: { documentId: id } });
+      const count = await this.documentVersionRepository.count({
+        where: { documentId: id },
+      });
 
       if (count === 0) {
         await this.documentVersionRepository.save({
@@ -509,8 +558,13 @@ export class DocumentsService {
 
       const nextVer = count === 0 ? 2 : count + 1;
 
-      const newFileName = Buffer.from(file.originalname, 'latin1').toString('utf8');
-      const newExtension = path.extname(file.originalname).toLowerCase().replace('.', '');
+      const newFileName = Buffer.from(file.originalname, 'latin1').toString(
+        'utf8',
+      );
+      const newExtension = path
+        .extname(file.originalname)
+        .toLowerCase()
+        .replace('.', '');
 
       await this.documentVersionRepository.save({
         document: document,
@@ -531,11 +585,15 @@ export class DocumentsService {
       document.fileFormat = this.getFileFormat(newExtension);
     }
 
-    if (updateDocumentDto.companyName) document.companyName = updateDocumentDto.companyName.toUpperCase();
-    if (updateDocumentDto.documentNumber) document.documentNumber = updateDocumentDto.documentNumber;
+    if (updateDocumentDto.companyName)
+      document.companyName = updateDocumentDto.companyName.toUpperCase();
+    if (updateDocumentDto.documentNumber)
+      document.documentNumber = updateDocumentDto.documentNumber;
     if (updateDocumentDto.amount) document.amount = updateDocumentDto.amount;
-    if (updateDocumentDto.documentType) document.documentType = updateDocumentDto.documentType;
-    if (updateDocumentDto.documentDate) document.documentDate = new Date(updateDocumentDto.documentDate);
+    if (updateDocumentDto.documentType)
+      document.documentType = updateDocumentDto.documentType;
+    if (updateDocumentDto.documentDate)
+      document.documentDate = new Date(updateDocumentDto.documentDate);
 
     document.updatedBy = { id: userId } as User;
     document.updatedById = userId;
@@ -562,14 +620,18 @@ export class DocumentsService {
       }
     }
 
-    const versions = await this.documentVersionRepository.find({ where: { documentId: id } });
+    const versions = await this.documentVersionRepository.find({
+      where: { documentId: id },
+    });
 
     for (const version of versions) {
       if (version.filePath && fs.existsSync(version.filePath)) {
         try {
           fs.unlinkSync(version.filePath);
         } catch (e) {
-          console.error(`Versiya faylını silərkən xəta (${version.version}): ${e.message}`);
+          console.error(
+            `Versiya faylını silərkən xəta (${version.version}): ${e.message}`,
+          );
         }
       }
     }
@@ -580,7 +642,9 @@ export class DocumentsService {
           try {
             fs.unlinkSync(attachment.filePath);
           } catch (e) {
-            console.error(`Əlavə faylı silərkən xəta (${attachment.fileName}): ${e.message}`);
+            console.error(
+              `Əlavə faylı silərkən xəta (${attachment.fileName}): ${e.message}`,
+            );
           }
         }
       }
@@ -591,7 +655,10 @@ export class DocumentsService {
     return { message: 'Sənəd və bütün faylları uğurla silindi' };
   }
 
-  async findByUser(userId: number, filterDto: FilterDocumentDto): Promise<{
+  async findByUser(
+    userId: number,
+    filterDto: FilterDocumentDto,
+  ): Promise<{
     data: Document[];
     total: number;
     page: number;
@@ -620,8 +687,12 @@ export class DocumentsService {
     };
   }
 
-  async getVersionFile(id: number): Promise<{ filePath: string; fileName: string }> {
-    const version = await this.documentVersionRepository.findOne({ where: { id } });
+  async getVersionFile(
+    id: number,
+  ): Promise<{ filePath: string; fileName: string }> {
+    const version = await this.documentVersionRepository.findOne({
+      where: { id },
+    });
 
     if (!version) {
       throw new NotFoundException(`Versiya tapılmadı: ${id}`);
@@ -637,13 +708,13 @@ export class DocumentsService {
   async markAsRead(id: number, user: User) {
     const userId = user['userId'] || user.id;
     const exists = await this.documentReadRepository.findOne({
-      where: { documentId: id, userId }
+      where: { documentId: id, userId },
     });
 
     if (!exists) {
       await this.documentReadRepository.save({
         documentId: id,
-        userId
+        userId,
       });
     }
     return { success: true };
@@ -657,7 +728,8 @@ export class DocumentsService {
     }
 
     const baseUrl = process.env.BACKEND_URL || 'http://localhost:3000';
-    const hasAttachments = document.attachments && document.attachments.length > 0;
+    const hasAttachments =
+      document.attachments && document.attachments.length > 0;
     const downloadUrl = hasAttachments
       ? `${baseUrl}/documents/${id}/download-zip`
       : `${baseUrl}/documents/${id}/download`;
@@ -666,17 +738,23 @@ export class DocumentsService {
       success: true,
       downloadUrl,
       document: {
-        fileName: hasAttachments ? `${document.companyName}_sənədlər.zip` : document.fileName,
+        fileName: hasAttachments
+          ? `${document.companyName}_sənədlər.zip`
+          : document.fileName,
         companyName: document.companyName,
         amount: document.amount,
         documentType: document.documentType,
         attachmentCount: document.attachments?.length || 0,
-      }
+      },
     };
   }
 
-  async getAttachmentFile(id: number): Promise<{ filePath: string; fileName: string }> {
-    const attachment = await this.documentAttachmentRepository.findOne({ where: { id } });
+  async getAttachmentFile(
+    id: number,
+  ): Promise<{ filePath: string; fileName: string }> {
+    const attachment = await this.documentAttachmentRepository.findOne({
+      where: { id },
+    });
 
     if (!attachment) {
       throw new NotFoundException(`Əlavə fayl tapılmadı: ${id}`);
@@ -709,7 +787,9 @@ export class DocumentsService {
 
     const ext = file.originalname.split('.').pop() || '';
 
-    attachment.fileName = Buffer.from(file.originalname, 'latin1').toString('utf8');
+    attachment.fileName = Buffer.from(file.originalname, 'latin1').toString(
+      'utf8',
+    );
     attachment.filePath = file.path;
     attachment.fileExtension = ext.toLowerCase();
     attachment.fileFormat = this.getFileFormat(ext);
@@ -733,7 +813,9 @@ export class DocumentsService {
       throw new BadRequestException('Fayl yüklənməlidir');
     }
 
-    const document = await this.documentRepository.findOne({ where: { id: documentId } });
+    const document = await this.documentRepository.findOne({
+      where: { id: documentId },
+    });
     if (!document) {
       throw new NotFoundException(`Sənəd tapılmadı: ${documentId}`);
     }
@@ -759,13 +841,19 @@ export class DocumentsService {
     return await this.documentAttachmentRepository.save(attachment);
   }
 
-  async createSingleDocumentZip(id: number): Promise<{ zipPath: string; zipFileName: string }> {
+  async createSingleDocumentZip(
+    id: number,
+  ): Promise<{ zipPath: string; zipFileName: string }> {
     const document = await this.findOne(id);
     const versions = await this.getVersions(id);
     const latestVersion = versions[0];
 
-    const mainFilePath = latestVersion ? latestVersion.filePath : document.filePath;
-    const mainFileName = latestVersion ? latestVersion.fileName : document.fileName;
+    const mainFilePath = latestVersion
+      ? latestVersion.filePath
+      : document.filePath;
+    const mainFileName = latestVersion
+      ? latestVersion.fileName
+      : document.fileName;
 
     if (!fs.existsSync(mainFilePath)) {
       throw new NotFoundException('Ana fayl tapılmadı');
@@ -800,7 +888,7 @@ export class DocumentsService {
         for (const attachment of document.attachments) {
           if (fs.existsSync(attachment.filePath)) {
             archive.file(attachment.filePath, {
-              name: `əlavələr/${attachment.fileName}`
+              name: `əlavələr/${attachment.fileName}`,
             });
           }
         }
@@ -810,7 +898,9 @@ export class DocumentsService {
     });
   }
 
-  async createBulkDownloadZip(ids: number[]): Promise<{ zipPath: string; zipFileName: string }> {
+  async createBulkDownloadZip(
+    ids: number[],
+  ): Promise<{ zipPath: string; zipFileName: string }> {
     if (!ids || ids.length === 0) {
       throw new BadRequestException('Ən azı bir sənəd seçilməlidir');
     }
@@ -830,10 +920,13 @@ export class DocumentsService {
         } catch {
           return null;
         }
-      })
+      }),
     );
 
-    const validDocs = documents.filter((d): d is NonNullable<typeof d> => d !== null && fs.existsSync(d.filePath));
+    const validDocs = documents.filter(
+      (d): d is NonNullable<typeof d> =>
+        d !== null && fs.existsSync(d.filePath),
+    );
 
     if (validDocs.length === 0) {
       throw new NotFoundException('Yüklənəcək fayl tapılmadı');
@@ -882,7 +975,7 @@ export class DocumentsService {
           for (const attachment of doc.document.attachments) {
             if (fs.existsSync(attachment.filePath)) {
               archive.file(attachment.filePath, {
-                name: `${folderName}/əlavələr/${attachment.fileName}`
+                name: `${folderName}/əlavələr/${attachment.fileName}`,
               });
             }
           }

@@ -1,4 +1,8 @@
-import { Injectable, ConflictException, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  BadRequestException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
 import * as bcrypt from 'bcrypt';
@@ -14,7 +18,7 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private mailService: MailService,
-  ) { }
+  ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
@@ -38,7 +42,9 @@ export class UsersService {
     } catch (error) {
       console.error('Registration Error Details:', error);
       if (error.code === '23505') {
-        throw new ConflictException('Bu email adresi ilə artıq qeydiyyatdan keçilib');
+        throw new ConflictException(
+          'Bu email adresi ilə artıq qeydiyyatdan keçilib',
+        );
       }
       throw new BadRequestException('İstifadəçi yaradılanda xəta baş verdi');
     }
@@ -60,7 +66,9 @@ export class UsersService {
       return await this.usersRepository.save(user);
     } catch (error) {
       if (error.code === '23505') {
-        throw new ConflictException('Bu email adresi ilə artıq qeydiyyatdan keçilib');
+        throw new ConflictException(
+          'Bu email adresi ilə artıq qeydiyyatdan keçilib',
+        );
       }
       throw new BadRequestException('İstifadəçi yaradılanda xəta baş verdi');
     }
@@ -102,14 +110,17 @@ export class UsersService {
       throw new BadRequestException('İstifadəçi tapılmadı');
     }
 
-
     if (user.otpCode !== code) {
       throw new BadRequestException('Yanlış OTP kodu');
     }
     return true;
   }
 
-  async resetPassword(email: string, code: string, newPass: string): Promise<void> {
+  async resetPassword(
+    email: string,
+    code: string,
+    newPass: string,
+  ): Promise<void> {
     const user = await this.findByEmail(email);
     if (!user) {
       throw new BadRequestException('İstifadəçi tapılmadı');
@@ -123,7 +134,7 @@ export class UsersService {
 
     await this.usersRepository.update(user.id, {
       password: hashedPassword,
-      otpCode: null
+      otpCode: null,
     });
   }
 
@@ -143,7 +154,7 @@ export class UsersService {
             { role, firstName: Like(`%${search}%`) },
             { role, lastName: Like(`%${search}%`) },
             { role, email: Like(`%${search}%`) },
-          ]
+          ],
         });
       } else {
         return this.usersRepository.find({
@@ -151,7 +162,7 @@ export class UsersService {
             { firstName: Like(`%${search}%`) },
             { lastName: Like(`%${search}%`) },
             { email: Like(`%${search}%`) },
-          ]
+          ],
         });
       }
     }

@@ -94,7 +94,7 @@ export interface Document {
   id: number;
   companyName: string;
   documentNumber: string | null;
-  amount: number | null;
+  amount: string | null;
   documentType: DocumentType;
   department: Department | null;
   documentDate: string;
@@ -117,7 +117,7 @@ export interface Document {
 export interface CreateDocumentDto {
   companyName: string;
   documentNumber?: string;
-  amount?: number;
+  amount?: string;
   documentType?: DocumentType;
   department?: Department | string;
   documentDate: string;
@@ -127,7 +127,7 @@ export interface CreateDocumentDto {
 export interface UpdateDocumentDto {
   companyName?: string;
   documentNumber?: string;
-  amount?: number;
+  amount?: string;
   documentType?: DocumentType;
   department?: Department | string;
   documentDate?: string;

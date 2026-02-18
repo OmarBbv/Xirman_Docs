@@ -9,7 +9,7 @@ export class MailService {
 
   constructor(
     @InjectQueue('email-queue') private emailQueue: Queue<EmailJobData>,
-  ) { }
+  ) {}
 
   async sendOtpEmail(email: string, otp: string): Promise<boolean> {
     try {
@@ -27,7 +27,9 @@ export class MailService {
         },
       );
 
-      this.logger.log(`📧 Email queued | Job #${job.id} | ${email} | OTP: ${otp}`);
+      this.logger.log(
+        `📧 Email queued | Job #${job.id} | ${email} | OTP: ${otp}`,
+      );
 
       return true;
     } catch (error) {

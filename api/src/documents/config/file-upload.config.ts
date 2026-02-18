@@ -53,7 +53,9 @@ export const documentFileFilter = (
     cb(null, true);
   } else {
     cb(
-      new BadRequestException('Yalnız PDF, Word və Excel faylları yükləmək mümkündür'),
+      new BadRequestException(
+        'Yalnız PDF, Word və Excel faylları yükləmək mümkündür',
+      ),
       false,
     );
   }

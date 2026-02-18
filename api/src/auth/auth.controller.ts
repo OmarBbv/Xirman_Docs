@@ -10,7 +10,7 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private usersService: UsersService,
-  ) { }
+  ) {}
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
@@ -29,7 +29,10 @@ export class AuthController {
 
   @Post('verify-otp')
   async verifyOtp(@Body() verifyDto: { email: string; code: string }) {
-    const user = await this.usersService.verifyOtp(verifyDto.email, verifyDto.code);
+    const user = await this.usersService.verifyOtp(
+      verifyDto.email,
+      verifyDto.code,
+    );
     return this.authService.login(user);
   }
 
@@ -46,7 +49,9 @@ export class AuthController {
   }
 
   @Post('reset-password')
-  async resetPassword(@Body() body: { email: string; code: string; newPass: string }) {
+  async resetPassword(
+    @Body() body: { email: string; code: string; newPass: string },
+  ) {
     await this.usersService.resetPassword(body.email, body.code, body.newPass);
     return { message: 'Şifrəniz uğurla yeniləndi' };
   }

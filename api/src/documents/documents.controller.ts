@@ -30,7 +30,7 @@ import { Public } from '../auth/decorators/public.decorator';
 @Controller('documents')
 @UseGuards(JwtAuthGuard)
 export class DocumentsController {
-  constructor(private readonly documentsService: DocumentsService) { }
+  constructor(private readonly documentsService: DocumentsService) {}
 
   @Post('upload')
   @UseInterceptors(FilesInterceptor('files', 10, documentUploadOptions))
@@ -48,7 +48,10 @@ export class DocumentsController {
   }
 
   @Get('my')
-  async findMyDocuments(@Query() filterDto: FilterDocumentDto, @Req() req: any) {
+  async findMyDocuments(
+    @Query() filterDto: FilterDocumentDto,
+    @Req() req: any,
+  ) {
     return this.documentsService.findByUser(req.user.id, filterDto);
   }
 
@@ -68,12 +71,18 @@ export class DocumentsController {
   }
 
   @Get('years/:year/companies')
-  async getCompaniesByYear(@Param('year', ParseIntPipe) year: number, @Req() req: any) {
+  async getCompaniesByYear(
+    @Param('year', ParseIntPipe) year: number,
+    @Req() req: any,
+  ) {
     return this.documentsService.getCompaniesByYear(year, req.user);
   }
 
   @Get('years/:year/departments')
-  async getDepartmentsByYear(@Param('year', ParseIntPipe) year: number, @Req() req: any) {
+  async getDepartmentsByYear(
+    @Param('year', ParseIntPipe) year: number,
+    @Req() req: any,
+  ) {
     return this.documentsService.getDepartmentsByYear(year, req.user);
   }
 
@@ -81,9 +90,13 @@ export class DocumentsController {
   async getDocumentTypesInDepartment(
     @Param('year', ParseIntPipe) year: number,
     @Param('department') department: string,
-    @Req() req: any
+    @Req() req: any,
   ) {
-    return this.documentsService.getDocumentTypesInDepartment(year, department, req.user);
+    return this.documentsService.getDocumentTypesInDepartment(
+      year,
+      department,
+      req.user,
+    );
   }
 
   @Get('attachments/:id/download')
@@ -91,7 +104,8 @@ export class DocumentsController {
     @Param('id', ParseIntPipe) id: number,
     @Res() res: Response,
   ) {
-    const { filePath, fileName } = await this.documentsService.getAttachmentFile(id);
+    const { filePath, fileName } =
+      await this.documentsService.getAttachmentFile(id);
     res.download(filePath, fileName);
   }
 
@@ -118,7 +132,9 @@ export class DocumentsController {
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
     const document = await this.documentsService.findOne(id);
-    this.documentsService.recordView(id, req.user).catch(err => console.error('View record error:', err));
+    this.documentsService
+      .recordView(id, req.user)
+      .catch((err) => console.error('View record error:', err));
 
     return document;
   }
@@ -133,7 +149,9 @@ export class DocumentsController {
     const document = await this.documentsService.findOne(id);
 
     if (req.user) {
-      await this.documentsService.recordView(id, req.user).catch(err => console.error('View record error:', err));
+      await this.documentsService
+        .recordView(id, req.user)
+        .catch((err) => console.error('View record error:', err));
     }
 
     const filePath = path.resolve(document.filePath);
@@ -150,7 +168,8 @@ export class DocumentsController {
     @Param('id', ParseIntPipe) id: number,
     @Res() res: Response,
   ) {
-    const { zipPath, zipFileName } = await this.documentsService.createSingleDocumentZip(id);
+    const { zipPath, zipFileName } =
+      await this.documentsService.createSingleDocumentZip(id);
 
     res.download(zipPath, zipFileName, (err) => {
       if (!err) {
@@ -190,8 +209,12 @@ export class DocumentsController {
   }
 
   @Get('versions/:id/download')
-  async downloadVersion(@Param('id', ParseIntPipe) id: number, @Res() res: Response) {
-    const { filePath, fileName } = await this.documentsService.getVersionFile(id);
+  async downloadVersion(
+    @Param('id', ParseIntPipe) id: number,
+    @Res() res: Response,
+  ) {
+    const { filePath, fileName } =
+      await this.documentsService.getVersionFile(id);
 
     res.download(filePath, fileName, (err) => {
       if (err) {
@@ -206,7 +229,9 @@ export class DocumentsController {
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
     if (req.user.role !== 'admin') {
-      throw new ForbiddenException('Bu əməliyyatı yerinə yetirmək üçün icazəniz yoxdur');
+      throw new ForbiddenException(
+        'Bu əməliyyatı yerinə yetirmək üçün icazəniz yoxdur',
+      );
     }
     return this.documentsService.remove(id);
   }
@@ -217,18 +242,14 @@ export class DocumentsController {
   }
 
   @Post(':id/share')
-  async getShareLink(
-    @Param('id', ParseIntPipe) id: number,
-  ) {
+  async getShareLink(@Param('id', ParseIntPipe) id: number) {
     return this.documentsService.getPublicShareLink(id);
   }
 
   @Post('bulk-download')
-  async bulkDownload(
-    @Body('ids') ids: number[],
-    @Res() res: Response,
-  ) {
-    const { zipPath, zipFileName } = await this.documentsService.createBulkDownloadZip(ids);
+  async bulkDownload(@Body('ids') ids: number[], @Res() res: Response) {
+    const { zipPath, zipFileName } =
+      await this.documentsService.createBulkDownloadZip(ids);
 
     res.download(zipPath, zipFileName, (err) => {
       if (err) {

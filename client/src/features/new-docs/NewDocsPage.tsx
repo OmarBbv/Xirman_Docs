@@ -70,7 +70,7 @@ export default function NewDocsPage() {
         data: {
           companyName: data.companyName,
           documentNumber: data.documentNumber,
-          amount: data.amount ? parseFloat(data.amount) : undefined,
+          amount: data.amount || undefined,
           documentDate: data.documentDate,
           documentType: data.documentType as DocumentType,
           department: data.department,
@@ -179,6 +179,7 @@ export default function NewDocsPage() {
             />
             <Input
               type="number"
+              step="0.01"
               label={t('form.amount')}
               placeholder={t('form.amountPlaceholder')}
               {...register('amount')}

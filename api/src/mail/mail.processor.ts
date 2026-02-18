@@ -124,7 +124,9 @@ export class EmailProcessor extends WorkerHost {
         </html>
       `;
 
-      const senderEmail = this.configService.get<string>('BREVO_SENDER_EMAIL') || 'noreply@xirmandocs.com';
+      const senderEmail =
+        this.configService.get<string>('BREVO_SENDER_EMAIL') ||
+        'noreply@xirmandocs.com';
 
       sendSmtpEmail.sender = {
         name: 'Xirman Docs',
@@ -133,11 +135,15 @@ export class EmailProcessor extends WorkerHost {
 
       const result = await this.apiInstance.sendTransacEmail(sendSmtpEmail);
 
-      this.logger.log(`✅ Email sent | Job #${job.id} | Recipient: ${email} | OTP: ${otp}`);
+      this.logger.log(
+        `✅ Email sent | Job #${job.id} | Recipient: ${email} | OTP: ${otp}`,
+      );
 
       return { success: true, messageId: result.body.messageId };
     } catch (error) {
-      this.logger.error(`❌ Email failed | Job #${job.id} | ${email} - ${error.message}`);
+      this.logger.error(
+        `❌ Email failed | Job #${job.id} | ${email} - ${error.message}`,
+      );
 
       throw error;
     }

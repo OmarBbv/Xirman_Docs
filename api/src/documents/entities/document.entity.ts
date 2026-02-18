@@ -26,7 +26,7 @@ export class Document {
   documentNumber: string;
 
   @Column({ type: 'decimal', precision: 12, scale: 2, nullable: true })
-  amount: number;
+  amount: string;
 
   @Column({ type: 'enum', enum: DocumentType })
   documentType: DocumentType;
@@ -75,7 +75,9 @@ export class Document {
   @OneToMany(() => DocumentView, (view) => view.document)
   views: DocumentView[];
 
-  @OneToMany(() => DocumentAttachment, (attachment) => attachment.document, { cascade: true })
+  @OneToMany(() => DocumentAttachment, (attachment) => attachment.document, {
+    cascade: true,
+  })
   attachments: DocumentAttachment[];
 
   @CreateDateColumn({ name: 'uploaded_at' })

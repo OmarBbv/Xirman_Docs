@@ -14,7 +14,9 @@ export class DocumentView {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Document, (document) => document.views, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Document, (document) => document.views, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'document_id' })
   document: Document;
 

@@ -12,7 +12,13 @@ import { DocumentAttachment } from './entities/document-attachment.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Document, DocumentView, DocumentVersion, DocumentRead, DocumentAttachment]),
+    TypeOrmModule.forFeature([
+      Document,
+      DocumentView,
+      DocumentVersion,
+      DocumentRead,
+      DocumentAttachment,
+    ]),
     MulterModule.register({
       dest: './uploads/documents',
     }),
@@ -21,4 +27,4 @@ import { DocumentAttachment } from './entities/document-attachment.entity';
   providers: [DocumentsService],
   exports: [DocumentsService],
 })
-export class DocumentsModule { }
+export class DocumentsModule {}

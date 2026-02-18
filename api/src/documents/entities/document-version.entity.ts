@@ -15,7 +15,9 @@ export class DocumentVersion {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(() => Document, (document) => document.versions, { onDelete: 'CASCADE' })
+  @ManyToOne(() => Document, (document) => document.versions, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn({ name: 'document_id' })
   document: Document;
 

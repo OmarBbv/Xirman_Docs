@@ -17,7 +17,7 @@ import { EmailProcessor } from './mail.processor';
           return {
             connection: {
               url: redisUrl,
-            }
+            },
           };
         }
 
@@ -35,7 +35,7 @@ import { EmailProcessor } from './mail.processor';
           connection: {
             host: 'localhost',
             port: 6379,
-          }
+          },
         };
       },
     }),
@@ -46,4 +46,4 @@ import { EmailProcessor } from './mail.processor';
   providers: [MailService, EmailProcessor],
   exports: [MailService],
 })
-export class MailModule { }
+export class MailModule {}
