@@ -179,7 +179,7 @@ export default function NewDocsPage() {
             />
             <Input
               type="number"
-              step="0.01"
+              step="any"
               label={t('form.amount')}
               placeholder={t('form.amountPlaceholder')}
               {...register('amount')}
