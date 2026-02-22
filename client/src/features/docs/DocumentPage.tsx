@@ -124,6 +124,7 @@ export default function DocumentPage() {
     const newFilters: FilterDocumentDto = {
       page: 1,
       limit: filters.limit,
+      documentId: values.documentId,
       companyName: values.companyName,
       fileName: values.fileName,
       documentType: currentType as any || values.documentType,
@@ -451,30 +452,35 @@ export default function DocumentPage() {
                         className="p-4 bg-gray-50 rounded-lg border border-gray-100"
                       >
                         <Row gutter={[16, 16]}>
-                          <Col xs={24} sm={12} lg={6}>
+                          <Col xs={24} sm={12} lg={4}>
+                            <Form.Item name="documentId" label="ID">
+                              <InputNumber placeholder="ID daxil edin" style={{ width: '100%' }} min={1} />
+                            </Form.Item>
+                          </Col>
+                          <Col xs={24} sm={12} lg={5}>
                             <Form.Item name="fileName" label="Sənəd adı">
                               <Input placeholder="Fayl adını daxil edin" allowClear />
                             </Form.Item>
                           </Col>
-                          <Col xs={24} sm={12} lg={6}>
+                          <Col xs={24} sm={12} lg={5}>
                             <Form.Item name="companyName" label="Şirkət adı">
                               <Input placeholder="Şirkət adını daxil edin" allowClear />
                             </Form.Item>
                           </Col>
-                          <Col xs={24} sm={12} lg={6}>
+                          <Col xs={24} sm={12} lg={5}>
                             <Form.Item label={t('filters.amountRange')}>
                               <div className="flex gap-2">
                                 <Form.Item name="minAmount" noStyle>
-                                  <InputNumber placeholder={t('filters.min')} className="w-full" min={0} />
+                                  <InputNumber placeholder={t('filters.min')} style={{ width: '100%' }} min={0} />
                                 </Form.Item>
                                 <span className="text-gray-400 self-center">-</span>
                                 <Form.Item name="maxAmount" noStyle>
-                                  <InputNumber placeholder={t('filters.max')} className="w-full" min={0} />
+                                  <InputNumber placeholder={t('filters.max')} style={{ width: '100%' }} min={0} />
                                 </Form.Item>
                               </div>
                             </Form.Item>
                           </Col>
-                          <Col xs={24} sm={12} lg={6}>
+                          <Col xs={24} sm={12} lg={5}>
                             <Form.Item name="dateRange" label={t('filters.dateRange')}>
                               <RangePicker className="w-full" placeholder={[t('filters.startDate'), t('filters.endDate')]} />
                             </Form.Item>

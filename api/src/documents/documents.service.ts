@@ -31,7 +31,7 @@ export class DocumentsService {
     private documentReadRepository: Repository<DocumentRead>,
     @InjectRepository(DocumentAttachment)
     private documentAttachmentRepository: Repository<DocumentAttachment>,
-  ) {}
+  ) { }
 
   private getFileFormat(extension: string): FileFormat {
     const ext = extension.toLowerCase();
@@ -141,6 +141,7 @@ export class DocumentsService {
       limit = 10,
       excludeRead,
       exactCompanyMatch,
+      documentId,
     } = filterDto;
 
     const userId = user ? user['userId'] || user.id : null;
@@ -170,6 +171,10 @@ export class DocumentsService {
           }),
         );
       }
+    }
+
+    if (documentId) {
+      queryBuilder.andWhere('document.id = :documentId', { documentId });
     }
 
     if (companyName) {
@@ -585,14 +590,27 @@ export class DocumentsService {
       document.fileFormat = this.getFileFormat(newExtension);
     }
 
-    if (updateDocumentDto.companyName)
+    if (updateDocumentDto.companyName !== undefined)
       document.companyName = updateDocumentDto.companyName.toUpperCase();
-    if (updateDocumentDto.documentNumber)
+    if (updateDocumentDto.documentNumber !== undefined)
       document.documentNumber = updateDocumentDto.documentNumber;
-    if (updateDocumentDto.amount) document.amount = updateDocumentDto.amount;
-    if (updateDocumentDto.documentType)
+    if (updateDocumentDto.amount !== undefined)
+      document.amount = updateDocumentDto.amount;
+    if (updateDocumentDto.documentType !== undefined)
       document.documentType = updateDocumentDto.documentType;
-    if (updateDocumentDto.documentDate)
+    if (updateDocumentDto.department !== undefined)
+      document.department = updateDocumentDto.department as any;
+
+    if (updateDocumentDto.allowedPositions !== undefined) {
+      if (typeof updateDocumentDto.allowedPositions === 'string') {
+        const str = updateDocumentDto.allowedPositions as string;
+        document.allowedPositions = str ? str.split(',') : [];
+      } else {
+        document.allowedPositions = updateDocumentDto.allowedPositions;
+      }
+    }
+
+    if (updateDocumentDto.documentDate !== undefined)
       document.documentDate = new Date(updateDocumentDto.documentDate);
 
     document.updatedBy = { id: userId } as User;

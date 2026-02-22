@@ -10,12 +10,14 @@ import {
   FileExcelOutlined,
   FileOutlined,
   MoreOutlined,
-  ShareAltOutlined
+  ShareAltOutlined,
+  EditOutlined
 } from '@ant-design/icons';
 import { useTranslations } from "use-intl";
 import { useAuth } from "../../context/AuthContext";
 import type { Document, FileFormat } from "../types/document.types";
 import { DocumentPreviewModal } from './DocumentPreviewModal';
+import { DocumentEditModal } from './DocumentEditModal';
 
 interface DocumentTableProps {
   data: Document[];
@@ -110,6 +112,8 @@ export const DocumentTable = ({
 
   const [previewDocument, setPreviewDocument] = useState<Document | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [editDocument, setEditDocument] = useState<Document | null>(null);
+  const [isEditOpen, setIsEditOpen] = useState(false);
 
   const handlePreview = (record: Document) => {
     setPreviewDocument(record);
@@ -155,6 +159,13 @@ export const DocumentTable = ({
         />
       ),
     }] : []),
+    {
+      title: 'ID',
+      dataIndex: 'id',
+      key: 'id',
+      width: 70,
+      render: (id) => <span className="text-gray-500 font-mono text-xs">#{id}</span>,
+    },
     {
       title: t('table.file'),
       key: 'file',
@@ -251,6 +262,16 @@ export const DocumentTable = ({
               },
               ...(user?.role === 'admin' ? [
                 {
+                  key: 'edit',
+                  label: "Düzəliş et",
+                  icon: <EditOutlined />,
+                  onClick: (e: any) => {
+                    e.domEvent.stopPropagation();
+                    setEditDocument(record);
+                    setIsEditOpen(true);
+                  },
+                },
+                {
                   type: 'divider',
                 },
                 {
@@ -335,8 +356,11 @@ export const DocumentTable = ({
                       }}
                     />
                   )}
-                  {getFileIcon(record.fileFormat)}
-                  <span className="font-medium text-base text-gray-900 truncate">{record.fileName}</span>
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="text-gray-400 font-mono text-xs shrink-0 self-center">#{record.id}</span>
+                    {getFileIcon(record.fileFormat)}
+                    <span className="font-medium text-base text-gray-900 truncate">{record.fileName}</span>
+                  </div>
                 </div>
                 <Tag color={getDocumentTypeColor(record.documentType)} className="mr-0 rounded-full px-2 text-xs">
                   {t(`types.${record.documentType}`)}
@@ -383,6 +407,16 @@ export const DocumentTable = ({
                           onClick: (info: any) => {
                             info.domEvent.stopPropagation();
                             onShare?.(record.id);
+                          },
+                        },
+                        {
+                          key: 'edit',
+                          label: "Düzəliş et",
+                          icon: <EditOutlined />,
+                          onClick: (info: any) => {
+                            info.domEvent.stopPropagation();
+                            setEditDocument(record);
+                            setIsEditOpen(true);
                           },
                         },
                         ...(user?.role === 'admin' ? [
@@ -450,6 +484,15 @@ export const DocumentTable = ({
         document={previewDocument}
         isOpen={isPreviewOpen}
         onClose={closePreview}
+      />
+
+      <DocumentEditModal
+        document={editDocument}
+        isOpen={isEditOpen}
+        onClose={() => {
+          setIsEditOpen(false);
+          setEditDocument(null);
+        }}
       />
     </>
   );

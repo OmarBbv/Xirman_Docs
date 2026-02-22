@@ -131,9 +131,11 @@ export interface UpdateDocumentDto {
   documentType?: DocumentType;
   department?: Department | string;
   documentDate?: string;
+  allowedPositions?: string[];
 }
 
 export interface FilterDocumentDto {
+  documentId?: number;
   companyName?: string;
   fileName?: string;
   minAmount?: number;

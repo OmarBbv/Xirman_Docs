@@ -7,10 +7,11 @@ interface Props {
   accept?: string;
   onChange?: (files: File[]) => void;
   className?: string;
+  labelClassName?: string;
   multiple?: boolean;
 }
 
-export const FileUpload = ({ label, accept = ".pdf,.doc,.docx,.xls,.xlsx", onChange, className = "", multiple = false }: Props) => {
+export const FileUpload = ({ label, accept = ".pdf,.doc,.docx,.xls,.xlsx", onChange, className = "", labelClassName = "", multiple = false }: Props) => {
   const [files, setFiles] = useState<File[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [previewFile, setPreviewFile] = useState<File | null>(null);
@@ -99,7 +100,7 @@ export const FileUpload = ({ label, accept = ".pdf,.doc,.docx,.xls,.xlsx", onCha
 
   return (
     <div className={`relative ${className}`}>
-      <label className="block text-[14px] font-medium text-[#5f6368] mb-2">
+      <label className={`block text-[14px] font-medium text-[#5f6368] mb-2 ${labelClassName}`}>
         {label}
       </label>
 
