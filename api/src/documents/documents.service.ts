@@ -71,6 +71,7 @@ export class DocumentsService {
 
     const document = this.documentRepository.create({
       ...createDocumentDto,
+      amount: createDocumentDto.amount === '' ? null as any : createDocumentDto.amount,
       companyName: createDocumentDto.companyName?.toUpperCase(),
       fileName,
       filePath: mainFile.path,
@@ -81,6 +82,7 @@ export class DocumentsService {
       uploadedById: userId,
       documentDate: new Date(createDocumentDto.documentDate),
       documentType: createDocumentDto.documentType || DocumentType.OTHER,
+      documentNumber: createDocumentDto.documentNumber === '' ? null as any : createDocumentDto.documentNumber,
     });
 
     const savedDocument = await this.documentRepository.save(document);
@@ -141,7 +143,7 @@ export class DocumentsService {
       limit = 10,
       excludeRead,
       exactCompanyMatch,
-      documentId,
+      documentNumber,
     } = filterDto;
 
     const userId = user ? user['userId'] || user.id : null;
@@ -173,8 +175,10 @@ export class DocumentsService {
       }
     }
 
-    if (documentId) {
-      queryBuilder.andWhere('document.id = :documentId', { documentId });
+    if (documentNumber) {
+      queryBuilder.andWhere('document.documentNumber ILIKE :documentNumber', {
+        documentNumber: `%${documentNumber}%`,
+      });
     }
 
     if (companyName) {
@@ -593,9 +597,9 @@ export class DocumentsService {
     if (updateDocumentDto.companyName !== undefined)
       document.companyName = updateDocumentDto.companyName.toUpperCase();
     if (updateDocumentDto.documentNumber !== undefined)
-      document.documentNumber = updateDocumentDto.documentNumber;
+      document.documentNumber = updateDocumentDto.documentNumber === '' ? null as any : updateDocumentDto.documentNumber;
     if (updateDocumentDto.amount !== undefined)
-      document.amount = updateDocumentDto.amount;
+      document.amount = updateDocumentDto.amount === '' ? null as any : updateDocumentDto.amount;
     if (updateDocumentDto.documentType !== undefined)
       document.documentType = updateDocumentDto.documentType;
     if (updateDocumentDto.department !== undefined)

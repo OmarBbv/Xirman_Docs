@@ -135,7 +135,7 @@ export interface UpdateDocumentDto {
 }
 
 export interface FilterDocumentDto {
-  documentId?: number;
+  documentNumber?: string;
   companyName?: string;
   fileName?: string;
   minAmount?: number;

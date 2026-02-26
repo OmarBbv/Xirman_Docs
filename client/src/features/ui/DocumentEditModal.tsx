@@ -298,7 +298,7 @@ export function DocumentEditModal({ document, isOpen, onClose }: DocumentEditMod
           <Button
             type="button"
             onClick={onClose}
-            className="px-6 py-2 bg-gray-100 text-[#5f6368] hover:bg-gray-200 border-none rounded-lg"
+            className="px-6 py-2 text-[#5f6368] border-none rounded-lg"
           >
             {t('buttons.cancel')}
           </Button>

@@ -10,10 +10,9 @@ import { Type, Transform } from 'class-transformer';
 import { DocumentType, FileFormat, Department } from '../enums/document-enums';
 
 export class FilterDocumentDto {
-  @IsNumber()
+  @IsString()
   @IsOptional()
-  @Type(() => Number)
-  documentId?: number;
+  documentNumber?: string;
 
   @IsString()
   @IsOptional()

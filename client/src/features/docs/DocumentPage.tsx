@@ -124,7 +124,7 @@ export default function DocumentPage() {
     const newFilters: FilterDocumentDto = {
       page: 1,
       limit: filters.limit,
-      documentId: values.documentId,
+      documentNumber: values.documentNumber,
       companyName: values.companyName,
       fileName: values.fileName,
       documentType: currentType as any || values.documentType,
@@ -453,8 +453,8 @@ export default function DocumentPage() {
                       >
                         <Row gutter={[16, 16]}>
                           <Col xs={24} sm={12} lg={4}>
-                            <Form.Item name="documentId" label="ID">
-                              <InputNumber placeholder="ID daxil edin" style={{ width: '100%' }} min={1} />
+                            <Form.Item name="documentNumber" label="Sənəd nömrəsi">
+                              <Input placeholder="Sənəd nömrəsini daxil edin" allowClear />
                             </Form.Item>
                           </Col>
                           <Col xs={24} sm={12} lg={5}>

@@ -183,7 +183,10 @@ export default function DocumentDetailsPage() {
               <h1 className="text-3xl font-bold">{document.companyName}</h1>
             </div>
             <p className="text-blue-100 text-sm ml-12">
-              {t('document.number')} {document.id} • {new Date(document.documentDate).toLocaleDateString(locale === 'az' ? 'az-AZ' : 'ru-RU')}
+              {document.documentNumber && (
+                <span>{t('document.number')} {document.documentNumber} • </span>
+              )}
+              {new Date(document.documentDate).toLocaleDateString(locale === 'az' ? 'az-AZ' : 'ru-RU')}
             </p>
           </div>
           <div className="flex items-center gap-3">
@@ -203,6 +206,13 @@ export default function DocumentDetailsPage() {
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {document.documentNumber && (
+                <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                  <p className="text-sm text-gray-500 mb-1">{t('document.number')}</p>
+                  <p className="font-semibold text-gray-900">{document.documentNumber}</p>
+                </div>
+              )}
+
               <div className="bg-gray-50 p-4 rounded-lg border border-gray-100">
                 <p className="text-sm text-gray-500 mb-1">{t('document.uploadDate')}</p>
                 <p className="font-semibold text-gray-900">
