@@ -148,6 +148,7 @@
     },
     "table": {
       "file": "Fayl",
+      "documentNumber": "Sənəd Nömrəsi",
       "company": "Şirkət",
       "type": "Növ",
       "amount": "Məbləğ",

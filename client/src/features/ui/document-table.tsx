@@ -177,6 +177,12 @@ export const DocumentTable = ({
       ),
     },
     {
+      title: t('table.documentNumber'),
+      dataIndex: 'documentNumber',
+      key: 'documentNumber',
+      render: (text) => text ? <span className="text-gray-700 font-medium">{text}</span> : '-',
+    },
+    {
       title: t('table.company'),
       dataIndex: 'companyName',
       key: 'companyName',
@@ -368,6 +374,10 @@ export const DocumentTable = ({
               </div>
 
               <div className="space-y-2 text-sm text-gray-600 mb-3">
+                <div className="flex justify-between">
+                  <span className="text-gray-500">{t('table.documentNumber')}:</span>
+                  <span className="font-medium text-gray-800">{record.documentNumber || '-'}</span>
+                </div>
                 <div className="flex justify-between">
                   <span className="text-gray-500">{t('table.company')}:</span>
                   <span className="font-medium text-gray-800">{record.companyName}</span>
