@@ -205,7 +205,8 @@
       "waybill_requisition": "Qaimə-tələbnamə",
       "financial_reports": "Maliyyə hesabatları",
       "incoming_letter": "Məktublar (daxil olan)",
-      "outgoing_letter": "Məktublar (xaric olan)"
+      "outgoing_letter": "Məktublar (xaric olan)",
+      "employee_personal_file": "İşçinin Şəxsi işi"
     },
     "departments": {
       "mill": "Dəyirman",

@@ -120,6 +120,7 @@ export default function NewDocsPage() {
     { value: 'financial_reports', label: t('types.financial_reports') },
     { value: 'incoming_letter', label: t('types.incoming_letter') },
     { value: 'outgoing_letter', label: t('types.outgoing_letter') },
+    { value: 'employee_personal_file', label: t('types.employee_personal_file') },
   ];
 
   const positionOptions = [

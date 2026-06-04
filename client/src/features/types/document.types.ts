@@ -28,6 +28,7 @@ export const DocumentType = {
   FINANCIAL_REPORTS: 'financial_reports',
   INCOMING_LETTER: 'incoming_letter',
   OUTGOING_LETTER: 'outgoing_letter',
+  EMPLOYEE_PERSONAL_FILE: 'employee_personal_file',
   OTHER: 'other',
 } as const;
 
