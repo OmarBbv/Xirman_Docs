@@ -14,7 +14,6 @@ import {
   Req,
   ParseIntPipe,
   Res,
-  ForbiddenException,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import type { Response } from 'express';
@@ -24,14 +23,19 @@ import * as fs from 'fs';
 import { DocumentsService } from './documents.service';
 import { CreateDocumentDto, UpdateDocumentDto, FilterDocumentDto } from './dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { PermissionsGuard } from '../auth/guards/permissions.guard';
+import { Permissions } from '../auth/decorators/permissions.decorator';
+import { PERMISSIONS } from '../roles/permissions';
 import { documentUploadOptions } from './config/file-upload.config';
 import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('documents')
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
+@Permissions(PERMISSIONS.DOCUMENTS_VIEW)
 export class DocumentsController {
   constructor(private readonly documentsService: DocumentsService) {}
 
+  @Permissions(PERMISSIONS.DOCUMENTS_CREATE)
   @Post('upload')
   @UseInterceptors(FilesInterceptor('files', 10, documentUploadOptions))
   async create(
@@ -99,6 +103,7 @@ export class DocumentsController {
     );
   }
 
+  @Permissions(PERMISSIONS.DOCUMENTS_DOWNLOAD)
   @Get('attachments/:id/download')
   async downloadAttachment(
     @Param('id', ParseIntPipe) id: number,
@@ -109,6 +114,7 @@ export class DocumentsController {
     res.download(filePath, fileName);
   }
 
+  @Permissions(PERMISSIONS.DOCUMENTS_UPDATE)
   @Patch('attachments/:id')
   @UseInterceptors(FileInterceptor('file', documentUploadOptions))
   async updateAttachment(
@@ -119,6 +125,7 @@ export class DocumentsController {
     return this.documentsService.updateAttachment(id, file, req.user);
   }
 
+  @Permissions(PERMISSIONS.DOCUMENTS_UPDATE)
   @Post(':id/attachments')
   @UseInterceptors(FileInterceptor('file', documentUploadOptions))
   async addAttachment(
@@ -132,6 +139,7 @@ export class DocumentsController {
   @Get(':id')
   async findOne(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
     const document = await this.documentsService.findOne(id);
+    this.documentsService.assertRoleScope(document, req.user);
     this.documentsService
       .recordView(id, req.user)
       .catch((err) => console.error('View record error:', err));
@@ -192,6 +200,7 @@ export class DocumentsController {
     return this.documentsService.getViewHistory(id, search);
   }
 
+  @Permissions(PERMISSIONS.DOCUMENTS_UPDATE)
   @Patch(':id')
   @UseInterceptors(FileInterceptor('file', documentUploadOptions))
   async update(
@@ -208,6 +217,7 @@ export class DocumentsController {
     return this.documentsService.getVersions(id);
   }
 
+  @Permissions(PERMISSIONS.DOCUMENTS_DOWNLOAD)
   @Get('versions/:id/download')
   async downloadVersion(
     @Param('id', ParseIntPipe) id: number,
@@ -226,13 +236,11 @@ export class DocumentsController {
     });
   }
 
+  @Permissions(PERMISSIONS.DOCUMENTS_DELETE)
   @Delete(':id')
   async remove(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
-    if (req.user.role !== 'admin') {
-      throw new ForbiddenException(
-        'Bu əməliyyatı yerinə yetirmək üçün icazəniz yoxdur',
-      );
-    }
+    const document = await this.documentsService.findOne(id);
+    this.documentsService.assertRoleScope(document, req.user);
     return this.documentsService.remove(id);
   }
 
@@ -246,6 +254,7 @@ export class DocumentsController {
     return this.documentsService.getPublicShareLink(id);
   }
 
+  @Permissions(PERMISSIONS.DOCUMENTS_DOWNLOAD)
   @Post('bulk-download')
   async bulkDownload(@Body('ids') ids: number[], @Res() res: Response) {
     const { zipPath, zipFileName } =

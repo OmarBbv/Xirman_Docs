@@ -2,15 +2,17 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Brackets } from 'typeorm';
+import { Repository, Brackets, SelectQueryBuilder } from 'typeorm';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as archiver from 'archiver';
 
 import { Document } from './entities/document.entity';
-import { DocumentType, FileFormat } from './enums/document-enums';
+import { DocumentType, FileFormat, Department } from './enums/document-enums';
+import { SYSTEM_ROLES } from '../roles/permissions';
 import { DocumentView } from './entities/document-view.entity';
 import { DocumentVersion } from './entities/document-version.entity';
 import { DocumentRead } from './entities/document-read.entity';
@@ -32,6 +34,58 @@ export class DocumentsService {
     @InjectRepository(DocumentAttachment)
     private documentAttachmentRepository: Repository<DocumentAttachment>,
   ) { }
+
+  /**
+   * İstifadəçinin rolunda təyin edilmiş şöbə / sənəd növü məhdudiyyətlərini
+   * sorğuya tətbiq edir. Siyahı boşdursa məhdudiyyət yoxdur.
+   */
+  private applyRoleScope(
+    qb: SelectQueryBuilder<Document>,
+    user?: any,
+  ): void {
+    if (!user || user.role === SYSTEM_ROLES.ADMIN) {
+      return;
+    }
+
+    const departments: string[] = user.allowedDepartments ?? [];
+    if (departments.length > 0) {
+      // Şöbəsi boş olan sənədlər interfeysdə "other_service" kimi göstərilir.
+      const includeNull = departments.includes(Department.OTHER_SERVICE);
+      qb.andWhere(
+        `(document.department IN (:...scopedDepartments)${
+          includeNull ? ' OR document.department IS NULL' : ''
+        })`,
+        { scopedDepartments: departments },
+      );
+    }
+
+    const types: string[] = user.allowedDocumentTypes ?? [];
+    if (types.length > 0) {
+      qb.andWhere('document.documentType IN (:...scopedTypes)', {
+        scopedTypes: types,
+      });
+    }
+  }
+
+  /** Tək sənəd üçün rol əhatəsini yoxlayır (siyahı sorğularının qarşılığı). */
+  assertRoleScope(document: Document, user?: any): void {
+    if (!user || user.role === SYSTEM_ROLES.ADMIN) {
+      return;
+    }
+
+    const departments: string[] = user.allowedDepartments ?? [];
+    if (
+      departments.length > 0 &&
+      !departments.includes(document.department ?? Department.OTHER_SERVICE)
+    ) {
+      throw new ForbiddenException('Bu sənədə baxmaq icazəniz yoxdur');
+    }
+
+    const types: string[] = user.allowedDocumentTypes ?? [];
+    if (types.length > 0 && !types.includes(document.documentType)) {
+      throw new ForbiddenException('Bu sənədə baxmaq icazəniz yoxdur');
+    }
+  }
 
   private getFileFormat(extension: string): FileFormat {
     const ext = extension.toLowerCase();
@@ -174,6 +228,7 @@ export class DocumentsService {
         );
       }
     }
+    this.applyRoleScope(queryBuilder, user);
 
     if (documentNumber) {
       queryBuilder.andWhere('document.documentNumber ILIKE :documentNumber', {
@@ -288,6 +343,7 @@ export class DocumentsService {
           );
         }
       }
+      this.applyRoleScope(qb, user);
 
       return qb;
     };
@@ -358,6 +414,7 @@ export class DocumentsService {
         );
       }
     }
+    this.applyRoleScope(qb, user);
 
     const results = await qb
       .groupBy('year')
@@ -391,6 +448,7 @@ export class DocumentsService {
         );
       }
     }
+    this.applyRoleScope(qb, user);
 
     const results = await qb
       .groupBy('document.companyName')
@@ -424,6 +482,7 @@ export class DocumentsService {
         );
       }
     }
+    this.applyRoleScope(qb, user);
 
     const results = await qb
       .groupBy('document.department')
@@ -469,6 +528,7 @@ export class DocumentsService {
         );
       }
     }
+    this.applyRoleScope(qb, user);
 
     const results = await qb
       .groupBy('document.documentType')

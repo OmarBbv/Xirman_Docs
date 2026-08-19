@@ -13,7 +13,8 @@
     "menu": "Меню",
     "newDocsToday": "Новые документы (Сегодня)",
     "viewAll": "Посмотреть все",
-    "noNotifications": "Нет новых уведомлений"
+    "noNotifications": "Нет новых уведомлений",
+    "roles": "Роли"
   },
   "NotificationsPage": {
     "title": "Уведомления",
@@ -205,7 +206,8 @@
       "financial_reports": "Финансовые отчеты",
       "incoming_letter": "Входящие письма",
       "outgoing_letter": "Исходящие письма",
-      "employee_personal_file": "Личное дело работника"
+      "employee_personal_file": "Личное дело работника",
+      "other": "Другое"
     },
     "departments": {
       "mill": "Мельница",
@@ -452,5 +454,75 @@
     "backShort": "Назад",
     "info": "Мы отправим вам ссылку/код для сброса пароля.",
     "passwordMismatch": "Пароли не совпадают"
+  },
+  "RolesPage": {
+    "title": "Роли и права",
+    "subtitle": "Создайте роль и укажите, какие разделы и документы она может просматривать",
+    "newRole": "Новая роль",
+    "empty": "Роли не найдены",
+    "systemRoleHint": "Системная роль — удалить нельзя",
+    "scopeHint": "Если отделы и типы документов не выбраны, роль видит все отделы и все типы документов.",
+    "columns": {
+      "role": "Роль",
+      "permissions": "Права",
+      "departments": "Отделы",
+      "documentTypes": "Типы документов",
+      "users": "Пользователи",
+      "actions": "Действия"
+    },
+    "actions": {
+      "edit": "Редактировать",
+      "delete": "Удалить"
+    },
+    "delete": {
+      "title": "Удалить роль",
+      "confirm": "Вы уверены, что хотите удалить роль \"{name}\"?",
+      "yes": "Да",
+      "no": "Нет"
+    },
+    "scope": {
+      "all": "Все",
+      "none": "Нет"
+    },
+    "groups": {
+      "dashboard": "Главная",
+      "documents": "Документы",
+      "general": "Общее",
+      "users": "Пользователи",
+      "roles": "Роли"
+    },
+    "permissions": {
+      "dashboard_view": "Просмотр главной",
+      "documents_view": "Просмотр документов",
+      "documents_view_all": "Просмотр всех документов",
+      "documents_create": "Добавление документа",
+      "documents_update": "Редактирование документа",
+      "documents_delete": "Удаление документа",
+      "documents_download": "Скачивание документа",
+      "notifications_view": "Просмотр уведомлений",
+      "settings_view": "Просмотр настроек",
+      "users_view": "Просмотр пользователей",
+      "users_manage": "Управление пользователями",
+      "roles_view": "Просмотр ролей",
+      "roles_manage": "Управление ролями"
+    },
+    "form": {
+      "displayName": "Название роли",
+      "displayNamePlaceholder": "Например: Кладовщик",
+      "key": "Ключ (системное имя)",
+      "keyHint": "Только строчные буквы, цифры и подчёркивание. После создания не меняется.",
+      "keyPattern": "Используйте только строчные буквы, цифры и подчёркивание",
+      "description": "Описание",
+      "descriptionPlaceholder": "Для чего эта роль?",
+      "permissions": "Права",
+      "permissionsRequired": "Выберите хотя бы одно право",
+      "departments": "Доступные отделы",
+      "documentTypes": "Доступные типы документов",
+      "emptyMeansAll": "Пусто — все",
+      "required": "Обязательное поле",
+      "cancel": "Отмена",
+      "create": "Создать",
+      "save": "Сохранить"
+    }
   }
 }

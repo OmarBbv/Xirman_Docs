@@ -1,6 +1,7 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { JwtService } from '@nestjs/jwt';
+import { RolesService } from '../roles/roles.service';
 import * as bcrypt from 'bcrypt';
 import { User } from '../users/entities/user.entity';
 
@@ -9,6 +10,7 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private rolesService: RolesService,
   ) {}
 
   async validateUser(email: string, pass: string): Promise<any> {
@@ -32,6 +34,9 @@ export class AuthService {
       role: user.role,
       position: user.position,
     };
+
+    const role = await this.rolesService.findByName(user.role);
+
     return {
       access_token: this.jwtService.sign(payload),
       user: {
@@ -41,6 +46,10 @@ export class AuthService {
         email: user.email,
         position: user.position,
         role: user.role,
+        roleDisplayName: role?.displayName ?? user.role,
+        permissions: role?.permissions ?? [],
+        allowedDepartments: role?.allowedDepartments ?? [],
+        allowedDocumentTypes: role?.allowedDocumentTypes ?? [],
       },
     };
   }

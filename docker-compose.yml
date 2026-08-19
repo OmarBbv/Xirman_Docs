@@ -1,0 +1,41 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: xirman_docs_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DB_DATABASE:-xirman_docs}
+      POSTGRES_USER: ${DB_USERNAME:-xirman}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-xirman}
+      TZ: Asia/Baku
+      PGTZ: Asia/Baku
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - xirman_docs_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-xirman} -d ${DB_DATABASE:-xirman_docs}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: xirman_docs_redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - xirman_docs_redisdata:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  xirman_docs_pgdata:
+    name: xirman_docs_pgdata
+  xirman_docs_redisdata:
+    name: xirman_docs_redisdata

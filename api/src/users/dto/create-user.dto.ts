@@ -2,6 +2,7 @@ import {
   IsEmail,
   IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
   MinLength,
 } from 'class-validator';
@@ -28,4 +29,9 @@ export class CreateUserDto {
   @IsString()
   @MinLength(6)
   password: string;
+
+  /** Rol açarı (roles cədvəlindəki "name"). Boş qalarsa "user" təyin olunur. */
+  @IsOptional()
+  @IsString()
+  role?: string;
 }

@@ -5,6 +5,7 @@ import { useTranslations } from "use-intl";
 
 import type { ColumnsType } from 'antd/es/table';
 import { useUsers, useDeleteUser, useCreateUser, useUpdateUser } from "../hooks/userHooks";
+import { useRoles } from "../hooks/roleHooks";
 import type { User } from "../services/userService";
 import {
   UserOutlined,
@@ -42,6 +43,16 @@ export default function UserPage() {
   }, [searchText]);
 
   const { data: users, isLoading } = useUsers(debouncedSearchText, roleFilter);
+  const { data: roles } = useRoles();
+
+  // Rollar artıq bazadan gəlir — admin yeni rol yaradanda burada avtomatik görünür.
+  const roleOptions = (roles ?? []).map((role) => ({
+    value: role.name,
+    label: role.displayName,
+  }));
+  const roleLabel = (name: string) =>
+    roles?.find((role) => role.name === name)?.displayName ?? name;
+  const roleColor = (name: string) => (name === 'admin' ? 'purple' : name === 'user' ? 'green' : 'blue');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [showPassword, setShowPassword] = useState(false);
@@ -115,18 +126,11 @@ export default function UserPage() {
       title: t("columns.role"),
       dataIndex: 'role',
       key: 'role',
-      render: (role) => {
-        let color = 'default';
-        if (role === 'admin') color = 'purple';
-        if (role === 'editor') color = 'blue';
-        if (role === 'user') color = 'green';
-
-        return (
-          <Tag color={color} className="capitalize rounded-full px-2.5">
-            {t(`roles.${role}`)}
-          </Tag>
-        );
-      },
+      render: (role) => (
+        <Tag color={roleColor(role)} className="rounded-full px-2.5">
+          {roleLabel(role)}
+        </Tag>
+      ),
     },
     {
       title: t("columns.status"),
@@ -253,11 +257,7 @@ export default function UserPage() {
               className="w-full md:w-40 h-10"
               value={roleFilter}
               onChange={setRoleFilter}
-              options={[
-                { value: 'admin', label: t("roles.admin") },
-                { value: 'user', label: t("roles.user") },
-                { value: 'editor', label: t("roles.editor") },
-              ]}
+              options={roleOptions}
             />
             {(searchText || roleFilter) && (
               <Button
@@ -295,11 +295,6 @@ export default function UserPage() {
             <div className="md:hidden flex flex-col gap-3">
               {(users?.length || 0) > 0 ? (
                 users?.map((user) => {
-                  let roleColor = 'default';
-                  if (user.role === 'admin') roleColor = 'purple';
-                  if (user.role === 'editor') roleColor = 'blue';
-                  if (user.role === 'user') roleColor = 'green';
-
                   return (
                     <Card key={user.id} className="shadow-none border border-gray-200" styles={{ body: { padding: '16px' } }}>
                       <div className="flex justify-between items-start mb-3">
@@ -307,8 +302,8 @@ export default function UserPage() {
                           <Avatar style={{ backgroundColor: '#2271b1' }} icon={<UserOutlined />} />
                           <div>
                             <div className="font-medium text-gray-900">{user.firstName} {user.lastName}</div>
-                            <Tag color={roleColor} className="capitalize rounded-full px-2 text-xs m-0">
-                              {t(`roles.${user.role}`)}
+                            <Tag color={roleColor(user.role)} className="rounded-full px-2 text-xs m-0">
+                              {roleLabel(user.role)}
                             </Tag>
                           </div>
                         </div>
@@ -444,12 +439,9 @@ export default function UserPage() {
               initialValue="user"
             >
               <Select
+                options={roleOptions}
                 className="h-[55px] [&_.ant-select-selector]:h-full! [&_.ant-select-selector]:flex! [&_.ant-select-selector]:items-center!"
-              >
-                <Select.Option value="admin">{t("roles.admin")}</Select.Option>
-                <Select.Option value="editor">{t("roles.editor")}</Select.Option>
-                <Select.Option value="user">{t("roles.user")}</Select.Option>
-              </Select>
+              />
             </Form.Item>
 
             <Form.Item

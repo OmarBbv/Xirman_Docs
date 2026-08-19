@@ -11,6 +11,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { User, UserPosition } from './entities/user.entity';
 
 import { MailService } from '../mail/mail.service';
+import { RolesService } from '../roles/roles.service';
+import { SYSTEM_ROLES } from '../roles/permissions';
 
 @Injectable()
 export class UsersService {
@@ -18,18 +20,33 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     private mailService: MailService,
+    private rolesService: RolesService,
   ) {}
+
+  /** Verilmiş rol açarının roles cədvəlində mövcud olduğunu yoxlayır. */
+  private async resolveRole(role?: string): Promise<string> {
+    if (!role) {
+      return SYSTEM_ROLES.USER;
+    }
+    const found = await this.rolesService.findByName(role);
+    if (!found) {
+      throw new BadRequestException(`"${role}" adlı rol tapılmadı`);
+    }
+    return found.name;
+  }
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     try {
-      const { password, ...rest } = createUserDto;
+      const { password, role, ...rest } = createUserDto;
       const salt = await bcrypt.genSalt();
       const hashedPassword = await bcrypt.hash(password, salt);
 
       const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
 
+      // Açıq qeydiyyatda rol seçilə bilməz — həmişə standart istifadəçi.
       const user = this.usersRepository.create({
         ...rest,
+        role: SYSTEM_ROLES.USER,
         password: hashedPassword,
         otpCode: otpCode,
         isVerified: false,
@@ -52,12 +69,13 @@ export class UsersService {
 
   async createByAdmin(createUserDto: CreateUserDto): Promise<User> {
     try {
-      const { password, ...rest } = createUserDto;
+      const { password, role, ...rest } = createUserDto;
       const salt = await bcrypt.genSalt();
       const hashedPassword = await bcrypt.hash(password, salt);
 
       const user = this.usersRepository.create({
         ...rest,
+        role: await this.resolveRole(role),
         password: hashedPassword,
         isVerified: true,
         otpCode: null,
@@ -175,6 +193,9 @@ export class UsersService {
       const salt = await bcrypt.genSalt();
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, salt);
     }
+    if (updateUserDto.role) {
+      updateUserDto.role = await this.resolveRole(updateUserDto.role);
+    }
     return this.usersRepository.update(id, updateUserDto);
   }
 
@@ -196,7 +217,7 @@ export class UsersService {
         email: adminEmail,
         password: hashedPassword,
         position: UserPosition.DIRECTOR,
-        role: 'admin',
+        role: SYSTEM_ROLES.ADMIN,
         isVerified: true,
       });
 

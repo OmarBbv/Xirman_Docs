@@ -3,21 +3,37 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 interface ProtectedRoleProps {
-  allowedRoles: string[];
+  /** Köhnə üsul — rol adına görə. Mümkün olduqda `permissions` istifadə edin. */
+  allowedRoles?: string[];
+  /** Sadalananlardan ən azı biri kifayətdir. */
+  permissions?: string[];
   children?: ReactNode;
 }
 
-export const ProtectedRole = ({ allowedRoles, children }: ProtectedRoleProps) => {
-  const { user, isAuthenticated } = useAuth();
+export const ProtectedRole = ({
+  allowedRoles = [],
+  permissions = [],
+  children,
+}: ProtectedRoleProps) => {
+  const { user, isAuthenticated, hasPermission } = useAuth();
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  const hasAccess = allowedRoles.length === 0 || (user && allowedRoles.includes(user.role));
+  const roleOk = allowedRoles.length === 0 || (user && allowedRoles.includes(user.role));
+  const permissionOk = permissions.length === 0 || hasPermission(...permissions);
 
-  if (!hasAccess) {
-    return <Navigate to="/dashboard/docs" replace />;
+  if (!roleOk || !permissionOk) {
+    // İstifadəçinin icazəsi olan ilk səhifəyə yönləndiririk ki,
+    // sonsuz yönləndirmə dövrü yaranmasın.
+    const fallback = hasPermission("documents.view")
+      ? "/dashboard/docs"
+      : hasPermission("dashboard.view")
+        ? "/dashboard"
+        : "/dashboard/settings";
+
+    return <Navigate to={fallback} replace />;
   }
 
   return children ? <>{children}</> : <Outlet />;

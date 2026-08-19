@@ -13,7 +13,8 @@
     "menu": "Menyu",
     "newDocsToday": "Yeni Sənədlər (Bu gün)",
     "viewAll": "Hamısına bax",
-    "noNotifications": "Yeni bildiriş yoxdur"
+    "noNotifications": "Yeni bildiriş yoxdur",
+    "roles": "Rollar"
   },
   "NotificationsPage": {
     "title": "Bildirişlər",
@@ -206,7 +207,8 @@
       "financial_reports": "Maliyyə hesabatları",
       "incoming_letter": "Məktublar (daxil olan)",
       "outgoing_letter": "Məktublar (xaric olan)",
-      "employee_personal_file": "İşçinin Şəxsi işi"
+      "employee_personal_file": "İşçinin Şəxsi işi",
+      "other": "Digər"
     },
     "departments": {
       "mill": "Dəyirman",
@@ -453,5 +455,75 @@
     "backShort": "Geri",
     "info": "Biz sizə şifrəni yeniləmək üçün link/kod göndərəcəyik.",
     "passwordMismatch": "Şifrələr eyni deyil"
+  },
+  "RolesPage": {
+    "title": "Rol və İcazələr",
+    "subtitle": "Rol yaradın və hər rolun hansı bölmələrə və sənədlərə baxa biləcəyini təyin edin",
+    "newRole": "Yeni Rol",
+    "empty": "Rol tapılmadı",
+    "systemRoleHint": "Sistem rolu — silinə bilməz",
+    "scopeHint": "Şöbə və sənəd növü boş saxlanılarsa, rol bütün şöbələrə və bütün sənəd növlərinə baxa bilər.",
+    "columns": {
+      "role": "Rol",
+      "permissions": "İcazələr",
+      "departments": "Şöbələr",
+      "documentTypes": "Sənəd növləri",
+      "users": "İstifadəçi",
+      "actions": "Əməliyyatlar"
+    },
+    "actions": {
+      "edit": "Düzəliş et",
+      "delete": "Sil"
+    },
+    "delete": {
+      "title": "Rolu sil",
+      "confirm": "\"{name}\" rolunu silmək istədiyinizə əminsiniz?",
+      "yes": "Bəli",
+      "no": "Xeyr"
+    },
+    "scope": {
+      "all": "Hamısı",
+      "none": "Yoxdur"
+    },
+    "groups": {
+      "dashboard": "Ana səhifə",
+      "documents": "Sənədlər",
+      "general": "Ümumi",
+      "users": "İstifadəçilər",
+      "roles": "Rollar"
+    },
+    "permissions": {
+      "dashboard_view": "Ana səhifəyə bax",
+      "documents_view": "Sənədlərə bax",
+      "documents_view_all": "Bütün sənədlərə bax",
+      "documents_create": "Sənəd əlavə et",
+      "documents_update": "Sənədi redaktə et",
+      "documents_delete": "Sənədi sil",
+      "documents_download": "Sənədi yüklə",
+      "notifications_view": "Bildirişlərə bax",
+      "settings_view": "Parametrlərə bax",
+      "users_view": "İstifadəçilərə bax",
+      "users_manage": "İstifadəçiləri idarə et",
+      "roles_view": "Rollara bax",
+      "roles_manage": "Rolları idarə et"
+    },
+    "form": {
+      "displayName": "Rolun adı",
+      "displayNamePlaceholder": "Məsələn: Anbardar",
+      "key": "Açar (sistem adı)",
+      "keyHint": "Yalnız kiçik hərf, rəqəm və alt xətt. Yaradıldıqdan sonra dəyişdirilmir.",
+      "keyPattern": "Yalnız kiçik hərf, rəqəm və alt xətt istifadə edin",
+      "description": "Qeyd",
+      "descriptionPlaceholder": "Bu rol nə üçündür?",
+      "permissions": "İcazələr",
+      "permissionsRequired": "Ən azı bir icazə seçin",
+      "departments": "Baxa biləcəyi şöbələr",
+      "documentTypes": "Baxa biləcəyi sənəd növləri",
+      "emptyMeansAll": "Boş saxlansa — hamısı",
+      "required": "Bu sahə mütləqdir",
+      "cancel": "Ləğv et",
+      "create": "Yarat",
+      "save": "Yadda saxla"
+    }
   }
 }

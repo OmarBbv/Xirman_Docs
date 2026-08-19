@@ -1,6 +1,15 @@
-import { Controller, Post, Body, UseGuards, Request } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Body,
+  UseGuards,
+  Request,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LocalAuthGuard } from './guards/local-auth.guard';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { RolesService } from '../roles/roles.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { UsersService } from '../users/users.service';
 import { LoginDto } from './dto/login.dto';
@@ -10,7 +19,29 @@ export class AuthController {
   constructor(
     private authService: AuthService,
     private usersService: UsersService,
+    private rolesService: RolesService,
   ) {}
+
+  /** Cari istifadəçi və onun aktual icazələri (rol dəyişdikdə yenilənir). */
+  @UseGuards(JwtAuthGuard)
+  @Get('me')
+  async me(@Request() req) {
+    const user = await this.usersService.findOne(req.user.userId);
+    const role = user ? await this.rolesService.findByName(user.role) : null;
+
+    return {
+      id: user?.id,
+      firstName: user?.firstName,
+      lastName: user?.lastName,
+      email: user?.email,
+      position: user?.position,
+      role: user?.role,
+      roleDisplayName: role?.displayName ?? user?.role,
+      permissions: role?.permissions ?? [],
+      allowedDepartments: role?.allowedDepartments ?? [],
+      allowedDocumentTypes: role?.allowedDocumentTypes ?? [],
+    };
+  }
 
   @UseGuards(LocalAuthGuard)
   @Post('login')

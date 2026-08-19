@@ -8,7 +8,6 @@ interface Props {
     name: string;
     path: string;
     icon: React.ReactNode;
-    allowedRoles: string[];
   }[];
   mobile?: boolean;
   onClose?: () => void;

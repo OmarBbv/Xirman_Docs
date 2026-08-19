@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { queryClient } from "../features/utils/queryClient";
+import { PRIVATE_API } from "../features/utils/apiConfig";
 
 interface User {
   id: number;
@@ -8,6 +9,10 @@ interface User {
   email: string;
   position: string;
   role: string;
+  roleDisplayName?: string;
+  permissions?: string[];
+  allowedDepartments?: string[];
+  allowedDocumentTypes?: string[];
 }
 
 interface AuthContextType {
@@ -16,6 +21,9 @@ interface AuthContextType {
   login: (userData: User, token: string) => void;
   logout: () => void;
   isLoading: boolean;
+  /** Rolun icazələrini yoxlayır. Admin həmişə icazəlidir. */
+  hasPermission: (...permissions: string[]) => boolean;
+  refreshUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -23,6 +31,18 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+
+  /** İcazələr rol dəyişdikdə köhnəlməsin deyə serverdən yenidən oxunur. */
+  const refreshUser = useCallback(async () => {
+    if (!localStorage.getItem("token")) return;
+    try {
+      const { data } = await PRIVATE_API.get("/auth/me");
+      localStorage.setItem("user", JSON.stringify(data));
+      setUser(data);
+    } catch (error) {
+      console.error("User refresh error:", error);
+    }
+  }, []);
 
   useEffect(() => {
     const storedUser = localStorage.getItem("user");
@@ -36,9 +56,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         localStorage.removeItem("user");
         localStorage.removeItem("token");
       }
+      void refreshUser();
     }
     setIsLoading(false);
-  }, []);
+  }, [refreshUser]);
 
   const login = (userData: User, token: string) => {
     localStorage.setItem("token", token);
@@ -55,6 +76,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUser(null);
   };
 
+  const hasPermission = useCallback(
+    (...permissions: string[]) => {
+      if (!user) return false;
+      if (user.role === "admin") return true;
+      if (permissions.length === 0) return true;
+      const granted = user.permissions ?? [];
+      return permissions.some((permission) => granted.includes(permission));
+    },
+    [user]
+  );
+
   return (
     <AuthContext.Provider
       value={{
@@ -63,6 +95,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         logout,
         isLoading,
+        hasPermission,
+        refreshUser,
       }}
     >
       {children}

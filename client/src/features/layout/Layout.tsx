@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Outlet, useNavigate, Link, useLocation, Navigate } from "react-router-dom";
 import { useTranslations } from "use-intl";
 import { HomeIcon, PostsIcon, UsersIcon, SettingsIcon } from "../ui/Icons";
+import { SafetyCertificateOutlined } from "@ant-design/icons";
 import { useLanguage } from "../../context/LanguageContext";
 import { Sidebar } from "./Sidebar";
 import { useAuth } from "../../context/AuthContext";
@@ -15,7 +16,7 @@ export default function Layout() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const t = useTranslations('Layout');
   const { locale, setLocale } = useLanguage();
-  const { user, logout, isAuthenticated, isLoading } = useAuth();
+  const { user, logout, isAuthenticated, isLoading, hasPermission } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const queryClient = useQueryClient();
@@ -116,22 +117,23 @@ export default function Layout() {
     </div>
   );
 
+  // Menyu bəndləri rolun icazələrinə görə süzülür.
   const menuItems = [
     {
       name: t('dashboard'),
       path: "/dashboard",
       icon: <HomeIcon />,
-      allowedRoles: ['admin']
+      permissions: ['dashboard.view'],
     },
-    { name: t('docs'), path: "/dashboard/docs", icon: <PostsIcon />, allowedRoles: [] },
-    { name: t('users'), path: "/dashboard/users", icon: <UsersIcon />, allowedRoles: ['admin'] },
-    { name: t('settings'), path: "/dashboard/settings", icon: <SettingsIcon />, allowedRoles: [] },
+    { name: t('docs'), path: "/dashboard/docs", icon: <PostsIcon />, permissions: ['documents.view'] },
+    { name: t('users'), path: "/dashboard/users", icon: <UsersIcon />, permissions: ['users.view', 'users.manage'] },
+    { name: t('roles'), path: "/dashboard/roles", icon: <SafetyCertificateOutlined className="text-[16px]" />, permissions: ['roles.view', 'roles.manage'] },
+    { name: t('settings'), path: "/dashboard/settings", icon: <SettingsIcon />, permissions: [] },
   ];
 
-  const filteredMenuItems = menuItems.filter(item => {
-    if (item.allowedRoles.length === 0) return true;
-    return user && item.allowedRoles.includes(user.role);
-  });
+  const filteredMenuItems = menuItems.filter(item =>
+    item.permissions.length === 0 || hasPermission(...item.permissions)
+  );
 
   return (
     <div className="flex h-screen bg-[#f0f0f1] font-sans text-[#1d2327] overflow-hidden">

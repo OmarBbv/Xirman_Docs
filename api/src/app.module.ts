@@ -6,6 +6,7 @@ import { AllExceptionsFilter } from './common/filters/http-exception.filter';
 import { ConfigModule } from '@nestjs/config';
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './users/users.module';
+import { RolesModule } from './roles/roles.module';
 import { AuthModule } from './auth/auth.module';
 import { MailModule } from './mail/mail.module';
 import { DocumentsModule } from './documents/documents.module';
@@ -16,6 +17,7 @@ import { DocumentsModule } from './documents/documents.module';
     SentryModule.forRoot(),
     DatabaseModule,
     MailModule,
+    RolesModule,
     UsersModule,
     AuthModule,
     DocumentsModule,

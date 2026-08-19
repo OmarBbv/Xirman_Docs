@@ -11,6 +11,7 @@ import SettingsPage from "../features/settings/SettingsPage";
 import { ProtectedRole } from "../features/utils/ProtectedRole";
 import NewDocsPage from "../features/new-docs/NewDocsPage";
 import NotificationsPage from "../features/notifications/NotificationsPage";
+import RolesPage from "../features/roles/RolesPage";
 
 export const router = createBrowserRouter([
   {
@@ -33,36 +34,64 @@ export const router = createBrowserRouter([
       {
         index: true,
         element: (
-          <ProtectedRole allowedRoles={['admin']}>
+          <ProtectedRole permissions={['dashboard.view']}>
             <HomePage />
           </ProtectedRole>
         ),
       },
       {
         path: "docs",
-        element: <DocumentPage />,
+        element: (
+          <ProtectedRole permissions={['documents.view']}>
+            <DocumentPage />
+          </ProtectedRole>
+        ),
       },
       {
         path: "docs/year/:year",
-        element: <DocumentPage />,
+        element: (
+          <ProtectedRole permissions={['documents.view']}>
+            <DocumentPage />
+          </ProtectedRole>
+        ),
       },
       {
         path: "docs/year/:year/department/:department",
-        element: <DocumentPage />,
+        element: (
+          <ProtectedRole permissions={['documents.view']}>
+            <DocumentPage />
+          </ProtectedRole>
+        ),
       },
       {
         path: "docs/year/:year/department/:department/type/:type",
-        element: <DocumentPage />,
+        element: (
+          <ProtectedRole permissions={['documents.view']}>
+            <DocumentPage />
+          </ProtectedRole>
+        ),
       },
       {
         path: "docs/:id",
-        element: <DocumentDetailsPage />,
+        element: (
+          <ProtectedRole permissions={['documents.view']}>
+            <DocumentDetailsPage />
+          </ProtectedRole>
+        ),
       },
       {
         path: "users",
         element: (
-          <ProtectedRole allowedRoles={['admin']}>
+          <ProtectedRole permissions={['users.view', 'users.manage']}>
             <UserPage />
+          </ProtectedRole>
+        ),
+      },
+      {
+        path: "roles",
+        element: (
+          <ProtectedRole permissions={['roles.view', 'roles.manage']}>
+            <RolesPage />
           </ProtectedRole>
         ),
       },
@@ -72,11 +101,19 @@ export const router = createBrowserRouter([
       },
       {
         path: "docs/new",
-        element: <NewDocsPage />,
+        element: (
+          <ProtectedRole permissions={['documents.create']}>
+            <NewDocsPage />
+          </ProtectedRole>
+        ),
       },
       {
         path: "notifications",
-        element: <NotificationsPage />,
+        element: (
+          <ProtectedRole permissions={['notifications.view']}>
+            <NotificationsPage />
+          </ProtectedRole>
+        ),
       }
     ],
   },
