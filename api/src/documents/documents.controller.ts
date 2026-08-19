@@ -27,7 +27,6 @@ import { PermissionsGuard } from '../auth/guards/permissions.guard';
 import { Permissions } from '../auth/decorators/permissions.decorator';
 import { PERMISSIONS } from '../roles/permissions';
 import { documentUploadOptions } from './config/file-upload.config';
-import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('documents')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
@@ -65,8 +64,8 @@ export class DocumentsController {
   }
 
   @Get('activities')
-  async getRecentActivities() {
-    return this.documentsService.getRecentActivities();
+  async getRecentActivities(@Req() req: any) {
+    return this.documentsService.getRecentActivities(5, req.user);
   }
 
   @Get('years')
@@ -108,9 +107,10 @@ export class DocumentsController {
   async downloadAttachment(
     @Param('id', ParseIntPipe) id: number,
     @Res() res: Response,
+    @Req() req: any,
   ) {
     const { filePath, fileName } =
-      await this.documentsService.getAttachmentFile(id);
+      await this.documentsService.getAttachmentFile(id, req.user);
     res.download(filePath, fileName);
   }
 
@@ -147,7 +147,7 @@ export class DocumentsController {
     return document;
   }
 
-  @Public()
+  @Permissions(PERMISSIONS.DOCUMENTS_DOWNLOAD)
   @Get(':id/download')
   async download(
     @Param('id', ParseIntPipe) id: number,
@@ -155,12 +155,11 @@ export class DocumentsController {
     @Req() req: any,
   ) {
     const document = await this.documentsService.findOne(id);
+    this.documentsService.assertRoleScope(document, req.user);
 
-    if (req.user) {
-      await this.documentsService
-        .recordView(id, req.user)
-        .catch((err) => console.error('View record error:', err));
-    }
+    await this.documentsService
+      .recordView(id, req.user)
+      .catch((err) => console.error('View record error:', err));
 
     const filePath = path.resolve(document.filePath);
     if (!fs.existsSync(filePath)) {
@@ -170,12 +169,18 @@ export class DocumentsController {
     res.download(filePath, document.fileName);
   }
 
-  @Public()
+  @Permissions(PERMISSIONS.DOCUMENTS_DOWNLOAD)
   @Get(':id/download-zip')
   async downloadZip(
     @Param('id', ParseIntPipe) id: number,
     @Res() res: Response,
+    @Req() req: any,
   ) {
+    this.documentsService.assertRoleScope(
+      await this.documentsService.findOne(id),
+      req.user,
+    );
+
     const { zipPath, zipFileName } =
       await this.documentsService.createSingleDocumentZip(id);
 
@@ -195,9 +200,10 @@ export class DocumentsController {
   @Get(':id/views')
   async getViewHistory(
     @Param('id', ParseIntPipe) id: number,
+    @Req() req: any,
     @Query('search') search?: string,
   ) {
-    return this.documentsService.getViewHistory(id, search);
+    return this.documentsService.getViewHistory(id, search, req.user);
   }
 
   @Permissions(PERMISSIONS.DOCUMENTS_UPDATE)
@@ -213,8 +219,8 @@ export class DocumentsController {
   }
 
   @Get(':id/versions')
-  async getVersions(@Param('id', ParseIntPipe) id: number) {
-    return this.documentsService.getVersions(id);
+  async getVersions(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
+    return this.documentsService.getVersions(id, req.user);
   }
 
   @Permissions(PERMISSIONS.DOCUMENTS_DOWNLOAD)
@@ -222,9 +228,10 @@ export class DocumentsController {
   async downloadVersion(
     @Param('id', ParseIntPipe) id: number,
     @Res() res: Response,
+    @Req() req: any,
   ) {
     const { filePath, fileName } =
-      await this.documentsService.getVersionFile(id);
+      await this.documentsService.getVersionFile(id, req.user);
 
     res.download(filePath, fileName, (err) => {
       if (err) {
@@ -249,16 +256,21 @@ export class DocumentsController {
     return this.documentsService.markAsRead(id, req.user);
   }
 
+  @Permissions(PERMISSIONS.DOCUMENTS_DOWNLOAD)
   @Post(':id/share')
-  async getShareLink(@Param('id', ParseIntPipe) id: number) {
-    return this.documentsService.getPublicShareLink(id);
+  async getShareLink(@Param('id', ParseIntPipe) id: number, @Req() req: any) {
+    return this.documentsService.getPublicShareLink(id, req.user);
   }
 
   @Permissions(PERMISSIONS.DOCUMENTS_DOWNLOAD)
   @Post('bulk-download')
-  async bulkDownload(@Body('ids') ids: number[], @Res() res: Response) {
+  async bulkDownload(
+    @Body('ids') ids: number[],
+    @Res() res: Response,
+    @Req() req: any,
+  ) {
     const { zipPath, zipFileName } =
-      await this.documentsService.createBulkDownloadZip(ids);
+      await this.documentsService.createBulkDownloadZip(ids, req.user);
 
     res.download(zipPath, zipFileName, (err) => {
       if (err) {

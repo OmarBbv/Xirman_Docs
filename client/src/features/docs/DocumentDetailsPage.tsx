@@ -9,6 +9,7 @@ import { useTranslations, useLocale } from "use-intl";
 import { documentService } from "../services/documentServices";
 import { message } from "antd";
 import { DocumentPreviewModal } from "../ui/DocumentPreviewModal";
+import { useAuth } from "../../context/AuthContext";
 import type { DocumentAttachment } from "../types/document.types";
 
 export default function DocumentDetailsPage() {
@@ -18,6 +19,8 @@ export default function DocumentDetailsPage() {
   const [viewSearch, setViewSearch] = useState("");
   const debouncedSearch = useDebounce(viewSearch, 500);
   const [showHistory, setShowHistory] = useState(false);
+  const { hasPermission } = useAuth();
+  const canUpdate = hasPermission('documents.update');
   const t = useTranslations('DocumentDetailsPage');
   const tCommon = useTranslations('DocumentsPage');
   const locale = useLocale();
@@ -296,13 +299,15 @@ export default function DocumentDetailsPage() {
                     >
                       <DownloadOutlined className="text-lg text-[#2271b1]" />
                     </button>
-                    <button
-                      onClick={handleMainFileClick}
-                      className="w-9 h-9 flex items-center justify-center rounded-lg bg-white border border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer"
-                      title="Yeni versiya yüklə"
-                    >
-                      <UploadOutlined className="text-lg text-[#2271b1]" />
-                    </button>
+                    {canUpdate && (
+                      <button
+                        onClick={handleMainFileClick}
+                        className="w-9 h-9 flex items-center justify-center rounded-lg bg-white border border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer"
+                        title="Yeni versiya yüklə"
+                      >
+                        <UploadOutlined className="text-lg text-[#2271b1]" />
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -357,13 +362,15 @@ export default function DocumentDetailsPage() {
                           >
                             <DownloadOutlined className="text-gray-500 hover:text-[#2271b1]" />
                           </button>
-                          <button
-                            onClick={(e) => handleAttachmentClick(attachment.id, e)}
-                            className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors cursor-pointer"
-                            title="Yeni versiya yüklə"
-                          >
-                            <UploadOutlined className="text-gray-500 hover:text-[#2271b1]" />
-                          </button>
+                          {canUpdate && (
+                            <button
+                              onClick={(e) => handleAttachmentClick(attachment.id, e)}
+                              className="w-8 h-8 flex items-center justify-center rounded hover:bg-gray-200 transition-colors cursor-pointer"
+                              title="Yeni versiya yüklə"
+                            >
+                              <UploadOutlined className="text-gray-500 hover:text-[#2271b1]" />
+                            </button>
+                          )}
                         </div>
                       </div>
                     ))}
@@ -403,16 +410,18 @@ export default function DocumentDetailsPage() {
                     className="hidden"
                     onChange={handleAddAttachmentUpload}
                   />
-                  <AntButton
-                    icon={<UploadOutlined />}
-                    size="small"
-                    loading={addAttachment.isPending}
-                    onClick={() => addAttachmentInputRef.current?.click()}
-                    type="default"
-                    className="text-xs"
-                  >
-                    {t('file.uploadNew')}
-                  </AntButton>
+                  {canUpdate && (
+                    <AntButton
+                      icon={<UploadOutlined />}
+                      size="small"
+                      loading={addAttachment.isPending}
+                      onClick={() => addAttachmentInputRef.current?.click()}
+                      type="default"
+                      className="text-xs"
+                    >
+                      {t('file.uploadNew')}
+                    </AntButton>
+                  )}
 
                   <AntButton
                     icon={<ShareAltOutlined />}

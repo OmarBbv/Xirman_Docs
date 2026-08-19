@@ -14,6 +14,15 @@ import {
   useRoles, useRoleCatalog, useCreateRole, useUpdateRole, useDeleteRole,
 } from "../hooks/roleHooks";
 import type { Role } from "../services/roleService";
+
+interface RoleFormValues {
+  name: string;
+  displayName: string;
+  description?: string;
+  permissions?: string[];
+  allowedDepartments?: string[];
+  allowedDocumentTypes?: string[];
+}
 import { useAuth } from "../../context/AuthContext";
 
 export default function RolesPage() {
@@ -79,7 +88,7 @@ export default function RolesPage() {
     form.resetFields();
   };
 
-  const handleSave = (values: any) => {
+  const handleSave = (values: RoleFormValues) => {
     const payload = {
       displayName: values.displayName,
       description: values.description || undefined,

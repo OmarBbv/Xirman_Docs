@@ -29,10 +29,11 @@ export const useDocumentStats = () => {
   });
 };
 
-export const useDocuments = (filters?: FilterDocumentDto) => {
+export const useDocuments = (filters?: FilterDocumentDto, enabled = true) => {
   return useQuery({
     queryKey: documentKeys.list(filters || {}),
     queryFn: () => documentService.getAll(filters),
+    enabled,
   });
 };
 

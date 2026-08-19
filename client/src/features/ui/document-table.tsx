@@ -108,7 +108,7 @@ export const DocumentTable = ({
   onSelectionChange
 }: DocumentTableProps) => {
   const t = useTranslations('DocumentsPage');
-  const { user } = useAuth();
+  const { hasPermission } = useAuth();
 
   const [previewDocument, setPreviewDocument] = useState<Document | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -266,7 +266,7 @@ export const DocumentTable = ({
                   onShare?.(record.id);
                 },
               },
-              ...(user?.role === 'admin' ? [
+              ...(hasPermission('documents.update') ? [
                 {
                   key: 'edit',
                   label: "Düzəliş et",
@@ -277,6 +277,8 @@ export const DocumentTable = ({
                     setIsEditOpen(true);
                   },
                 },
+              ] : []),
+              ...(hasPermission('documents.delete') ? [
                 {
                   type: 'divider',
                 },
@@ -429,7 +431,7 @@ export const DocumentTable = ({
                             setIsEditOpen(true);
                           },
                         },
-                        ...(user?.role === 'admin' ? [
+                        ...(hasPermission('documents.delete') ? [
                           {
                             key: 'delete',
                             label: t('table.delete'),

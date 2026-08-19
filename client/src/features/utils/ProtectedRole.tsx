@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Navigate, Outlet } from "react-router-dom";
+import { Spin } from "antd";
 import { useAuth } from "../../context/AuthContext";
 
 interface ProtectedRoleProps {
@@ -15,7 +16,15 @@ export const ProtectedRole = ({
   permissions = [],
   children,
 }: ProtectedRoleProps) => {
-  const { user, isAuthenticated, hasPermission } = useAuth();
+  const { user, isAuthenticated, isLoading, hasPermission } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <Spin size="large" />
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;

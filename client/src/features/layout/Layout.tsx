@@ -27,12 +27,15 @@ export default function Layout() {
   const day = String(today.getDate()).padStart(2, '0');
   const dateString = `${year}-${month}-${day}`;
 
-  const { data: notificationsData } = useDocuments({
-    page: 1,
-    limit: 5,
-    startDate: dateString,
-    excludeRead: true,
-  });
+  const { data: notificationsData } = useDocuments(
+    {
+      page: 1,
+      limit: 5,
+      startDate: dateString,
+      excludeRead: true,
+    },
+    hasPermission('documents.view')
+  );
 
   useEffect(() => {
     setMobileMenuOpen(false);

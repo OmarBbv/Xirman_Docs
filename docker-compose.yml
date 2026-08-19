@@ -10,7 +10,8 @@ services:
       TZ: Asia/Baku
       PGTZ: Asia/Baku
     ports:
-      - "${DB_PORT:-5432}:5432"
+      # Yalnız lokal host-a bind: baza internetə açılmır.
+      - "127.0.0.1:${DB_PORT:-5432}:5432"
     volumes:
       - xirman_docs_pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -25,7 +26,7 @@ services:
     restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes"]
     ports:
-      - "${REDIS_PORT:-6379}:6379"
+      - "127.0.0.1:${REDIS_PORT:-6379}:6379"
     volumes:
       - xirman_docs_redisdata:/data
     healthcheck:

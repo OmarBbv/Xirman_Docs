@@ -7,7 +7,10 @@ import {
   Param,
   Delete,
   Query,
+  Req,
   UseGuards,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -19,6 +22,8 @@ import { PERMISSIONS } from '../roles/permissions';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
+// Layihədə qlobal ValidationPipe yoxdur — DTO-lar burada yoxlanılır.
+@UsePipes(new ValidationPipe({ whitelist: true, transform: true }))
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -30,8 +35,8 @@ export class UsersController {
 
   @Post('admin')
   @Permissions(PERMISSIONS.USERS_MANAGE)
-  createByAdmin(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.createByAdmin(createUserDto);
+  createByAdmin(@Body() createUserDto: CreateUserDto, @Req() req: any) {
+    return this.usersService.createByAdmin(createUserDto, req.user);
   }
 
   @Get()
@@ -48,13 +53,17 @@ export class UsersController {
 
   @Patch(':id')
   @Permissions(PERMISSIONS.USERS_MANAGE)
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @Req() req: any,
+  ) {
+    return this.usersService.update(+id, updateUserDto, req.user);
   }
 
   @Delete(':id')
   @Permissions(PERMISSIONS.USERS_MANAGE)
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  remove(@Param('id') id: string, @Req() req: any) {
+    return this.usersService.remove(+id, req.user);
   }
 }

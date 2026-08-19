@@ -2,6 +2,7 @@ import {
   Injectable,
   ConflictException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like } from 'typeorm';
@@ -23,8 +24,11 @@ export class UsersService {
     private rolesService: RolesService,
   ) {}
 
-  /** Verilmiş rol açarının roles cədvəlində mövcud olduğunu yoxlayır. */
-  private async resolveRole(role?: string): Promise<string> {
+  /**
+   * Rol açarının mövcudluğunu yoxlayır və eskalasiyanın qarşısını alır:
+   * yalnız admin `admin` rolunu təyin edə bilər.
+   */
+  private async resolveRole(role?: string, actor?: any): Promise<string> {
     if (!role) {
       return SYSTEM_ROLES.USER;
     }
@@ -32,6 +36,12 @@ export class UsersService {
     if (!found) {
       throw new BadRequestException(`"${role}" adlı rol tapılmadı`);
     }
+
+    const isAdmin = !actor || actor.role === SYSTEM_ROLES.ADMIN;
+    if (!isAdmin && found.name === SYSTEM_ROLES.ADMIN) {
+      throw new ForbiddenException('Admin rolunu yalnız admin təyin edə bilər');
+    }
+
     return found.name;
   }
 
@@ -67,15 +77,18 @@ export class UsersService {
     }
   }
 
-  async createByAdmin(createUserDto: CreateUserDto): Promise<User> {
+  async createByAdmin(createUserDto: CreateUserDto, actor?: any): Promise<User> {
+    const { password, role, ...rest } = createUserDto;
+    // Rol yoxlaması try-dan kənardadır ki, konkret xəta mesajı itməsin.
+    const resolvedRole = await this.resolveRole(role, actor);
+
     try {
-      const { password, role, ...rest } = createUserDto;
       const salt = await bcrypt.genSalt();
       const hashedPassword = await bcrypt.hash(password, salt);
 
       const user = this.usersRepository.create({
         ...rest,
-        role: await this.resolveRole(role),
+        role: resolvedRole,
         password: hashedPassword,
         isVerified: true,
         otpCode: null,
@@ -188,18 +201,42 @@ export class UsersService {
     return this.usersRepository.find({ where: role ? { role } : {} });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
+  async update(id: number, updateUserDto: UpdateUserDto, actor?: any) {
+    const isAdmin = !actor || actor.role === SYSTEM_ROLES.ADMIN;
+
+    if (updateUserDto.role) {
+      // Eskalasiya qarşısı: admin olmayan öz rolunu dəyişə bilməz və
+      // mövcud admin istifadəçisinə toxuna bilməz.
+      if (!isAdmin) {
+        if (actor.userId === id) {
+          throw new ForbiddenException('Öz rolunuzu dəyişə bilməzsiniz');
+        }
+        const target = await this.findOne(id);
+        if (target?.role === SYSTEM_ROLES.ADMIN) {
+          throw new ForbiddenException('Admin istifadəçisini dəyişə bilməzsiniz');
+        }
+      }
+      updateUserDto.role = await this.resolveRole(updateUserDto.role, actor);
+    }
+
     if (updateUserDto.password) {
       const salt = await bcrypt.genSalt();
       updateUserDto.password = await bcrypt.hash(updateUserDto.password, salt);
     }
-    if (updateUserDto.role) {
-      updateUserDto.role = await this.resolveRole(updateUserDto.role);
-    }
+
     return this.usersRepository.update(id, updateUserDto);
   }
 
-  remove(id: number) {
+  async remove(id: number, actor?: any) {
+    const isAdmin = !actor || actor.role === SYSTEM_ROLES.ADMIN;
+
+    if (!isAdmin) {
+      const target = await this.findOne(id);
+      if (target?.role === SYSTEM_ROLES.ADMIN) {
+        throw new ForbiddenException('Admin istifadəçisi silinə bilməz');
+      }
+    }
+
     return this.usersRepository.delete(id);
   }
 

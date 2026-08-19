@@ -67,6 +67,40 @@ export class DocumentsService {
     }
   }
 
+  /**
+   * `documents.view_all` icazəsi olan rol vəzifə (allowedPositions) filtrindən
+   * azaddır — admin kimi bütün sənədləri görür. Şöbə/növ əhatəsi yenə tətbiq olunur.
+   */
+  private bypassesPositionFilter(user?: any): boolean {
+    if (!user) return false;
+    if (user.role === SYSTEM_ROLES.ADMIN) return true;
+    return (user.permissions ?? []).includes('documents.view_all');
+  }
+
+  /** Şöbə/növ dəyərlərinin rolun əhatəsinə düşdüyünü yoxlayır (yazı əməliyyatları üçün). */
+  private assertScopeValues(
+    department: string | undefined,
+    documentType: string | undefined,
+    user?: any,
+  ): void {
+    if (!user || user.role === SYSTEM_ROLES.ADMIN) {
+      return;
+    }
+
+    const departments: string[] = user.allowedDepartments ?? [];
+    if (
+      departments.length > 0 &&
+      !departments.includes(department ?? Department.OTHER_SERVICE)
+    ) {
+      throw new ForbiddenException('Bu şöbə üçün icazəniz yoxdur');
+    }
+
+    const types: string[] = user.allowedDocumentTypes ?? [];
+    if (documentType && types.length > 0 && !types.includes(documentType)) {
+      throw new ForbiddenException('Bu sənəd növü üçün icazəniz yoxdur');
+    }
+  }
+
   /** Tək sənəd üçün rol əhatəsini yoxlayır (siyahı sorğularının qarşılığı). */
   assertRoleScope(document: Document, user?: any): void {
     if (!user || user.role === SYSTEM_ROLES.ADMIN) {
@@ -103,6 +137,12 @@ export class DocumentsService {
     if (!files || files.length === 0) {
       throw new BadRequestException('Ən azı bir fayl yüklənməlidir');
     }
+
+    this.assertScopeValues(
+      createDocumentDto.department,
+      createDocumentDto.documentType,
+      user,
+    );
 
     const mainFile = files[0];
     const attachmentFiles = files.slice(1);
@@ -208,7 +248,7 @@ export class DocumentsService {
       .leftJoinAndSelect('document.updatedBy', 'updatedBy')
       .orderBy('document.uploadedAt', 'DESC');
 
-    if (user && user.role !== 'admin') {
+    if (user && !this.bypassesPositionFilter(user)) {
       const userPosition = user.position || user['position'];
       if (userPosition) {
         queryBuilder.andWhere(
@@ -334,7 +374,7 @@ export class DocumentsService {
     const baseQueryBuilder = () => {
       const qb = this.documentRepository.createQueryBuilder('document');
 
-      if (user && user.role !== 'admin') {
+      if (user && !this.bypassesPositionFilter(user)) {
         const userPosition = user.position || user['position'];
         if (userPosition) {
           qb.andWhere(
@@ -387,12 +427,29 @@ export class DocumentsService {
     };
   }
 
-  async getRecentActivities(limit: number = 5) {
-    return this.documentViewRepository.find({
+  async getRecentActivities(limit: number = 5, user?: any) {
+    const activities = await this.documentViewRepository.find({
       order: { viewedAt: 'DESC' },
-      take: limit,
+      take: user && user.role !== SYSTEM_ROLES.ADMIN ? limit * 5 : limit,
       relations: ['viewedBy', 'document'],
     });
+
+    if (!user || user.role === SYSTEM_ROLES.ADMIN) {
+      return activities;
+    }
+
+    // Əhatədən kənar sənədlərin fəaliyyəti göstərilmir.
+    return activities
+      .filter((activity) => {
+        if (!activity.document) return false;
+        try {
+          this.assertRoleScope(activity.document, user);
+          return true;
+        } catch {
+          return false;
+        }
+      })
+      .slice(0, limit);
   }
 
   async getDocumentYears(
@@ -405,7 +462,7 @@ export class DocumentsService {
       .select('EXTRACT(YEAR FROM document.documentDate)', 'year')
       .addSelect('COUNT(*)', 'count');
 
-    if (user && user.role !== 'admin') {
+    if (user && !this.bypassesPositionFilter(user)) {
       const userPosition = user.position || user['position'];
       if (userPosition) {
         qb.where(
@@ -439,7 +496,7 @@ export class DocumentsService {
       .addSelect('COUNT(*)', 'count')
       .where('EXTRACT(YEAR FROM document.documentDate) = :year', { year });
 
-    if (user && user.role !== 'admin') {
+    if (user && !this.bypassesPositionFilter(user)) {
       const userPosition = user.position || user['position'];
       if (userPosition) {
         qb.andWhere(
@@ -473,7 +530,7 @@ export class DocumentsService {
       .addSelect('COUNT(*)', 'count')
       .where('EXTRACT(YEAR FROM document.documentDate) = :year', { year });
 
-    if (user && user.role !== 'admin') {
+    if (user && !this.bypassesPositionFilter(user)) {
       const userPosition = user.position || user['position'];
       if (userPosition) {
         qb.andWhere(
@@ -519,7 +576,7 @@ export class DocumentsService {
       qb.andWhere('document.department = :department', { department });
     }
 
-    if (user && user.role !== 'admin') {
+    if (user && !this.bypassesPositionFilter(user)) {
       const userPosition = user.position || user['position'];
       if (userPosition) {
         qb.andWhere(
@@ -577,8 +634,9 @@ export class DocumentsService {
   async getViewHistory(
     documentId: number,
     search?: string,
+    user?: any,
   ): Promise<DocumentView[]> {
-    await this.findOne(documentId);
+    this.assertRoleScope(await this.findOne(documentId), user);
 
     const query = this.documentViewRepository
       .createQueryBuilder('view')
@@ -603,6 +661,7 @@ export class DocumentsService {
     file?: Express.Multer.File,
   ): Promise<Document> {
     const document = await this.findOne(id);
+    this.assertRoleScope(document, user);
     const userId = user['userId'] || user.id;
 
     if (file) {
@@ -683,7 +742,10 @@ export class DocumentsService {
     return this.documentRepository.save(document);
   }
 
-  async getVersions(id: number): Promise<DocumentVersion[]> {
+  async getVersions(id: number, user?: any): Promise<DocumentVersion[]> {
+    if (user) {
+      this.assertRoleScope(await this.findOne(id), user);
+    }
     return this.documentVersionRepository.find({
       where: { documentId: id },
       order: { version: 'DESC' },
@@ -771,6 +833,7 @@ export class DocumentsService {
 
   async getVersionFile(
     id: number,
+    user?: any,
   ): Promise<{ filePath: string; fileName: string }> {
     const version = await this.documentVersionRepository.findOne({
       where: { id },
@@ -778,6 +841,10 @@ export class DocumentsService {
 
     if (!version) {
       throw new NotFoundException(`Versiya tapılmadı: ${id}`);
+    }
+
+    if (user) {
+      this.assertRoleScope(await this.findOne(version.documentId), user);
     }
 
     if (!fs.existsSync(version.filePath)) {
@@ -788,6 +855,7 @@ export class DocumentsService {
   }
 
   async markAsRead(id: number, user: User) {
+    this.assertRoleScope(await this.findOne(id), user);
     const userId = user['userId'] || user.id;
     const exists = await this.documentReadRepository.findOne({
       where: { documentId: id, userId },
@@ -802,12 +870,14 @@ export class DocumentsService {
     return { success: true };
   }
 
-  async getPublicShareLink(id: number) {
+  async getPublicShareLink(id: number, user?: any) {
     const document = await this.findOne(id);
 
     if (!document) {
       throw new NotFoundException('Sənəd tapılmadı');
     }
+
+    this.assertRoleScope(document, user);
 
     const baseUrl = process.env.BACKEND_URL || 'http://localhost:3000';
     const hasAttachments =
@@ -833,6 +903,7 @@ export class DocumentsService {
 
   async getAttachmentFile(
     id: number,
+    user?: any,
   ): Promise<{ filePath: string; fileName: string }> {
     const attachment = await this.documentAttachmentRepository.findOne({
       where: { id },
@@ -840,6 +911,10 @@ export class DocumentsService {
 
     if (!attachment) {
       throw new NotFoundException(`Əlavə fayl tapılmadı: ${id}`);
+    }
+
+    if (user) {
+      this.assertRoleScope(await this.findOne(attachment.documentId), user);
     }
 
     if (!fs.existsSync(attachment.filePath)) {
@@ -866,6 +941,8 @@ export class DocumentsService {
     if (!attachment) {
       throw new NotFoundException(`Əlavə fayl tapılmadı: ${id}`);
     }
+
+    this.assertRoleScope(attachment.document, user);
 
     const ext = file.originalname.split('.').pop() || '';
 
@@ -901,6 +978,8 @@ export class DocumentsService {
     if (!document) {
       throw new NotFoundException(`Sənəd tapılmadı: ${documentId}`);
     }
+
+    this.assertRoleScope(document, user);
 
     const ext = file.originalname.split('.').pop() || '';
     const userId = user['userId'] || user.id;
@@ -982,6 +1061,7 @@ export class DocumentsService {
 
   async createBulkDownloadZip(
     ids: number[],
+    user?: any,
   ): Promise<{ zipPath: string; zipFileName: string }> {
     if (!ids || ids.length === 0) {
       throw new BadRequestException('Ən azı bir sənəd seçilməlidir');
@@ -991,6 +1071,8 @@ export class DocumentsService {
       ids.map(async (id) => {
         try {
           const doc = await this.findOne(id);
+          // Rol əhatəsindən kənar sənədlər arxivə düşmür.
+          this.assertRoleScope(doc, user);
           const versions = await this.getVersions(id);
           const latestVersion = versions[0];
 

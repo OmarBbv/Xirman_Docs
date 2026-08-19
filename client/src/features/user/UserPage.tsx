@@ -6,6 +6,7 @@ import { useTranslations } from "use-intl";
 import type { ColumnsType } from 'antd/es/table';
 import { useUsers, useDeleteUser, useCreateUser, useUpdateUser } from "../hooks/userHooks";
 import { useRoles } from "../hooks/roleHooks";
+import { useAuth } from "../../context/AuthContext";
 import type { User } from "../services/userService";
 import {
   UserOutlined,
@@ -25,6 +26,7 @@ import {
 
 export default function UserPage() {
   const t = useTranslations("UserPage");
+  const { hasPermission } = useAuth();
   const deleteUser = useDeleteUser();
   const createUser = useCreateUser();
   const updateUser = useUpdateUser();
@@ -43,7 +45,7 @@ export default function UserPage() {
   }, [searchText]);
 
   const { data: users, isLoading } = useUsers(debouncedSearchText, roleFilter);
-  const { data: roles } = useRoles();
+  const { data: roles } = useRoles(hasPermission("roles.view", "roles.manage"));
 
   // Rollar artıq bazadan gəlir — admin yeni rol yaradanda burada avtomatik görünür.
   const roleOptions = (roles ?? []).map((role) => ({

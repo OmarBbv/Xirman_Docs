@@ -1,6 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { message } from "antd";
+import { AxiosError } from "axios";
 import { roleService, type RolePayload } from "../services/roleService";
+
+/** Backend xəta cavabından oxunaqlı mesaj çıxarır. */
+const errorMessage = (error: unknown) => {
+  const detail = (error as AxiosError<{ message?: string | string[] }>).response
+    ?.data?.message;
+  if (Array.isArray(detail)) return detail.join(", ");
+  return detail || "Xəta baş verdi";
+};
 
 export const roleKeys = {
   all: ["roles"] as const,
@@ -34,8 +43,8 @@ export const useCreateRole = () => {
       message.success("Rol yaradıldı");
       invalidate(queryClient);
     },
-    onError: (error: any) => {
-      message.error(error.response?.data?.message || "Xəta baş verdi");
+    onError: (error: unknown) => {
+      message.error(errorMessage(error));
     },
   });
 };
@@ -49,8 +58,8 @@ export const useUpdateRole = () => {
       message.success("Rol yeniləndi");
       invalidate(queryClient);
     },
-    onError: (error: any) => {
-      message.error(error.response?.data?.message || "Xəta baş verdi");
+    onError: (error: unknown) => {
+      message.error(errorMessage(error));
     },
   });
 };
@@ -63,8 +72,8 @@ export const useDeleteRole = () => {
       message.success("Rol silindi");
       invalidate(queryClient);
     },
-    onError: (error: any) => {
-      message.error(error.response?.data?.message || "Xəta baş verdi");
+    onError: (error: unknown) => {
+      message.error(errorMessage(error));
     },
   });
 };

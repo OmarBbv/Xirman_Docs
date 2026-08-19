@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   ParseIntPipe,
+  Req,
   UseGuards,
   UsePipes,
   ValidationPipe,
@@ -56,8 +57,9 @@ export class RolesController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateRoleDto: UpdateRoleDto,
+    @Req() req: any,
   ) {
-    return this.rolesService.update(id, updateRoleDto);
+    return this.rolesService.update(id, updateRoleDto, req.user);
   }
 
   @Delete(':id')

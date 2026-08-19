@@ -3,6 +3,7 @@ import {
   ConflictException,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -18,6 +19,12 @@ import {
   SYSTEM_ROLES,
 } from './permissions';
 import { Department, DocumentType } from '../documents/enums/document-enums';
+
+/** "user" rolundan silinməsi qadağan olan minimum icazələr. */
+const MINIMUM_USER_PERMISSIONS: string[] = [
+  PERMISSIONS.DOCUMENTS_VIEW,
+  PERMISSIONS.SETTINGS_VIEW,
+];
 
 @Injectable()
 export class RolesService {
@@ -83,13 +90,49 @@ export class RolesService {
     return this.rolesRepository.save(role);
   }
 
-  async update(id: number, updateRoleDto: UpdateRoleDto): Promise<Role> {
+  async update(
+    id: number,
+    updateRoleDto: UpdateRoleDto,
+    actor?: any,
+  ): Promise<Role> {
     const role = await this.findOne(id);
 
     if (role.name === SYSTEM_ROLES.ADMIN) {
       throw new BadRequestException(
         'Admin rolunun icazələri dəyişdirilə bilməz',
       );
+    }
+
+    const isAdmin = !actor || actor.role === SYSTEM_ROLES.ADMIN;
+
+    if (!isAdmin) {
+      // Eskalasiya qarşısı: istifadəçi öz rolunu redaktə edə bilməz.
+      if (actor.role === role.name) {
+        throw new ForbiddenException('Öz rolunuzu redaktə edə bilməzsiniz');
+      }
+
+      // Eskalasiya qarşısı: özündə olmayan icazəni başqasına verə bilməz.
+      const own: string[] = actor.permissions ?? [];
+      const granting = updateRoleDto.permissions ?? [];
+      const escalating = granting.filter((p) => !own.includes(p));
+      if (escalating.length > 0) {
+        throw new ForbiddenException(
+          `Özünüzdə olmayan icazəni verə bilməzsiniz: ${escalating.join(', ')}`,
+        );
+      }
+    }
+
+    // `user` sistem rolu heç vaxt minimum icazələrdən məhrum edilə bilməz —
+    // əks halda bütün adi istifadəçilər dərhal kilidlənərdi.
+    if (role.name === SYSTEM_ROLES.USER && updateRoleDto.permissions) {
+      const missing = MINIMUM_USER_PERMISSIONS.filter(
+        (p) => !updateRoleDto.permissions!.includes(p),
+      );
+      if (missing.length > 0) {
+        throw new BadRequestException(
+          `"user" rolundan bu icazələr silinə bilməz: ${missing.join(', ')}`,
+        );
+      }
     }
 
     Object.assign(role, updateRoleDto);
@@ -129,9 +172,12 @@ export class RolesService {
         name: SYSTEM_ROLES.USER,
         displayName: 'İstifadəçi',
         description: 'Standart istifadəçi',
+        // Rol sistemindən əvvəlki davranış: hər loginli istifadəçi sənədi
+        // görə, yarada, redaktə edə və yükləyə bilirdi.
         permissions: [
           PERMISSIONS.DOCUMENTS_VIEW,
           PERMISSIONS.DOCUMENTS_CREATE,
+          PERMISSIONS.DOCUMENTS_UPDATE,
           PERMISSIONS.DOCUMENTS_DOWNLOAD,
           PERMISSIONS.NOTIFICATIONS_VIEW,
           PERMISSIONS.SETTINGS_VIEW,
@@ -142,15 +188,20 @@ export class RolesService {
     for (const def of defaults) {
       const existing = await this.findByName(def.name);
       if (!existing) {
-        await this.rolesRepository.save(
-          this.rolesRepository.create({
-            ...def,
-            allowedDepartments: [],
-            allowedDocumentTypes: [],
-            isSystem: true,
-          }),
-        );
-        console.log(`Rol yaradıldı: ${def.name}`);
+        try {
+          await this.rolesRepository.save(
+            this.rolesRepository.create({
+              ...def,
+              allowedDepartments: [],
+              allowedDocumentTypes: [],
+              isSystem: true,
+            }),
+          );
+          console.log(`Rol yaradıldı: ${def.name}`);
+        } catch (error) {
+          // Çoxinstansiyalı start: başqa instansiya artıq yaradıbsa keç.
+          if (error.code !== '23505') throw error;
+        }
       } else if (def.name === SYSTEM_ROLES.ADMIN) {
         // Yeni icazələr əlavə olunanda admin həmişə hamısına sahib olsun.
         existing.permissions = ALL_PERMISSIONS;
@@ -173,11 +224,12 @@ export class RolesService {
       .getRawMany<{ role: string }>();
 
     for (const { role } of used) {
-      if (!role || (await this.findByName(role))) {
+      if (!role || !role.trim() || (await this.findByName(role))) {
         continue;
       }
 
-      await this.rolesRepository.save(
+      try {
+        await this.rolesRepository.save(
         this.rolesRepository.create({
           name: role,
           displayName: role,
@@ -194,8 +246,11 @@ export class RolesService {
           allowedDocumentTypes: [],
           isSystem: false,
         }),
-      );
-      console.log(`Köhnə rol köçürüldü: ${role}`);
+        );
+        console.log(`Köhnə rol köçürüldü: ${role}`);
+      } catch (error) {
+        if (error.code !== '23505') throw error;
+      }
     }
   }
 }

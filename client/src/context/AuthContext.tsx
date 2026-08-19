@@ -48,17 +48,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const storedUser = localStorage.getItem("user");
     const token = localStorage.getItem("token");
 
-    if (storedUser && token) {
-      try {
-        setUser(JSON.parse(storedUser));
-      } catch (error) {
-        console.error("User restoration error:", error);
-        localStorage.removeItem("user");
-        localStorage.removeItem("token");
-      }
-      void refreshUser();
+    if (!storedUser || !token) {
+      setIsLoading(false);
+      return;
     }
-    setIsLoading(false);
+
+    try {
+      setUser(JSON.parse(storedUser));
+    } catch (error) {
+      console.error("User restoration error:", error);
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
+      setIsLoading(false);
+      return;
+    }
+
+    // Köhnə formatda saxlanmış istifadəçidə `permissions` olmaya bilər —
+    // serverdən aktual icazələr gəlməmiş marşrut qorumasına icazə vermirik,
+    // əks halda istifadəçi yanlışlıqla başqa səhifəyə yönləndirilir.
+    refreshUser().finally(() => setIsLoading(false));
   }, [refreshUser]);
 
   const login = (userData: User, token: string) => {
