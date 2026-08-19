@@ -178,15 +178,17 @@ export default function Layout() {
               <Link to="/dashboard/docs" className="text-[14px] font-bold text-white md:text-[13px] md:font-normal md:text-[#c3c4c7] whitespace-nowrap">{locale === 'ru' ? 'Хирман ЭАС' : 'Xirman EAS'}</Link>
             </div>
 
-            <Popover content={notificationContent} trigger={['hover', 'click']} placement="bottomLeft" overlayClassName="notification-popover">
-              <div className="flex hover:bg-white/10 h-full px-3 items-center cursor-pointer transition-colors space-x-2">
-                <div className="flex items-center justify-center mt-1 md:mt-0">
-                  <svg className="w-5 h-5 md:w-4 md:h-4 text-[#c3c4c7]" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zm-4 0H9v2h2V9z" clipRule="evenodd" /></svg>
+            {hasPermission('notifications.view') && (
+              <Popover content={notificationContent} trigger={['hover', 'click']} placement="bottomLeft" overlayClassName="notification-popover">
+                <div className="flex hover:bg-white/10 h-full px-3 items-center cursor-pointer transition-colors space-x-2">
+                  <div className="flex items-center justify-center mt-1 md:mt-0">
+                    <svg className="w-5 h-5 md:w-4 md:h-4 text-[#c3c4c7]" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zm-4 0H9v2h2V9z" clipRule="evenodd" /></svg>
+                  </div>
+                  <span className="text-[13px] hidden lg:inline">{t('notifications')}</span>
+                  <Badge count={notificationsData?.total || 0} size="small" overflowCount={99} />
                 </div>
-                <span className="text-[13px] hidden lg:inline">{t('notifications')}</span>
-                <Badge count={notificationsData?.total || 0} size="small" overflowCount={99} />
-              </div>
-            </Popover>
+              </Popover>
+            )}
 
           </div>
           <div className="flex items-center gap-2 md:gap-3 h-full px-0 md:px-3">

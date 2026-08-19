@@ -416,7 +416,6 @@ export default function RolesPage() {
                 />
               </Form.Item>
             </div>
-
           </div>
 
           <div className="flex justify-end gap-2 py-4 mt-2 border-t border-gray-100 bg-white">
