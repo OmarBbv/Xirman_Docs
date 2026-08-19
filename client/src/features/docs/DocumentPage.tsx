@@ -17,6 +17,7 @@ import { useTranslations } from "use-intl";
 import { documentService } from "../services/documentServices";
 import { message } from "antd";
 import { FolderBreadcrumb, GenericFolderView } from "../ui/FolderView";
+import { useAuth } from "../../context/AuthContext";
 
 const { RangePicker } = DatePicker;
 
@@ -45,6 +46,7 @@ export default function DocumentPage() {
 
   const [selectionMode, setSelectionMode] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const { hasPermission } = useAuth();
   const [bulkDownloading, setBulkDownloading] = useState(false);
 
   const activeFilterCount = Object.keys(filters).filter(k =>
@@ -270,16 +272,18 @@ export default function DocumentPage() {
             <h1 className="text-xl md:text-3xl font-bold mb-2">{t('title')}</h1>
             <p className="text-blue-100 text-xs md:text-sm">{t('subtitle')}</p>
           </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/dashboard/docs/new')}
-              className="cursor-pointer bg-white text-[#2271b1] px-4 py-2 md:px-5 md:py-2.5 rounded-lg text-sm font-semibold md:shadow-md transition-all flex items-center gap-2 hover:bg-blue-50">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
-              </svg>
-              {t('newDocument')}
-            </button>
-          </div>
+          {hasPermission('documents.create') && (
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => navigate('/dashboard/docs/new')}
+                className="cursor-pointer bg-white text-[#2271b1] px-4 py-2 md:px-5 md:py-2.5 rounded-lg text-sm font-semibold md:shadow-md transition-all flex items-center gap-2 hover:bg-blue-50">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
+                </svg>
+                {t('newDocument')}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -413,7 +417,7 @@ export default function DocumentPage() {
                       {t('table.deselectAll')}
                     </AntButton>
 
-                    {selectedIds.length > 0 && (
+                    {selectedIds.length > 0 && hasPermission('documents.download') && (
                       <AntButton
                         type="primary"
                         icon={<DownloadOutlined />}

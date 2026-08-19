@@ -248,6 +248,7 @@ export const DocumentTable = ({
                   handlePreview(record);
                 },
               },
+              ...(hasPermission('documents.download') ? [
               {
                 key: 'download',
                 label: t('table.download'),
@@ -266,6 +267,7 @@ export const DocumentTable = ({
                   onShare?.(record.id);
                 },
               },
+              ] : []),
               ...(hasPermission('documents.update') ? [
                 {
                   key: 'edit',
@@ -403,6 +405,7 @@ export const DocumentTable = ({
                     trigger={['click']}
                     menu={{
                       items: [
+                        ...(hasPermission('documents.download') ? [
                         {
                           key: 'download',
                           label: t('table.download'),
@@ -421,6 +424,8 @@ export const DocumentTable = ({
                             onShare?.(record.id);
                           },
                         },
+                        ] : []),
+                        ...(hasPermission('documents.update') ? [
                         {
                           key: 'edit',
                           label: "Düzəliş et",
@@ -431,6 +436,7 @@ export const DocumentTable = ({
                             setIsEditOpen(true);
                           },
                         },
+                        ] : []),
                         ...(hasPermission('documents.delete') ? [
                           {
                             key: 'delete',
