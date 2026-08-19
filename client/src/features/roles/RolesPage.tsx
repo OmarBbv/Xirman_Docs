@@ -326,89 +326,100 @@ export default function RolesPage() {
         onCancel={closeModal}
         footer={null}
         width={760}
+        centered
         destroyOnClose
+        styles={{ body: { paddingBottom: 0 } }}
       >
-        <Form form={form} layout="vertical" onFinish={handleSave} className="pt-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Form.Item
-              name="displayName"
-              label={t("form.displayName")}
-              rules={[{ required: true, message: t("form.required") }]}
-            >
-              <Input placeholder={t("form.displayNamePlaceholder")} />
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleSave}
+          className="flex flex-col"
+        >
+          {/* Sahələr modalın içində sürüşür — düymələr həmişə görünən qalır. */}
+          <div className="max-h-[calc(100vh-260px)] overflow-y-auto pt-4 pr-2 -mr-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Form.Item
+                name="displayName"
+                label={t("form.displayName")}
+                rules={[{ required: true, message: t("form.required") }]}
+              >
+                <Input placeholder={t("form.displayNamePlaceholder")} />
+              </Form.Item>
+
+              <Form.Item
+                name="name"
+                label={t("form.key")}
+                tooltip={t("form.keyHint")}
+                rules={[
+                  { required: !editing, message: t("form.required") },
+                  { pattern: /^[a-z0-9_]+$/, message: t("form.keyPattern") },
+                ]}
+              >
+                <Input placeholder="anbardar" disabled={!!editing} />
+              </Form.Item>
+            </div>
+
+            <Form.Item name="description" label={t("form.description")}>
+              <Input.TextArea rows={2} placeholder={t("form.descriptionPlaceholder")} />
             </Form.Item>
 
             <Form.Item
-              name="name"
-              label={t("form.key")}
-              tooltip={t("form.keyHint")}
-              rules={[
-                { required: !editing, message: t("form.required") },
-                { pattern: /^[a-z0-9_]+$/, message: t("form.keyPattern") },
-              ]}
+              name="permissions"
+              label={t("form.permissions")}
+              rules={[{ required: true, message: t("form.permissionsRequired") }]}
             >
-              <Input placeholder="anbardar" disabled={!!editing} />
+              <Checkbox.Group className="w-full">
+                <div className="space-y-3 w-full">
+                  {(catalog?.groups ?? []).map((group) => (
+                    <div key={group.key} className="border border-gray-200 rounded p-3">
+                      <div className="text-xs font-semibold text-gray-500 uppercase mb-2">
+                        {t(`groups.${group.key}` as never)}
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
+                        {group.permissions.map((permission) => (
+                          <Checkbox key={permission} value={permission}>
+                            {permissionLabel(permission)}
+                          </Checkbox>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Checkbox.Group>
             </Form.Item>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <Form.Item
+                name="allowedDepartments"
+                label={t("form.departments")}
+                tooltip={t("form.emptyMeansAll")}
+              >
+                <Select
+                  mode="multiple"
+                  allowClear
+                  placeholder={t("scope.all")}
+                  options={departmentOptions}
+                />
+              </Form.Item>
+
+              <Form.Item
+                name="allowedDocumentTypes"
+                label={t("form.documentTypes")}
+                tooltip={t("form.emptyMeansAll")}
+              >
+                <Select
+                  mode="multiple"
+                  allowClear
+                  placeholder={t("scope.all")}
+                  options={documentTypeOptions}
+                />
+              </Form.Item>
+            </div>
+
           </div>
 
-          <Form.Item name="description" label={t("form.description")}>
-            <Input.TextArea rows={2} placeholder={t("form.descriptionPlaceholder")} />
-          </Form.Item>
-
-          <Form.Item
-            name="permissions"
-            label={t("form.permissions")}
-            rules={[{ required: true, message: t("form.permissionsRequired") }]}
-          >
-            <Checkbox.Group className="w-full">
-              <div className="space-y-3 w-full">
-                {(catalog?.groups ?? []).map((group) => (
-                  <div key={group.key} className="border border-gray-200 rounded p-3">
-                    <div className="text-xs font-semibold text-gray-500 uppercase mb-2">
-                      {t(`groups.${group.key}` as never)}
-                    </div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-1">
-                      {group.permissions.map((permission) => (
-                        <Checkbox key={permission} value={permission}>
-                          {permissionLabel(permission)}
-                        </Checkbox>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Checkbox.Group>
-          </Form.Item>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Form.Item
-              name="allowedDepartments"
-              label={t("form.departments")}
-              tooltip={t("form.emptyMeansAll")}
-            >
-              <Select
-                mode="multiple"
-                allowClear
-                placeholder={t("scope.all")}
-                options={departmentOptions}
-              />
-            </Form.Item>
-
-            <Form.Item
-              name="allowedDocumentTypes"
-              label={t("form.documentTypes")}
-              tooltip={t("form.emptyMeansAll")}
-            >
-              <Select
-                mode="multiple"
-                allowClear
-                placeholder={t("scope.all")}
-                options={documentTypeOptions}
-              />
-            </Form.Item>
-          </div>
-
-          <div className="flex justify-end gap-2 mt-2">
+          <div className="flex justify-end gap-2 py-4 mt-2 border-t border-gray-100 bg-white">
             <Button onClick={closeModal}>{t("form.cancel")}</Button>
             <Button
               type="primary"
