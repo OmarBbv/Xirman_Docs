@@ -1,7 +1,17 @@
 import axios from "axios";
 
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+const getApiBaseUrl = (): string => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  if (typeof window !== "undefined" && window.location.hostname) {
+    return `http://${window.location.hostname}:3000`;
+  }
+  return "http://localhost:3000";
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 export const PUBLIC_API = axios.create({
   baseURL: API_BASE_URL,
